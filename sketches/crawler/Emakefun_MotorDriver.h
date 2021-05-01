@@ -6,7 +6,6 @@
 #include <SPI.h>
 #include "Emakefun_MS_PWMServoDriver.h"
 #include "IRremote.h"
-#include "PS2X_lib.h"  //for v1.6
 #include "Buzzer.h"
 #include "RGBLed.h"
 #include "Sounds.h"
@@ -54,16 +53,8 @@
 #define BUZZER_PIN A0
 #endif
 
-#define PS2_DAT   12
-#define PS2_CMD   11
-#define PS2_SEL   10
-#define PS2_CLK   13
-
 #define NRF24L01_CE 10
 #define NRF24L01_CSN 9
-
-#define NRF_NAME "Tank"
-#define NRF_DATA_LEN 12
 
 #define UL_LIMIT_MIN 16
 #define UL_LIMIT_MID 20
@@ -74,7 +65,7 @@ typedef enum
     E_RGB = 0,
     E_IR = 1,
     E_BUZZER = 2,
-    E_PS2X = 3,
+    // E_PS2X = 3,
     E_NRF24L01 = 4,
 	E_ULTRASONIC = 5,
     E_EXTERN_PIN = 6,
@@ -91,7 +82,6 @@ public:
   Emakefun_Sensor(void);
   friend class Emakefun_MotorDriver;
   IRremote  *mIrRecv;
-  PS2X *mPs2x;
   Buzzer *mBuzzer;
   RGBLed *mRgb;
   Nrf24l *mNrf24L01;
@@ -105,7 +95,6 @@ private:
   uint8_t BuzzerPin;  // Buzzer pin
   uint8_t RgbPin;     // Rgb pin
   uint8_t EchoPin,TrigPin;
-  uint8_t Ps2xClkPin, Ps2xCmdPin, Ps2xAttPin, Ps2xDatPin;    // for Ps2 remoter
   uint8_t P1, P2, P3, P4, P5;    // for Infrared tracing pin
   int GetNrfData,SendNrfData;
   Emakefun_MotorDriver *MC;

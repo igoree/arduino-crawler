@@ -661,12 +661,10 @@ uint8_t Emakefun_StepperMotor::onestep(uint8_t dir, uint8_t style) {
 Emakefun_Sensor::Emakefun_Sensor(void) {
   MC = NULL;
   mIrRecv = NULL;
-  mPs2x = NULL;
   mBuzzer = NULL;
   mRgb = NULL;
   mNrf24L01 = NULL;
   IrPin = BuzzerPin = RgbPin = EchoPin = TrigPin = 0;
-  Ps2xClkPin = Ps2xCmdPin = Ps2xAttPin = Ps2xDatPin = 0;
   P1 = P2 = P3 = P4 = P5 = 0;
 }
 
@@ -880,24 +878,6 @@ void *Emakefun_MotorDriver::getSensor(E_SENSOR_INDEX n)
     }
     return sensors.mBuzzer;
   }
-  if (n == E_PS2X) {
-    // Serial.println("E_PS2X in");
-    int error = 0;
-    if (sensors.mPs2x == NULL) {
-      sensors.mPs2x = new PS2X();
-      sensors.Ps2xClkPin = PS2_CLK;
-      sensors.Ps2xCmdPin = PS2_CMD;
-      sensors.Ps2xAttPin = PS2_SEL;
-      sensors.Ps2xDatPin = PS2_DAT;
-      error = sensors.mPs2x->config_gamepad(PS2_CLK, PS2_CMD, PS2_SEL, PS2_DAT, false, false);
-      if (error == 0) {
-        Serial.println("Found Controller, configured successful");
-      } else {
-        Serial.println("Connect Faile");
-      }
-    }
-    return sensors.mPs2x;
-  }
   if (n == E_NRF24L01) {
 
     if (sensors.mNrf24L01 == NULL) {
@@ -923,10 +903,3 @@ void *Emakefun_MotorDriver::getSensor(E_SENSOR_INDEX n)
   sensors.MC = this;
   return &sensors;
 }
-
-/*
-  Emakefun_Sensor *Emakefun_MotorDriver::getSensor()
-  {
-    sensors.MC = this;
-    return &sensors;
-  } */

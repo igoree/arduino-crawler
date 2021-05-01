@@ -1,18 +1,17 @@
-#include "Panther_Tank.h"
+#include "Crawler.h"
 #include "ProtocolParser.h"
 #include "Sounds.h"
 #include "KeyMap.h"
 #include "debug.h"
 
 //MotorDriverBoard V4.0
-Tank::Tank(ProtocolParser *Package): SmartCar("Tank", E_PANTHER_TANK, 0x01, E_BLUETOOTH_CONTROL)
+Crawler::Crawler(ProtocolParser *Package): SmartCar("Crawler", E_PANTHER_TANK, 0x01, E_BLUETOOTH_CONTROL)
 {
   LeftFoward = RightFoward = LeftBackward = RightBackward = NULL;
   IR = NULL;
   Buzzer  = NULL;
   Rgb = NULL;
   //UT = NULL;
-  Ps2x = NULL;
   Nrf24L01 = NULL;
   mServo1 = NULL;
   mServo2 = NULL;
@@ -24,7 +23,7 @@ Tank::Tank(ProtocolParser *Package): SmartCar("Tank", E_PANTHER_TANK, 0x01, E_BL
   mProtocolPackage = Package;
 }
 
-Tank::~Tank()
+Crawler::~Crawler()
 {
   delete LeftFoward;
   delete RightFoward;
@@ -33,7 +32,6 @@ Tank::~Tank()
   delete IR;
   delete Buzzer;
   delete Rgb;
-  delete Ps2x;
   delete Nrf24L01;
   delete mServo1;
   delete mServo2;
@@ -43,7 +41,7 @@ Tank::~Tank()
   delete mServo6;
 }
 
-void Tank::init(int leftward, int rightfoward)
+void Crawler::init(int leftward, int rightfoward)
 {
   MotorDriver = Emakefun_MotorDriver(0x60, MOTOR_DRIVER_BOARD_V5);
   Sensors = (Emakefun_Sensor *)MotorDriver.getSensor(E_SENSOR_MAX);
@@ -55,9 +53,9 @@ void Tank::init(int leftward, int rightfoward)
 
 
 #if ARDUINO > 10609
-void Tank::Move(int directions = 1)
+void Crawler::Move(int directions = 1)
 #else
-void Tank::Move(int directions)
+void Crawler::Move(int directions)
 #endif
 {
   if (directions == 1) {
@@ -73,7 +71,7 @@ void Tank::Move(int directions)
   }
 }
 
-void Tank::DriveSpeed(int s)
+void Crawler::DriveSpeed(int s)
 {
   if (s >= 0 && s <= 100) {
     LeftFoward->setSpeed((s / 10) * 25.5);
@@ -81,7 +79,7 @@ void Tank::DriveSpeed(int s)
   }
 }
 
-void Tank::GoForward(void)
+void Crawler::GoForward(void)
 {
   SetStatus(E_FORWARD);
   DriveSpeed(Speed);
@@ -89,20 +87,20 @@ void Tank::GoForward(void)
   RightFoward->run(FORWARD);
 }
 
-void Tank::GoBack(void)
+void Crawler::GoBack(void)
 {
   SetStatus(E_BACK);
   DriveSpeed(Speed);
   LeftFoward->run(BACKWARD);  RightFoward->run(BACKWARD);
 }
-void Tank::KeepStop(void)
+void Crawler::KeepStop(void)
 {
   SetStatus(E_STOP);
   LeftFoward->run(BRAKE);
   RightFoward->run(BRAKE);
 }
 
-void Tank::TurnLeft(void)
+void Crawler::TurnLeft(void)
 {
   int s;
   s = (Speed / 10) * 25.5;
@@ -113,7 +111,7 @@ void Tank::TurnLeft(void)
   RightFoward->run(FORWARD);
 }
 
-void Tank::TurnRight(void)
+void Crawler::TurnRight(void)
 {
   int s;
   SetStatus(E_RIGHT);
@@ -124,7 +122,7 @@ void Tank::TurnRight(void)
   RightFoward->run(FORWARD);
 }
 
-void Tank::TurnLeftRotate(void)
+void Crawler::TurnLeftRotate(void)
 {
   SetStatus(E_LEFT_ROTATE);
   DriveSpeed(Speed);
@@ -132,7 +130,7 @@ void Tank::TurnLeftRotate(void)
   RightFoward->run(FORWARD);
 }
 
-void Tank::TurnRightRotate(void)
+void Crawler::TurnRightRotate(void)
 {
   SetStatus(E_RIGHT_ROTATE);
   DriveSpeed(Speed);
@@ -140,12 +138,12 @@ void Tank::TurnRightRotate(void)
   RightFoward->run(BACKWARD);
 }
 
-void Tank::Drive(void)
+void Crawler::Drive(void)
 {
   Drive(Degree);
 }
 
-void Tank::Drive(int degree)
+void Crawler::Drive(int degree)
 {
   DEBUG_LOG(DEBUG_LEVEL_INFO, "degree = %d speed = %d\n", degree, Speed);
   byte value = (Speed / 10) * 25.5;	 //app contol hbot_speed is 0 ~ 100 ,pwm is 0~255
@@ -201,42 +199,42 @@ void Tank::Drive(int degree)
   }
 }
 
-void Tank::InitIr(void)
+void Crawler::InitIr(void)
 {
   IR = MotorDriver.getSensor(E_IR);
 }
 
-void Tank::InitBuzzer(void)
+void Crawler::InitBuzzer(void)
 {
   Buzzer = MotorDriver.getSensor(E_BUZZER);
 }
 
-void Tank::sing(byte songName)
+void Crawler::sing(byte songName)
 {
   Sensors->Sing(songName);
 }
 
-void Tank::PianoSing(ST_MUSIC_TYPE music)
+void Crawler::PianoSing(ST_MUSIC_TYPE music)
 {
   Buzzer->_tone(music.note, music.beat, 2);
 }
 
-void Tank::InitRgb(void)
+void Crawler::InitRgb(void)
 {
   Rgb = MotorDriver.getSensor(E_RGB);
 }
 
-void Tank::SetRgbColor(E_RGB_INDEX index , long Color)
+void Crawler::SetRgbColor(E_RGB_INDEX index , long Color)
 {
   Sensors->SetRgbColor(index, Color);
 }
 
-void Tank::LightOff(void)
+void Crawler::LightOff(void)
 {
   Sensors->SetRgbColor(E_RGB_ALL, RGB_BLACK);
 }
 
-void Tank::SetRgbEffect(E_RGB_INDEX index, long Color, uint8_t effect)
+void Crawler::SetRgbEffect(E_RGB_INDEX index, long Color, uint8_t effect)
 {
   if (Rgb != NULL) {
     switch ((E_RGB_EFFECT)effect) {
@@ -262,12 +260,12 @@ void Tank::SetRgbEffect(E_RGB_INDEX index, long Color, uint8_t effect)
   }
 }
 
-void Tank::InitUltrasonic(void)
+void Crawler::InitUltrasonic(void)
 {
   MotorDriver.getSensor(E_ULTRASONIC);
 }
 
-byte Tank::GetUltrasonicValue(byte direction)
+byte Crawler::GetUltrasonicValue(byte direction)
 {
   byte distance;
   if (direction == 0) {
@@ -287,7 +285,7 @@ byte Tank::GetUltrasonicValue(byte direction)
   return distance;
 }
 
-void Tank::InitServo(void)
+void Crawler::InitServo(void)
 {
   mServo1 = MotorDriver.getServo(1);
   mServo2 = MotorDriver.getServo(2);
@@ -297,12 +295,12 @@ void Tank::InitServo(void)
   mServo6 = MotorDriver.getServo(6);
 }
 
-void Tank::SetServoBaseDegree(uint8_t base)
+void Crawler::SetServoBaseDegree(uint8_t base)
 {
   ServoBaseDegree = base;
 }
 
-void Tank::SetServoDegree(byte pin , byte Angle)
+void Crawler::SetServoDegree(byte pin , byte Angle)
 {
   int Degree = Angle;
   int servo_degree;
@@ -329,27 +327,13 @@ void Tank::SetServoDegree(byte pin , byte Angle)
     mServo6->writeServo(Angle);
 }
 
-void Tank::InitPs2x(void)
-{
-  Ps2x = MotorDriver.getSensor(E_PS2X);
-}
-
-uint16_t Tank::GetPs2xRockerAngle(byte direction)
-{
-  //  Ps2x->mPs2x->read_gamepad(false, 0);
-  //  if (direction == 1)
-  //    return (Ps2x->LeftHart());
-  //  else if (direction == 2)
-  //    return (Ps2x->);
-}
-
-void Tank::InitNrf24L01(char *Rxaddr)
+void Crawler::InitNrf24L01(char *Rxaddr)
 {
   Nrf24L01 = MotorDriver.getSensor(E_NRF24L01);
   Nrf24L01->setRADDR(Rxaddr);
 }
 
-void Tank::SendUltrasonicData(void)
+void Crawler::SendUltrasonicData(void)
 {
   union
   {

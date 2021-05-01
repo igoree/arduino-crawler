@@ -19,7 +19,7 @@ typedef enum
   E_EFFECT_FLASH = 2
 } E_RGB_EFFECT;
 
-class Tank: public SmartCar {
+class Crawler: public SmartCar {
 
   private :
     byte ServoPin;
@@ -36,11 +36,10 @@ class Tank: public SmartCar {
     Buzzer *Buzzer;
     RGBLed *Rgb;
     Emakefun_Sensor *Sensors;
-    PS2X *Ps2x;
     Nrf24l *Nrf24L01;
     Emakefun_Servo *mServo1, *mServo2, *mServo3, *mServo4, *mServo5, *mServo6;
-    Tank(ProtocolParser *Package);
-    ~Tank(void);
+    Crawler(ProtocolParser *Package);
+    ~Crawler(void);
     void Move(int directions);
     void init(int leftward, int rightfoward, int leftbackward, int rightbackward);
     void init(int leftward, int rightfoward);
@@ -66,9 +65,6 @@ class Tank: public SmartCar {
     void InitServo(void);
     void SetServoBaseDegree(uint8_t base);
     void SetServoDegree(byte pin, byte Angle);
-    void InitPs2x(void);
-    int GetPs2xKeyValue(void);
-    uint16_t GetPs2xRockerAngle(byte);
     void SendUltrasonicData(void);
     void InitNrf24L01(char *Rxaddr);
 };
