@@ -1,6 +1,5 @@
 #include "Protocol.h"
 #include "ProtocolParser.h"
-//#define DEBUG_LEVEL DEBUG_LEVEL_ALL
 #include "debug.h"
 
 #if ARDUINO > 10609
@@ -46,7 +45,7 @@ bool ProtocolParser::ParserPackage(byte *data = NULL)
         if ((check_sum & 0xFFFF) != GetCheckSum()) {
             DEBUG_ERR("check sum error \n");
             for (int i = 0; i < m_PackageLength; i++) {
-                DEBUG_LOG(DEBUG_LEVEL_ERR, "0x%x ", buffer[i]);
+                DEBUG_INFO("0x%x ", buffer[i]);
             }
         return false ;
 	    }
@@ -54,7 +53,7 @@ bool ProtocolParser::ParserPackage(byte *data = NULL)
         recv->data = &buffer[5];
         protocol_data_len = m_PackageLength - 8;
         recv->end_code = buffer[m_PackageLength-1];
-        DEBUG_LOG(DEBUG_LEVEL_INFO, "\nRecevPackage end \n");
+        DEBUG_INFO( "\nRecevPackage end \n");
         return true;
 	}
     return false;
@@ -62,13 +61,13 @@ bool ProtocolParser::ParserPackage(byte *data = NULL)
 
 bool ProtocolParser::RecevData(void)
 {
-   // DEBUG_LOG(DEBUG_LEVEL_INFO, "RecevData start \n");
+   // DEBUG_INFO( "RecevData start \n");
     static bool avilable = false;
     static byte preRecvLen = 0;
     byte dat;
     while (Serial.available() > 0) {
         dat = Serial.read();
-        // DEBUG_LOG(DEBUG_LEVEL_INFO, "\n");
+        // DEBUG_INFO( "\n");
         // Serial.println(dat, HEX);
         delay(2);
         if (avilable == false && dat == m_StartCode) {
@@ -79,7 +78,7 @@ bool ProtocolParser::RecevData(void)
             m_RecvDataIndex = 0;
             avilable = true;
             // Serial.println(dat, HEX);
-            DEBUG_LOG(DEBUG_LEVEL_INFO, "aviable\n");
+            DEBUG_INFO( "aviable\n");
             // arduino_printf("aviable \n");
             continue;
         }
@@ -90,7 +89,7 @@ bool ProtocolParser::RecevData(void)
                 // m_RecvDataIndex++;
                 m_PackageLength = preRecvLen + 2;
                 m_recv_flag = true;
-                DEBUG_LOG(DEBUG_LEVEL_INFO, "RecevData end \n");
+                DEBUG_INFO( "RecevData end \n");
                 return true;
            } else {
                 //Serial.println(dat, HEX);
@@ -99,12 +98,12 @@ bool ProtocolParser::RecevData(void)
                 if (m_RecvDataIndex == 1) {
                    preRecvLen = dat;
                    if (preRecvLen > BUFFER_SIZE-2) goto error;
-                   DEBUG_LOG(DEBUG_LEVEL_INFO, "preRecvLen = %d\n", preRecvLen);
+                   DEBUG_INFO( "preRecvLen = %d\n", preRecvLen);
                 }
                 // arduino_printf("prelen= %d Index =%d \n",preRecvLen, m_RecvDataIndex);
                 if ((m_RecvDataIndex > preRecvLen) && (preRecvLen != 0)) {
                     for (int i = m_RecvDataIndex; i > 0; i--) {
-                        //DEBUG_LOG(DEBUG_LEVEL_ERR, "%x ", buffer[i]);
+                        //DEBUG_ERR("%x ", buffer[i]);
                         if (buffer[i] == m_StartCode) {
                             m_pHeader = &buffer[i];
                             preRecvLen = buffer[i+1];
@@ -112,15 +111,15 @@ bool ProtocolParser::RecevData(void)
                             continue;
                         }
                     }
-                    DEBUG_LOG(DEBUG_LEVEL_ERR, "preRecvLen \r\n");
+                    DEBUG_ERR("preRecvLen \r\n");
                     goto error;
                 }
 
                 if (m_RecvDataIndex >= BUFFER_SIZE - 1) {
                     for (int i = 0; i < BUFFER_SIZE; i++) {
-                        DEBUG_LOG(DEBUG_LEVEL_ERR, "%x ", buffer[i]);
+                        DEBUG_INFO("%x ", buffer[i]);
                     }
-                    DEBUG_LOG(DEBUG_LEVEL_ERR, "buffer is over\r\n");
+                    DEBUG_ERR("buffer is over\r\n");
                     goto error;
                  }
             }
@@ -137,7 +136,7 @@ error :
 
 bool ProtocolParser::RecevData(byte *data, size_t len)
 {
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "RecevData start \n");
+    DEBUG_INFO( "RecevData start \n");
     bool avilable = false;
     if (data == NULL || len > BUFFER_SIZE)
     {
@@ -157,18 +156,18 @@ bool ProtocolParser::RecevData(byte *data, size_t len)
             if ((*m_pHeader = *data) == m_EndCode) {
                 m_recv_flag = true;
                 m_PackageLength++;
-                DEBUG_LOG(DEBUG_LEVEL_INFO, "%x ", *m_pHeader);
+                DEBUG_INFO( "%x ", *m_pHeader);
                 //Serial.println("m_PackageLength ");
                 //Serial.print(m_PackageLength);
                 break;
             }
-            DEBUG_LOG(DEBUG_LEVEL_INFO, "%x ", *m_pHeader);
+            DEBUG_INFO( "%x ", *m_pHeader);
             m_pHeader++;
             m_PackageLength++;
         }
         data++;
     }
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "\nRecevPackage done\n");
+    DEBUG_INFO( "\nRecevPackage done\n");
     return true;
 }
 

@@ -8,7 +8,7 @@
 
 #define ULTRASONIC_SERVO 1
 
-typedef enum : byte
+typedef enum : uint8_t
 {
     E_FORWARD = 0,
     E_BACK,
@@ -23,14 +23,14 @@ typedef enum : byte
     E_LOW_POWER,
 } E_CRAWLER_STATUS;
 
-typedef enum : byte
+typedef enum : uint8_t
 {
   E_SERVO_FRONT,
   E_SERVO_LEFT,
   E_SERVO_RIGHT
 } E_SERVO_DIRECTION;
 
-typedef enum
+typedef enum : uint8_t
 {
   E_EFFECT_BREATHING = 0,
   E_EFFECT_ROTATE = 1,
@@ -47,13 +47,14 @@ class Crawler {
     uint8_t mServoBaseDegree;
     ST_PROTOCOL mSendData;
     ProtocolParser *mProtocolParser;
-    byte mSpeed;
+    uint8_t mSpeed;
     int mDegree;
     Emakefun_MotorDriver mMotorDriver;
     Emakefun_DCMotor *mLeftDrive, *mRightDrive;
     Emakefun_Servo *mServo1, *mServo2, *mServo3, *mServo4, *mServo5, *mServo6;
-    
-    void DriveSpeed(int s);
+
+    void StopDrive(Emakefun_DCMotor* drive);
+    void RunDrive(Emakefun_DCMotor* drive, uint8_t speed, uint8_t direction);
     void SetStatus(E_CRAWLER_STATUS status);
 
   public :
@@ -66,14 +67,13 @@ class Crawler {
     Crawler(ProtocolParser *protocolParser);
     ~Crawler(void);
     void Init(int leftDrive, int rightDrive);
-    void Move(int directions);
     void GoForward(void);
     void GoBack(void);
     void TurnLeft(void);
     void TurnRight(void);
     void TurnLeftRotate(void);
     void TurnRightRotate(void);
-    void KeepStop(void);
+    void Stop(void);
     void Drive(void);
     void Drive(int degree);
     void SetSpeed(int8_t s);

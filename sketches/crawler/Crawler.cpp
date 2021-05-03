@@ -52,88 +52,69 @@ void Crawler::Init(int leftDrive, int rightDrive)
   mMotorDriver.begin(50);
 }
 
-
-void Crawler::Move(int directions = 1)
+void Crawler::StopDrive(Emakefun_DCMotor* drive) 
 {
-  if (directions == 1) {
-    GoForward();
-  } else if (directions == 2) {
-    GoBack();
-  } else if (directions == 3) {
-    TurnLeft();
-  } else if (directions == 4) {
-    TurnRight();
-  } else {
-    KeepStop();
-  }
+  drive->run(BRAKE);
 }
 
-void Crawler::DriveSpeed(int s)
+void Crawler::RunDrive(Emakefun_DCMotor* drive, uint8_t speed, uint8_t direction)
 {
-  if (s >= 0 && s <= 100) {
-    mLeftDrive->setSpeed((s / 10) * 25.5);
-    mRightDrive->setSpeed((s / 10) * 25.5);
+  if (speed >= 0 && speed <= 100) {
+    drive->setSpeed((speed / 10) * 25.5);
+    drive->run(direction);
+    return;
   }
+  
+  DEBUG_ERR("Invalid speed: %d\r\n", speed);
 }
 
 void Crawler::GoForward(void)
 {
   SetStatus(E_FORWARD);
-  DriveSpeed(mSpeed);
-  mLeftDrive->run(FORWARD);
-  mRightDrive->run(FORWARD);
+  RunDrive(mLeftDrive, mSpeed, FORWARD);
+  RunDrive(mRightDrive, mSpeed, FORWARD);
 }
 
 void Crawler::GoBack(void)
 {
   SetStatus(E_BACK);
-  DriveSpeed(mSpeed);
-  mLeftDrive->run(BACKWARD);  
-  mRightDrive->run(BACKWARD);
+  RunDrive(mLeftDrive, mSpeed, BACKWARD);
+  RunDrive(mRightDrive, mSpeed, BACKWARD);
 }
-void Crawler::KeepStop(void)
+
+void Crawler::Stop(void)
 {
   SetStatus(E_STOP);
-  mLeftDrive->run(BRAKE);
-  mRightDrive->run(BRAKE);
+  StopDrive(mLeftDrive);
+  StopDrive(mRightDrive);
 }
 
 void Crawler::TurnLeft(void)
 {
-  int s;
-  s = (mSpeed / 10) * 25.5;
   SetStatus(E_LEFT);
-  mLeftDrive->setSpeed(s / 3);
-  mRightDrive->setSpeed(s);
-  mLeftDrive->run(FORWARD);
-  mRightDrive->run(FORWARD);
+  RunDrive(mLeftDrive, mSpeed / 3, FORWARD);
+  RunDrive(mRightDrive, mSpeed, FORWARD);
 }
 
 void Crawler::TurnRight(void)
 {
-  int s;
   SetStatus(E_RIGHT);
-  s = (mSpeed / 10) * 25.5;
-  mLeftDrive->setSpeed(s);
-  mRightDrive->setSpeed(s / 3);
-  mLeftDrive->run(FORWARD);
-  mRightDrive->run(FORWARD);
+  RunDrive(mLeftDrive, mSpeed, FORWARD);
+  RunDrive(mRightDrive, mSpeed / 3, FORWARD);
 }
 
 void Crawler::TurnLeftRotate(void)
 {
   SetStatus(E_LEFT_ROTATE);
-  DriveSpeed(mSpeed);
-  mLeftDrive->run(BACKWARD);
-  mRightDrive->run(FORWARD);
+  RunDrive(mLeftDrive, mSpeed, BACKWARD);
+  RunDrive(mRightDrive, mSpeed, FORWARD);
 }
 
 void Crawler::TurnRightRotate(void)
 {
   SetStatus(E_RIGHT_ROTATE);
-  DriveSpeed(mSpeed);
-  mLeftDrive->run(FORWARD);
-  mRightDrive->run(BACKWARD);
+  RunDrive(mLeftDrive, mSpeed, FORWARD);
+  RunDrive(mRightDrive, mSpeed, BACKWARD);
 }
 
 void Crawler::Drive(void)
@@ -143,7 +124,7 @@ void Crawler::Drive(void)
 
 void Crawler::Drive(int degree)
 {
-  DEBUG_LOG(DEBUG_LEVEL_INFO, "degree = %d speed = %d\n", degree, mSpeed);
+  DEBUG_INFO( "degree = %d speed = %d\n", degree, mSpeed);
   byte value = (mSpeed / 10) * 25.5;	 //app contol hbot_speed is 0 ~ 100 ,pwm is 0~255
   float f;
   if (degree >= 0 && degree <= 90) {
@@ -153,10 +134,8 @@ void Crawler::Drive(int degree)
     } else  if (degree >= 85) {
       SetStatus(E_FORWARD);
     }
-    mLeftDrive->setSpeed(value);
-    mRightDrive->setSpeed((float)(value * f));
-    mLeftDrive->run(FORWARD);
-    mRightDrive->run(FORWARD);
+    RunDrive(mLeftDrive, value, FORWARD);
+    RunDrive(mRightDrive, value * f, FORWARD);
   } else if (degree > 90 && degree <= 180) {
     f = (float)(180 - degree) / 90;
     if (degree <= 95) {
@@ -164,10 +143,8 @@ void Crawler::Drive(int degree)
     } else  if (degree >= 175) {
       SetStatus(E_LEFT);
     }
-    mLeftDrive->setSpeed((float)(value * f));
-    mRightDrive->setSpeed(value);
-    mLeftDrive->run(FORWARD);
-    mRightDrive->run(FORWARD);
+    RunDrive(mLeftDrive, value * f, FORWARD);
+    RunDrive(mRightDrive, value, FORWARD);
   } else if (degree > 180 && degree <= 270) {
     f = (float)(degree - 180) / 90;
     if (degree <= 185) {
@@ -175,10 +152,8 @@ void Crawler::Drive(int degree)
     } else  if (degree >= 265) {
       SetStatus(E_BACK);
     }
-    mLeftDrive->setSpeed((float)(value * f));
-    mRightDrive->setSpeed(value);
-    mLeftDrive->run(BACKWARD);
-    mRightDrive->run(BACKWARD);
+    RunDrive(mLeftDrive, value * f, BACKWARD);
+    RunDrive(mRightDrive, value, BACKWARD);
   } else if (degree > 270 && degree <= 360) {
     f = (float)(360 - degree) / 90;
     if (degree <= 275) {
@@ -186,13 +161,11 @@ void Crawler::Drive(int degree)
     } else  if (degree >= 355) {
       SetStatus(E_RIGHT);
     }
-    mLeftDrive->setSpeed(value);
-    mRightDrive->setSpeed((float)(value * f));
-    mLeftDrive->run(BACKWARD);
-    mRightDrive->run(BACKWARD);
+    RunDrive(mLeftDrive, value, BACKWARD);
+    RunDrive(mRightDrive, value * f, BACKWARD);
   }
   else {
-    KeepStop();
+    Stop();
     return;
   }
 }
@@ -226,7 +199,7 @@ void Crawler::SpeedDown(int8_t Duration = 5)
     mStatus = E_SPEED_DOWN;
 }
 
-void Crawler::SetStatus(E_CRAWLER_STATUS status=0)
+void Crawler::SetStatus(E_CRAWLER_STATUS status)
 {
     mStatus = status;
 }

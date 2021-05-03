@@ -31,7 +31,7 @@ void HandleInfaredRemote (byte irKeyCode)
       mCrawler.Sing(S_connection);
       mCrawler.SetRgbColor(E_RGB_ALL, mCrawler.GetSpeed() * 2.5);
       mCrawler.SpeedUp(10);
-      DEBUG_LOG(DEBUG_LEVEL_INFO, "Speed = %d \n", mCrawler.GetSpeed());
+      DEBUG_INFO( "Speed = %d \n", mCrawler.GetSpeed());
       break;
     case IR_KEYCODE_POUND:
       mCrawler.Sing(S_disconnection);
@@ -45,7 +45,7 @@ void HandleInfaredRemote (byte irKeyCode)
       mCrawler.GoBack();
       break;
     case IR_KEYCODE_OK:
-      mCrawler.KeepStop();
+      mCrawler.Stop();
       break;
     case IR_KEYCODE_LEFT:
       mCrawler.TurnLeft();
@@ -66,7 +66,7 @@ void HandleUltrasonicAvoidance(void)
     //mCrawler.SendUltrasonicData();
     count = 0;
   }
-  DEBUG_LOG(DEBUG_LEVEL_INFO, "UlFrontDistance = %d \n", UlFrontDistance);
+  DEBUG_INFO( "UlFrontDistance = %d \n", UlFrontDistance);
   if (UlFrontDistance < UL_LIMIT_MIN)
   {
     mCrawler.SetSpeed(80);
@@ -75,7 +75,7 @@ void HandleUltrasonicAvoidance(void)
   }
   if (UlFrontDistance < UL_LIMIT_MID)
   {
-    mCrawler.KeepStop();
+    mCrawler.Stop();
     delay(100);
     UlRightDistance = mCrawler.GetUltrasonicValue(2);
     delay(50);
@@ -109,7 +109,7 @@ void UltrasonicFollow()
   } else if (UlFrontDistance > 14) {
     mCrawler.GoForward();
   } else if (10 <= UlFrontDistance <= 14) {
-    mCrawler.KeepStop();
+    mCrawler.Stop();
   }
 }
 
@@ -125,12 +125,12 @@ void loop()
   byte irKeyCode;
   if (irKeyCode = mCrawler.IR->getCode())
   {
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "irKeyCode = %lx \n", irKeyCode);
+    DEBUG_INFO( "irKeyCode = %lx \n", irKeyCode);
     HandleInfaredRemote(irKeyCode);
     delay(110);
   } else {
     if (mCrawler.GetStatus() != E_STOP ) {
-      mCrawler.KeepStop();
+      mCrawler.Stop();
     }
   }
   
