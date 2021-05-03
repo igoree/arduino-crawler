@@ -126,8 +126,8 @@ public:
   int rawlen; // Number of records in rawbuf.
   String getString();
   unsigned char getCode();
-  String getKeyMap(byte keycode, byte ir_type = 1);
-  byte getIrKey(byte keycode,    byte ir_type = 1);
+  String getKeyMap(byte keycode);
+  byte getIrKey(byte keycode);
   void sendString(String s);
   void sendString(float v);
   void sendNEC(unsigned long data, int nbits);
@@ -149,4 +149,3 @@ private:
 };
 #endif // !__AVR_ATmega32U4__
 #endif
-

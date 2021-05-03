@@ -3,7 +3,7 @@
 #include "Crawler.h"
 #include "ProtocolParser.h"
 #include "BluetoothHandle.h"
-#include "KeyMap.h"
+#include "IRKeyMap.h"
 
 ProtocolParser *mProtocol = new ProtocolParser();
 Crawler mCrawler(mProtocol);
@@ -20,9 +20,11 @@ void setup()
   mCrawler.SetSpeed(50);
   mCrawler.SetServoBaseDegree(90);
   mCrawler.SetServoDegree(1, 90);
+  mCrawler.InitUltrasonic();
   Serial.println("init ok");
   mCrawler.sing(S_connection);
 }
+
 void HandleBluetoothRemote(bool recv_flag)
 {
   if (recv_flag) {
@@ -87,7 +89,7 @@ void HandleBluetoothRemote(bool recv_flag)
 
 void HandleInfaredRemote (byte irKeyCode)
 {
-  switch ((E_EM_IR_KEYCODE) mCrawler.IR->getIrKey(irKeyCode, IR_TYPE_NORMAL)) {
+  switch ((E_IR_KEYCODE)mCrawler.IR->getIrKey(irKeyCode)) {
     case IR_KEYCODE_STAR:
       mCrawler.sing(S_connection);
       mCrawler.SetRgbColor(E_RGB_ALL, mCrawler.GetSpeed() * 2.5);
@@ -256,6 +258,7 @@ void loop()
     default:
       break;
   }
+  
   switch (mCrawler.GetStatus()) {
     case E_FORWARD:
       mCrawler.SetRgbColor(E_RGB_ALL, RGB_WHITE);
