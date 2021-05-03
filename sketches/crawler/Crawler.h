@@ -40,26 +40,28 @@ typedef enum
 class Crawler {
 
   private :
-    byte Addr;
+    byte mAddr;
     E_CRAWLER_STATUS mStatus;
-    uint8_t BatteryPin;
-    uint8_t ServoBaseDegree;
-    ST_PROTOCOL SendData;
-    ProtocolParser *mProtocolPackage;
+    uint8_t mBateryPin;
+    uint8_t mBatteryValue;
+    uint8_t mServoBaseDegree;
+    ST_PROTOCOL mSendData;
+    ProtocolParser *mProtocolParser;
+    byte mSpeed;
+    int mDegree;
+    Emakefun_MotorDriver mMotorDriver;
+    Emakefun_DCMotor *mLeftDrive, *mRightDrive;
+    Emakefun_Servo *mServo1, *mServo2, *mServo3, *mServo4, *mServo5, *mServo6;
+    
     void DriveSpeed(int s);
+    void SetStatus(E_CRAWLER_STATUS status);
 
   public :
-    uint8_t BatteryValue;
-    byte Speed;
-    int Degree;
-    Emakefun_MotorDriver MotorDriver;
-    Emakefun_DCMotor *LeftFoward, *RightFoward, *LeftBackward, *RightBackward;
     IRremote *IR;
     Buzzer *Buzzer;
     RGBLed *Rgb;
     Emakefun_Sensor *Sensors;
     Nrf24l *Nrf24L01;
-    Emakefun_Servo *mServo1, *mServo2, *mServo3, *mServo4, *mServo5, *mServo6;
     
     Crawler(ProtocolParser *protocolParser);
     ~Crawler(void);
@@ -78,7 +80,6 @@ class Crawler {
     void SpeedUp(int8_t Duration = 5);
     void SpeedDown(int8_t Duration = 5);
     int  GetSpeed(void);
-    void SetStatus(E_CRAWLER_STATUS status);
     E_CRAWLER_STATUS GetStatus(void);
     uint8_t GetBattery(void);
     

@@ -31,10 +31,9 @@ void HandleInfaredRemote (byte irKeyCode)
       mCrawler.Sing(S_connection);
       mCrawler.SetRgbColor(E_RGB_ALL, mCrawler.GetSpeed() * 2.5);
       mCrawler.SpeedUp(10);
-      DEBUG_LOG(DEBUG_LEVEL_INFO, "mCrawler.Speed = %d \n", mCrawler.Speed);
+      DEBUG_LOG(DEBUG_LEVEL_INFO, "Speed = %d \n", mCrawler.GetSpeed());
       break;
     case IR_KEYCODE_POUND:
-      DEBUG_LOG(DEBUG_LEVEL_INFO, " start Degree = %d \n", mCrawler.Degree);
       mCrawler.Sing(S_disconnection);
       mCrawler.SetRgbColor(E_RGB_ALL, mCrawler.GetSpeed() * 2.5);
       mCrawler.SpeedDown(10);
