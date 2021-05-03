@@ -7,6 +7,7 @@
 ProtocolParser *mProtocol = new ProtocolParser();
 Crawler mCrawler(mProtocol);
 byte count = 0;
+bool secondSoundGroup = false;
 
 void setup()
 {
@@ -22,6 +23,13 @@ void setup()
   mCrawler.InitUltrasonic();
   Serial.println("init ok");
   mCrawler.Sing(S_connection);
+}
+
+void SingSound(uint8_t soundIndex) {
+  if (secondSoundGroup) {
+    soundIndex = soundIndex + 9;
+  }
+  mCrawler.Sing(soundIndex);
 }
 
 void HandleInfaredRemote (byte irKeyCode)
@@ -53,6 +61,47 @@ void HandleInfaredRemote (byte irKeyCode)
     case IR_KEYCODE_RIGHT:
       mCrawler.TurnRight();
       break;
+      
+    case IR_KEYCODE_1:
+      SingSound(2);
+      break;
+
+    case IR_KEYCODE_2:
+      SingSound(3);
+      break;
+
+    case IR_KEYCODE_3:
+      SingSound(4);
+      break;
+
+    case IR_KEYCODE_4:
+      SingSound(5);
+      break;
+
+    case IR_KEYCODE_5:
+      SingSound(6);
+      break;
+
+    case IR_KEYCODE_6:
+      SingSound(7);
+      break;
+
+    case IR_KEYCODE_7:
+      SingSound(8);
+      break;
+
+    case IR_KEYCODE_8:
+      SingSound(9);
+      break;
+
+    case IR_KEYCODE_9:
+      SingSound(10);
+      break;
+
+    case IR_KEYCODE_0:
+      secondSoundGroup = !secondSoundGroup;
+      break;
+      
     default:
       break;
   }

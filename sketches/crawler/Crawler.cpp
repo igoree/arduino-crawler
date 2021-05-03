@@ -172,31 +172,37 @@ void Crawler::Drive(int degree)
 
 void Crawler::SetSpeed(int8_t s)
 {
-    if (s > 100) {
-        mSpeed = 100;
-        return;
-    } else if (s < 0) {
-        mSpeed = 0;
-        return;
-    }
-    mSpeed = s;
+  if (s > 100) {
+    mSpeed = 100;
+    return;
+  } else if (s < 0) {
+    mSpeed = 0;
+    return;
+  }
+  mSpeed = s;
 }
 
 int Crawler::GetSpeed(void)
 {
-    return mSpeed;
+   return mSpeed;
 }
 
-void Crawler::SpeedUp(int8_t Duration = 5)
+bool Crawler::SpeedUp(int8_t delta = 5)
 {
-    SetSpeed(mSpeed + Duration);
-    mStatus = E_SPEED_UP;
+  mStatus = E_SPEED_UP;
+  uint8_t oldSpeed = mSpeed;
+  SetSpeed(mSpeed + delta);
+
+  return oldSpeed != mSpeed;
 }
 
-void Crawler::SpeedDown(int8_t Duration = 5)
+bool Crawler::SpeedDown(int8_t delta = 5)
 {
-    SetSpeed(mSpeed - Duration);
-    mStatus = E_SPEED_DOWN;
+  mStatus = E_SPEED_DOWN;  
+  uint8_t oldSpeed = mSpeed;
+  SetSpeed(mSpeed - delta);
+
+  return oldSpeed != mSpeed;
 }
 
 void Crawler::SetStatus(E_CRAWLER_STATUS status)

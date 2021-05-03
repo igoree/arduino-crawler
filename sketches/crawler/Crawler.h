@@ -77,8 +77,8 @@ class Crawler {
     void Drive(void);
     void Drive(int degree);
     void SetSpeed(int8_t s);
-    void SpeedUp(int8_t Duration = 5);
-    void SpeedDown(int8_t Duration = 5);
+    bool SpeedUp(int8_t delta = 5);
+    bool SpeedDown(int8_t delta = 5);
     int  GetSpeed(void);
     E_CRAWLER_STATUS GetStatus(void);
     uint8_t GetBattery(void);
