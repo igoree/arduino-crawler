@@ -5,10 +5,10 @@
 #define  DEBUG_LEVEL_ERR   2
 
 #ifndef  DEBUG_LEVEL
-#define  DEBUG_LEVEL  0
+#define  DEBUG_LEVEL  0xFF
 #endif
 
-#if DEBUG_LEVEL >= DEBUG_LEVEL_INFO
+#if DEBUG_LEVEL <= DEBUG_LEVEL_INFO
 #define DEBUG_INFO(fmt, ...) \
     do{\
         arduino_printf(fmt, ##__VA_ARGS__);\
@@ -17,7 +17,7 @@
 #define DEBUG_INFO(fmt, ...)
 #endif
 
-#if DEBUG_LEVEL >= DEBUG_LEVEL_ERR
+#if DEBUG_LEVEL <= DEBUG_LEVEL_ERR
 #define DEBUG_ERR(fmt, ...) \
     do{\
         arduino_printf("[Error][%s:%s:%d]",__FILE__,__FUNCTION__,__LINE__);\
