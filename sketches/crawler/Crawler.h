@@ -3,14 +3,32 @@
 #include <stdint.h>
 #include "SPI.h"
 #include "Arduino.h"
-#include "SmartCar.h"
 #include "Emakefun_MotorDriver.h"
 #include "ProtocolParser.h"
 
-#define FRONT 0
-#define LEFT 1
-#define RIGHT 2
-#define MIDDLE 3
+#define ULTRASONIC_SERVO 1
+
+typedef enum : byte
+{
+    E_FORWARD = 0,
+    E_BACK,
+    E_LEFT,
+    E_RIGHT,
+    E_RIGHT_ROTATE,
+    E_LEFT_ROTATE,
+    E_STOP,
+    E_RUNNING,
+    E_SPEED_UP,
+    E_SPEED_DOWN,
+    E_LOW_POWER,
+} E_CRAWLER_STATUS;
+
+typedef enum : byte
+{
+  E_SERVO_FRONT,
+  E_SERVO_LEFT,
+  E_SERVO_RIGHT
+} E_SERVO_DIRECTION;
 
 typedef enum
 {
@@ -19,10 +37,11 @@ typedef enum
   E_EFFECT_FLASH = 2
 } E_RGB_EFFECT;
 
-class Crawler: public SmartCar {
+class Crawler {
 
   private :
-    byte ServoPin;
+    byte Addr;
+    E_CRAWLER_STATUS mStatus;
     uint8_t BatteryPin;
     uint8_t ServoBaseDegree;
     ST_PROTOCOL SendData;
@@ -30,6 +49,9 @@ class Crawler: public SmartCar {
     void DriveSpeed(int s);
 
   public :
+    uint8_t BatteryValue;
+    byte Speed;
+    int Degree;
     Emakefun_MotorDriver MotorDriver;
     Emakefun_DCMotor *LeftFoward, *RightFoward, *LeftBackward, *RightBackward;
     IRremote *IR;
@@ -38,11 +60,11 @@ class Crawler: public SmartCar {
     Emakefun_Sensor *Sensors;
     Nrf24l *Nrf24L01;
     Emakefun_Servo *mServo1, *mServo2, *mServo3, *mServo4, *mServo5, *mServo6;
-    Crawler(ProtocolParser *Package);
+    
+    Crawler(ProtocolParser *protocolParser);
     ~Crawler(void);
+    void Init(int leftDrive, int rightDrive);
     void Move(int directions);
-    void init(int leftward, int rightfoward, int leftbackward, int rightbackward);
-    void init(int leftward, int rightfoward);
     void GoForward(void);
     void GoBack(void);
     void TurnLeft(void);
@@ -52,20 +74,32 @@ class Crawler: public SmartCar {
     void KeepStop(void);
     void Drive(void);
     void Drive(int degree);
+    void SetSpeed(int8_t s);
+    void SpeedUp(int8_t Duration = 5);
+    void SpeedDown(int8_t Duration = 5);
+    int  GetSpeed(void);
+    void SetStatus(E_CRAWLER_STATUS status);
+    E_CRAWLER_STATUS GetStatus(void);
+    uint8_t GetBattery(void);
+    
     void InitIr(void);
+    
     void InitBuzzer(void);
-    void sing(byte songName);
+    void Sing(byte songName);
     void PianoSing(ST_MUSIC_TYPE music);
+    
     void InitRgb(void);
     void SetRgbColor(E_RGB_INDEX index , long Color);
     void SetRgbEffect(E_RGB_INDEX index, long Color, uint8_t effect);
     void LightOff(void);
+    
     void InitUltrasonic(void);
-    byte GetUltrasonicValue(byte);
+    byte GetUltrasonicValue(E_SERVO_DIRECTION);
+    
     void InitServo(void);
     void SetServoBaseDegree(uint8_t base);
-    void SetServoDegree(byte pin, byte Angle);
-    void SendUltrasonicData(void);
+    void SetServoDegree(byte pin, byte angle);
+    
     void InitNrf24L01(char *Rxaddr);
 };
 

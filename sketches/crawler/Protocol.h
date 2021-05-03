@@ -29,28 +29,11 @@ typedef enum
     E_CONTOROL_CODE_MAX,
 } E_CONTOROL_FUNC;
 
-typedef enum
-{
-    E_SMARTCAR = 0,
-    E_HUMMER_BOT,
-    E_AURORA_RACING,
-    E_PANTHER_TANK,
-    E_BEETLE_BOT,
-    E_BALANCE_CAR,
-    E_OTTO,
-    E_QUADCOPTER,
-    E_HELLO_BOT,
-    E_MIRAGE_TANK,
-    E_4WD,
-    E_MECANUMCAR,
-    E_TYPE_MAX,
-} E_TYPE;
-
 typedef struct
 {
     byte start_code ;   // 8bit 0xAA
     byte len;           // protocol data length
-    E_TYPE type;
+    //E_TYPE type;
     byte addr;
     byte function;      // 8 bit
     byte *data;         // n bit

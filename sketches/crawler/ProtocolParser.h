@@ -4,7 +4,6 @@
 #include "Protocol.h"
 #include <stdint.h>
 #include "Sounds.h"
-#include "SmartCar.h"
 #include<stdint.h>
 
 #define BUFFER_SIZE 32
@@ -17,7 +16,6 @@ class ProtocolParser
     bool RecevData(byte *data, size_t len);
     bool RecevData(void);
     bool ParserPackage(byte *data = NULL);
-    E_TYPE GetRobotType(void);
     uint8_t GetRobotAddr(void);
     E_CONTOROL_FUNC GetRobotControlFun(void);
     int GetRobotSpeed(void);
@@ -35,7 +33,6 @@ class ProtocolParser
     byte GetRgbMode(void);
     byte* GetCmdLine(void);
     bool SendPackage(ST_PROTOCOL *send_dat, int len);
-    E_SMARTCAR_CONTROL_MODE GetControlMode(void);
     uint8_t GetProtocolDataLength(void);
 
   private:

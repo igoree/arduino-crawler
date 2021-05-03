@@ -4,8 +4,13 @@
 #include "debug.h"
 
 //MotorDriverBoard V4.0
-Crawler::Crawler(ProtocolParser *Package): SmartCar("Crawler", E_PANTHER_TANK, 0x01, E_BLUETOOTH_CONTROL)
+Crawler::Crawler(ProtocolParser *protocolParser)
 {
+  Addr = 0x01;
+  mStatus = E_STOP;
+  BatteryValue = 0;
+  Speed = 0 ;
+  Degree = 0;
   LeftFoward = RightFoward = LeftBackward = RightBackward = NULL;
   IR = NULL;
   Buzzer  = NULL;
@@ -18,7 +23,7 @@ Crawler::Crawler(ProtocolParser *Package): SmartCar("Crawler", E_PANTHER_TANK, 0
   mServo5 = NULL;
   mServo6 = NULL;
   SetStatus(E_STOP);
-  mProtocolPackage = Package;
+  mProtocolPackage = protocolParser;
 }
 
 Crawler::~Crawler()
@@ -39,7 +44,7 @@ Crawler::~Crawler()
   delete mServo6;
 }
 
-void Crawler::init(int leftward, int rightfoward)
+void Crawler::Init(int leftward, int rightfoward)
 {
   MotorDriver = Emakefun_MotorDriver(0x60, MOTOR_DRIVER_BOARD_V5);
   Sensors = (Emakefun_Sensor *)MotorDriver.getSensor(E_SENSOR_MAX);
@@ -50,11 +55,7 @@ void Crawler::init(int leftward, int rightfoward)
 }
 
 
-#if ARDUINO > 10609
 void Crawler::Move(int directions = 1)
-#else
-void Crawler::Move(int directions)
-#endif
 {
   if (directions == 1) {
     GoForward();
@@ -198,6 +199,51 @@ void Crawler::Drive(int degree)
   }
 }
 
+void Crawler::SetSpeed(int8_t s)
+{
+    // DEBUG_LOG(DEBUG_LEVEL_INFO, "SetSpeed =%d \n", s);
+    if (s > 100) {
+        Speed = 100;
+        return;
+    } else if (s < 0) {
+        Speed = 0;
+        return;
+    }
+    Speed = s;
+}
+
+int Crawler::GetSpeed(void)
+{
+    return Speed;
+}
+
+void Crawler::SpeedUp(int8_t Duration = 5)
+{
+    SetSpeed(Speed + Duration);
+    mStatus = E_SPEED_UP;
+}
+
+void Crawler::SpeedDown(int8_t Duration = 5)
+{
+    SetSpeed(Speed - Duration);
+    mStatus = E_SPEED_DOWN;
+}
+
+void Crawler::SetStatus(E_CRAWLER_STATUS status=0)
+{
+    mStatus = status;
+}
+
+E_CRAWLER_STATUS Crawler::GetStatus(void)
+{
+    return mStatus;
+}
+
+uint8_t Crawler::GetBattery(void)
+{
+    return BatteryValue;
+}
+
 void Crawler::InitIr(void)
 {
   IR = MotorDriver.getSensor(E_IR);
@@ -208,7 +254,7 @@ void Crawler::InitBuzzer(void)
   Buzzer = MotorDriver.getSensor(E_BUZZER);
 }
 
-void Crawler::sing(byte songName)
+void Crawler::Sing(byte songName)
 {
   Sensors->Sing(songName);
 }
@@ -264,22 +310,22 @@ void Crawler::InitUltrasonic(void)
   MotorDriver.getSensor(E_ULTRASONIC);
 }
 
-byte Crawler::GetUltrasonicValue(byte direction)
+byte Crawler::GetUltrasonicValue(E_SERVO_DIRECTION direction)
 {
   byte distance;
-  if (direction == 0) {
-    SetServoDegree(1, 90);
+  if (direction == E_SERVO_FRONT) {
+    SetServoDegree(ULTRASONIC_SERVO, 90);
     distance = Sensors->GetUltrasonicDistance();
-  } else if (direction == 1) {
-    SetServoDegree(1, 180);
-    distance = Sensors->GetUltrasonicDistance();
-    delay(400);
-    SetServoDegree(1, 90);
-  } else if (direction == 2) {
-    SetServoDegree(1, 15);
+  } else if (direction == E_SERVO_LEFT) {
+    SetServoDegree(ULTRASONIC_SERVO, 180);
     distance = Sensors->GetUltrasonicDistance();
     delay(400);
-    SetServoDegree(1, 90);
+    SetServoDegree(ULTRASONIC_SERVO, 90);
+  } else if (direction == E_SERVO_RIGHT) {
+    SetServoDegree(ULTRASONIC_SERVO, 15);
+    distance = Sensors->GetUltrasonicDistance();
+    delay(400);
+    SetServoDegree(ULTRASONIC_SERVO, 90);
   }
   return distance;
 }
@@ -299,53 +345,33 @@ void Crawler::SetServoBaseDegree(uint8_t base)
   ServoBaseDegree = base;
 }
 
-void Crawler::SetServoDegree(byte pin , byte Angle)
+void Crawler::SetServoDegree(byte pin, byte angle)
 {
-  int Degree = Angle;
   int servo_degree;
-  ServoPin = pin;
-  if (Degree > 360) {
+  if (angle > 360) {
     return;
   }
-  if (Degree == 90 || Degree == 270) {
+  if (angle == 90 || angle == 270) {
     servo_degree = ServoBaseDegree;
-  } else if (Degree >= 0 && Degree <= 180) {
-    servo_degree = ServoBaseDegree - 90 + Degree;   // 180-degree-diff
+  } else if (angle >= 0 && angle <= 180) {
+    servo_degree = ServoBaseDegree - 90 + angle;   // 180-degree-diff
   }
-  if (ServoPin == 1)
+  if (pin == 1)
     mServo1->writeServo(servo_degree);
-  else if (ServoPin == 2)
-    mServo2->writeServo(Angle);
-  else if (ServoPin == 3)
-    mServo3->writeServo(Angle);
-  else if (ServoPin == 4)
-    mServo4->writeServo(Angle);
-  else if (ServoPin == 5)
-    mServo5->writeServo(Angle);
-  else if (ServoPin == 6)
-    mServo6->writeServo(Angle);
+  else if (pin == 2)
+    mServo2->writeServo(servo_degree);
+  else if (pin == 3)
+    mServo3->writeServo(servo_degree);
+  else if (pin == 4)
+    mServo4->writeServo(servo_degree);
+  else if (pin == 5)
+    mServo5->writeServo(servo_degree);
+  else if (pin == 6)
+    mServo6->writeServo(servo_degree);
 }
 
 void Crawler::InitNrf24L01(char *Rxaddr)
 {
   Nrf24L01 = MotorDriver.getSensor(E_NRF24L01);
   Nrf24L01->setRADDR(Rxaddr);
-}
-
-void Crawler::SendUltrasonicData(void)
-{
-  union
-  {
-    float d;
-    byte data[4];
-  } value;
-  value.d = GetUltrasonicValue(FRONT);
-  SendData.start_code = 0xAA;
-  SendData.type = E_PANTHER_TANK;
-  SendData.addr = 0x01;
-  SendData.function = E_ULTRASONIC_MODE;
-  SendData.data = value.data;
-  SendData.len = 10;
-  SendData.end_code = 0x55;
-  mProtocolPackage->SendPackage(&SendData, 4);
 }

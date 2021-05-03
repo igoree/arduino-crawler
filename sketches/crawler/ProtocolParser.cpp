@@ -172,12 +172,6 @@ bool ProtocolParser::RecevData(byte *data, size_t len)
     return true;
 }
 
-
-E_TYPE ProtocolParser::GetRobotType(void)
-{
-    return (E_TYPE)recv->type;
-}
-
 uint8_t ProtocolParser::GetRobotAddr(void)
 {
     return recv->addr;
@@ -322,15 +316,6 @@ uint8_t ProtocolParser::GetPackageLength(void)
     return m_PackageLength;
 }
 
-E_SMARTCAR_CONTROL_MODE ProtocolParser::GetControlMode(void)
-{
-    if (((E_CONTOROL_FUNC)recv->function) == E_CONTROL_MODE) {
-        return (E_SMARTCAR_CONTROL_MODE)(*(recv->data));
-    } else {
-        return (E_SMARTCAR_CONTROL_MODE)0;
-    }
-}
-
 uint16_t ProtocolParser::GetCheckSum(void)
 {
     return ((buffer[m_PackageLength - 3] << 8 ) |  buffer[m_PackageLength - 2]);
@@ -344,14 +329,13 @@ bool ProtocolParser::SendPackage(ST_PROTOCOL *send_dat,int len)
         return false;
     }
     unsigned short checksum = 0;
-    byte *p_data = &buffer[5];
+    byte *p_data = &buffer[4];
     protocol_data_len = len;
     buffer[0] = send_dat->start_code;
     buffer[1] = send_dat->len;
-    buffer[2] = send_dat->type;
-    buffer[3] = send_dat->addr;
-    buffer[4] = send_dat->function;
-    checksum = buffer[1] + buffer[2] + buffer[3] + buffer[4];
+    buffer[2] = send_dat->addr;
+    buffer[3] = send_dat->function;
+    checksum = buffer[1] + buffer[2] + buffer[3];
 
    //  Serial.println(*send_dat->data);
    // Serial.println(*(send_dat->data + 1 ));
