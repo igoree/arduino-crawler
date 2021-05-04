@@ -166,7 +166,7 @@
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties config.Debug.customdebug_uno_debugger_type="universal" />
+      <UserProperties arduino.upload.port="COM4" config.Debug.customdebug_uno_debugger_type="universal" config.Release.customdebug_uno_debugger_type="universal" debug.view.AnalogPins="1" debug.view.DigitalPins="1" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>
