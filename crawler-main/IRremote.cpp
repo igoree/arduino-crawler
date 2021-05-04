@@ -1,6 +1,4 @@
-
 #include "IRremote.h"
-#include "IRKeyMap.h"
 // Provides ISR
 #ifndef __AVR_ATmega32U4__
 #include <avr/interrupt.h>
@@ -491,27 +489,6 @@ unsigned char IRremote::getCode()
   return irRead;
 }
 
-String IRremote::getKeyMap(byte keycode)
-{
-   byte i;
-   ST_IR_KEY_MAP *irkeymap = ir_keymap;
-   for (i = 0; i < IR_KEY_COUNT; i++) {
-        if (irkeymap[i].keycode == keycode)
-        return irkeymap[i].keyname;
-   }
-   return "";
-}
-
-byte IRremote::getIrKey(byte keycode)
-{
-    byte i;
-    ST_IR_KEY_MAP *irkeymap = ir_keymap;
-    for (i = 0; i < IR_KEY_COUNT; i++) {
-        if (irkeymap[i].keycode == keycode)
-        return i;
-    }
-   return 0xFF;
-}
 /**
  * \par Function
  *    sendString

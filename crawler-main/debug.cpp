@@ -7,5 +7,5 @@ void debug_printf(char* fmt, ...)
 	char string[128];
 	va_start(v_arg, fmt);
 	vsprintf(string, fmt, v_arg);
-	Serial.print(string);
+	Serial.println(string);
 }

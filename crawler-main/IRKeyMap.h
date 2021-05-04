@@ -1,34 +1,25 @@
 #ifndef _KEYMAY_H_
 #define _KEYMAY_H_
-#include <Arduino.h>
 
-#define IR_KEY_COUNT 18
+enum class IRKeyCode : uint8_t {
+	Unknown = 0,
+	Button1 = 0x45,
+	Button2 = 0x46,
+	Button3 = 0x47,
+	Button4 = 0x44,
+	Button5 = 0x40,
+	Button6 = 0x43,
+	Button7 = 0x07,
+	Button8 = 0x15,
+	Button9 = 0x09,
+	Button0 = 0x19,
+	Star = 0x16,
+	Pound = 0x0D,
+	Up = 0x18,
+	Down = 0x52,
+	Ok = 0x1C,
+	Left = 0x08,
+	Right = 0x5A
+};
 
-typedef struct
-{
-    String keyname;
-    byte keycode;
-} ST_IR_KEY_MAP;
-
-typedef enum {
-    IR_KEYCODE_1 = 0,
-    IR_KEYCODE_2,
-    IR_KEYCODE_3,
-    IR_KEYCODE_4,
-    IR_KEYCODE_5,
-    IR_KEYCODE_6,
-    IR_KEYCODE_7,
-    IR_KEYCODE_8,
-    IR_KEYCODE_9,
-    IR_KEYCODE_0,
-    IR_KEYCODE_STAR,      // *
-    IR_KEYCODE_POUND,     // # 
-    IR_KEYCODE_UP,
-    IR_KEYCODE_DOWN,
-    IR_KEYCODE_OK,
-    IR_KEYCODE_LEFT,
-    IR_KEYCODE_RIGHT,
-} E_IR_KEYCODE;
-
-extern ST_IR_KEY_MAP ir_keymap[];
 #endif  /* _KEYMAY_H_ */

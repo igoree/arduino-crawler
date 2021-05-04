@@ -31,73 +31,73 @@ void SingSound(uint8_t soundIndex) {
 	mCrawler.Sing(soundIndex);
 }
 
-void HandleInfaredRemote(byte irKeyCode)
+void HandleInfaredRemote(IRKeyCode irKeyCode)
 {
-	switch ((E_IR_KEYCODE)mCrawler.IR->getIrKey(irKeyCode)) {
-	case IR_KEYCODE_STAR:
+	switch (irKeyCode) {
+	case IRKeyCode::Star:
 		mCrawler.Sing(S_connection);
 		mCrawler.SetRgbColor(E_RGB_ALL, mCrawler.GetSpeed() * 2.5);
 		mCrawler.SpeedUp(10);
 		DEBUG_INFO("Speed = %d \n", mCrawler.GetSpeed());
 		break;
-	case IR_KEYCODE_POUND:
+	case IRKeyCode::Pound:
 		mCrawler.Sing(S_disconnection);
 		mCrawler.SetRgbColor(E_RGB_ALL, mCrawler.GetSpeed() * 2.5);
 		mCrawler.SpeedDown(10);
 		break;
-	case IR_KEYCODE_UP:
+	case IRKeyCode::Up:
 		mCrawler.GoForward();
 		break;
-	case IR_KEYCODE_DOWN:
+	case IRKeyCode::Down:
 		mCrawler.GoBack();
 		break;
-	case IR_KEYCODE_OK:
+	case IRKeyCode::Ok:
 		mCrawler.Stop();
 		break;
-	case IR_KEYCODE_LEFT:
+	case IRKeyCode::Left:
 		mCrawler.TurnLeft();
 		break;
-	case IR_KEYCODE_RIGHT:
+	case IRKeyCode::Right:
 		mCrawler.TurnRight();
 		break;
 
-	case IR_KEYCODE_1:
+	case IRKeyCode::Button1:
 		SingSound(2);
 		break;
 
-	case IR_KEYCODE_2:
+	case IRKeyCode::Button2:
 		SingSound(3);
 		break;
 
-	case IR_KEYCODE_3:
+	case IRKeyCode::Button3:
 		SingSound(4);
 		break;
 
-	case IR_KEYCODE_4:
+	case IRKeyCode::Button4:
 		SingSound(5);
 		break;
 
-	case IR_KEYCODE_5:
+	case IRKeyCode::Button5:
 		SingSound(6);
 		break;
 
-	case IR_KEYCODE_6:
+	case IRKeyCode::Button6:
 		SingSound(7);
 		break;
 
-	case IR_KEYCODE_7:
+	case IRKeyCode::Button7:
 		SingSound(8);
 		break;
 
-	case IR_KEYCODE_8:
+	case IRKeyCode::Button8:
 		SingSound(9);
 		break;
 
-	case IR_KEYCODE_9:
+	case IRKeyCode::Button9:
 		SingSound(10);
 		break;
 
-	case IR_KEYCODE_0:
+	case IRKeyCode::Button0:
 		secondSoundGroup = !secondSoundGroup;
 		break;
 
@@ -175,15 +175,17 @@ void loop()
 		}*/
 	}
 
-	byte irKeyCode;
-	if (irKeyCode = mCrawler.IR->getCode())
+	IRKeyCode irKeyCode = (IRKeyCode)mCrawler.IR->getCode();
+	if (irKeyCode != IRKeyCode::Unknown)
 	{
-		DEBUG_INFO("irKeyCode = %lx \n", irKeyCode);
+		DEBUG_INFO("irKeyCode = %x", (uint8_t) irKeyCode);
 		HandleInfaredRemote(irKeyCode);
 		delay(110);
 	}
-	else {
-		if (mCrawler.GetStatus() != E_STOP) {
+	else
+	{
+		if (mCrawler.GetStatus() != E_STOP) 
+		{
 			mCrawler.Stop();
 		}
 	}

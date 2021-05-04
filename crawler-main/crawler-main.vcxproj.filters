@@ -77,9 +77,6 @@
     <ClCompile Include="Emakefun_MS_PWMServoDriver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IRKeyMap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="IRremote.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

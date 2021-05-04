@@ -126,8 +126,6 @@ public:
   int rawlen; // Number of records in rawbuf.
   String getString();
   unsigned char getCode();
-  String getKeyMap(byte keycode);
-  byte getIrKey(byte keycode);
   void sendString(String s);
   void sendString(float v);
   void sendNEC(unsigned long data, int nbits);

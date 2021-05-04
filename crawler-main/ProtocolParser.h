@@ -45,7 +45,6 @@ class ProtocolParser
     uint8_t m_PackageLength;            // recevie package length
     uint16_t m_CheckSum;
     uint8_t m_RecvDataIndex;            // get recevie data index
-    char GetHeader(size_t index);
     uint8_t GetPackageLength(void);
     uint16_t GetCheckSum(void);             // get package check sum
 };
