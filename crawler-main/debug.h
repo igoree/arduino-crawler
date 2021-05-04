@@ -3,15 +3,22 @@
 
 #define  DEBUG_LEVEL_INFO  1
 #define  DEBUG_LEVEL_ERR   2
+#define  DEBUG_LEVEL_NONE  0xFF
 
 #ifndef  DEBUG_LEVEL
-#define  DEBUG_LEVEL  0xFF
+#define  DEBUG_LEVEL  DEBUG_LEVEL_INFO
+#endif
+
+#if DEBUG_LEVEL <= DEBUG_LEVEL_ERR
+#define INIT_DEBUG() Serial.begin(9600)
+#else
+#define INIT_DEBUG()
 #endif
 
 #if DEBUG_LEVEL <= DEBUG_LEVEL_INFO
 #define DEBUG_INFO(fmt, ...) \
     do{\
-        arduino_printf(fmt, ##__VA_ARGS__);\
+        debug_printf(fmt, ##__VA_ARGS__);\
     }while(0)
 #else
 #define DEBUG_INFO(fmt, ...)
@@ -20,13 +27,13 @@
 #if DEBUG_LEVEL <= DEBUG_LEVEL_ERR
 #define DEBUG_ERR(fmt, ...) \
     do{\
-        arduino_printf("[Error][%s:%s:%d]",__FILE__,__FUNCTION__,__LINE__);\
-        arduino_printf(fmt, ##__VA_ARGS__);\
-    }while(0)
+        debug_printf("[Error][%s:%s:%d]",__FILE__,__FUNCTION__,__LINE__);\
+        debug_printf(fmt, ##__VA_ARGS__);\
+    } while(0)
 #else
 #define DEBUG_ERR(fmt, ...)
 #endif
 
-void arduino_printf(char *fmt ,...);
+void debug_printf(char* fmt, ...);
 
-#endif  /*  _DEBUG_  */
+#endif  /*  _DEBUG_H  */
