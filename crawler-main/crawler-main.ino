@@ -1,3 +1,5 @@
+#include <SPI.h>
+#include <SoftwareSerial.h>
 #include "debug.h"
 #include "Emakefun_MotorDriver.h"
 #include "Crawler.h"
@@ -110,7 +112,7 @@ void HandleInfaredRemote (byte irKeyCode)
 void HandleUltrasonicAvoidance(void)
 {
   uint16_t UlFrontDistance, UlLeftDistance, UlRightDistance;
-  UlFrontDistance = mCrawler.GetUltrasonicValue(0);
+  UlFrontDistance = mCrawler.GetUltrasonicValue(E_SERVO_FRONT);
   if (count++ > 50) {
     //mCrawler.SendUltrasonicData();
     count = 0;
@@ -126,9 +128,9 @@ void HandleUltrasonicAvoidance(void)
   {
     mCrawler.Stop();
     delay(100);
-    UlRightDistance = mCrawler.GetUltrasonicValue(2);
+    UlRightDistance = mCrawler.GetUltrasonicValue(E_SERVO_RIGHT);
     delay(50);
-    UlLeftDistance = mCrawler.GetUltrasonicValue(1);
+    UlLeftDistance = mCrawler.GetUltrasonicValue(E_SERVO_LEFT);
     if ((UlRightDistance > UL_LIMIT_MIN) && (UlRightDistance < UL_LIMIT_MAX)) {
       mCrawler.SetSpeed(100);
       mCrawler.TurnRight();

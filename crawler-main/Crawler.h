@@ -1,8 +1,5 @@
 #ifndef _PANTHER_TANK_H_
 #define _PANTHER_TANK_H_
-#include <stdint.h>
-#include "SPI.h"
-#include "Arduino.h"
 #include "Emakefun_MotorDriver.h"
 #include "ProtocolParser.h"
 
