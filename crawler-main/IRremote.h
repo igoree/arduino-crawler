@@ -107,11 +107,11 @@ typedef struct {
 } irparams_t;
 
 
-class IRremote
+class IRRemote
 {
 public:
 
-  IRremote(int pin);
+  IRRemote(int pin);
   ErrorStatus decode();
   void begin();
   void end();

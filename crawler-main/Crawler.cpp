@@ -1,353 +1,293 @@
 #include "Crawler.h"
-#include "ProtocolParser.h"
 #include "Sounds.h"
 #include "debug.h"
 
 //MotorDriverBoard V4.0
-Crawler::Crawler(ProtocolParser *protocolParser)
+Crawler::Crawler()
 {
-  mAddr = 0x01;
-  mStatus = E_STOP;
-  mBatteryValue = 0;
-  mSpeed = 0 ;
-  mDegree = 0;
-  mLeftDrive = mRightDrive = NULL;
-  IR = NULL;
-  Buzzer  = NULL;
-  Rgb = NULL;
-  Nrf24L01 = NULL;
-  mServo1 = NULL;
-  mServo2 = NULL;
-  mServo3 = NULL;
-  mServo4 = NULL;
-  mServo5 = NULL;
-  mServo6 = NULL;
-  SetStatus(E_STOP);
-  mProtocolParser = protocolParser;
+	_status = CrawlerStatus::Stop;
+	_batteryValue = 0;
+	_speed = 0;
+	_leftDrive = _rightDrive = NULL;
+	_ir = NULL;
+	Buzzer = NULL;
+	Rgb = NULL;
+	Nrf24L01 = NULL;
+
+	for (uint8_t i = 0; i < CRAWLER_SERVO_COUNT; i++)
+	{
+		_servos[i] = NULL;
+	}
+
+	setStatus(CrawlerStatus::Stop);
 }
 
 Crawler::~Crawler()
 {
-  delete mLeftDrive;
-  delete mRightDrive;
-  delete IR;
-  delete Buzzer;
-  delete Rgb;
-  delete Nrf24L01;
-  delete mServo1;
-  delete mServo2;
-  delete mServo3;
-  delete mServo4;
-  delete mServo5;
-  delete mServo6;
+	delete _leftDrive;
+	delete _rightDrive;
+	delete _ir;
+	delete Buzzer;
+	delete Rgb;
+	delete Nrf24L01;
+
+	for (uint8_t i = 0; i < CRAWLER_SERVO_COUNT; i++)
+	{
+		delete _servos[i];
+	}
 }
 
-void Crawler::Init(int leftDrive, int rightDrive)
+void Crawler::init(int leftDrive, int rightDrive)
 {
-  mMotorDriver = Emakefun_MotorDriver(0x60, MOTOR_DRIVER_BOARD_V5);
-  Sensors = (Emakefun_Sensor *)mMotorDriver.getSensor(E_SENSOR_MAX);
-  mLeftDrive = mMotorDriver.getMotor(leftDrive);
-  mRightDrive = mMotorDriver.getMotor(rightDrive);
-  delay(200);
-  mMotorDriver.begin(50);
+	_motorDriver = Emakefun_MotorDriver(0x60, MOTOR_DRIVER_BOARD_V5);
+	_sensors = (Emakefun_Sensor*)_motorDriver.getSensor(E_SENSOR_MAX);
+	_leftDrive = _motorDriver.getMotor(leftDrive);
+	_rightDrive = _motorDriver.getMotor(rightDrive);
+	delay(200);
+	_motorDriver.begin(50);
 }
 
-void Crawler::StopDrive(Emakefun_DCMotor* drive) 
+void Crawler::stopDrive(Emakefun_DCMotor* drive)
 {
-  drive->run(BRAKE);
+	drive->run(BRAKE);
 }
 
-void Crawler::RunDrive(Emakefun_DCMotor* drive, uint8_t speed, uint8_t direction)
+void Crawler::runDrive(Emakefun_DCMotor* drive, uint8_t speed, uint8_t direction)
 {
-  if (speed >= 0 && speed <= 100) {
-    drive->setSpeed((speed / 10) * 25.5);
-    drive->run(direction);
-    return;
-  }
-  
-  DEBUG_ERR("Invalid speed: %d\r\n", speed);
+	if (speed >= 0 && speed <= 100) {
+		drive->setSpeed((speed / 10) * 25.5);
+		drive->run(direction);
+		return;
+	}
+
+	DEBUG_ERR("Invalid speed: %d", speed);
 }
 
-void Crawler::GoForward(void)
+void Crawler::goForward(void)
 {
-  SetStatus(E_FORWARD);
-  RunDrive(mLeftDrive, mSpeed, FORWARD);
-  RunDrive(mRightDrive, mSpeed, FORWARD);
+	setStatus(CrawlerStatus::RunForward);
+	runDrive(_leftDrive, _speed, FORWARD);
+	runDrive(_rightDrive, _speed, FORWARD);
 }
 
-void Crawler::GoBack(void)
+void Crawler::goBack(void)
 {
-  SetStatus(E_BACK);
-  RunDrive(mLeftDrive, mSpeed, BACKWARD);
-  RunDrive(mRightDrive, mSpeed, BACKWARD);
+	setStatus(CrawlerStatus::RunBackward);
+	runDrive(_leftDrive, _speed, BACKWARD);
+	runDrive(_rightDrive, _speed, BACKWARD);
 }
 
-void Crawler::Stop(void)
+void Crawler::stop(void)
 {
-  SetStatus(E_STOP);
-  StopDrive(mLeftDrive);
-  StopDrive(mRightDrive);
+	setStatus(CrawlerStatus::Stop);
+	stopDrive(_leftDrive);
+	stopDrive(_rightDrive);
 }
 
-void Crawler::TurnLeft(void)
+void Crawler::turnLeft(void)
 {
-  SetStatus(E_LEFT);
-  RunDrive(mLeftDrive, mSpeed / 3, FORWARD);
-  RunDrive(mRightDrive, mSpeed, FORWARD);
+	setStatus(CrawlerStatus::TurnLeft);
+	runDrive(_leftDrive, _speed / 3, FORWARD);
+	runDrive(_rightDrive, _speed, FORWARD);
 }
 
-void Crawler::TurnRight(void)
+void Crawler::turnRight(void)
 {
-  SetStatus(E_RIGHT);
-  RunDrive(mLeftDrive, mSpeed, FORWARD);
-  RunDrive(mRightDrive, mSpeed / 3, FORWARD);
+	setStatus(CrawlerStatus::TurnRight);
+	runDrive(_leftDrive, _speed, FORWARD);
+	runDrive(_rightDrive, _speed / 3, FORWARD);
 }
 
-void Crawler::TurnLeftRotate(void)
+void Crawler::turnLeftRotate(void)
 {
-  SetStatus(E_LEFT_ROTATE);
-  RunDrive(mLeftDrive, mSpeed, BACKWARD);
-  RunDrive(mRightDrive, mSpeed, FORWARD);
+	setStatus(CrawlerStatus::TurnLeftRotate);
+	runDrive(_leftDrive, _speed, BACKWARD);
+	runDrive(_rightDrive, _speed, FORWARD);
 }
 
-void Crawler::TurnRightRotate(void)
+void Crawler::turnRightRotate(void)
 {
-  SetStatus(E_RIGHT_ROTATE);
-  RunDrive(mLeftDrive, mSpeed, FORWARD);
-  RunDrive(mRightDrive, mSpeed, BACKWARD);
+	setStatus(CrawlerStatus::TurnRightRotate);
+	runDrive(_leftDrive, _speed, FORWARD);
+	runDrive(_rightDrive, _speed, BACKWARD);
 }
 
-void Crawler::Drive(void)
+void Crawler::setSpeed(int8_t speed)
 {
-  Drive(mDegree);
+	if (speed > 100) {
+		_speed = 100;
+		return;
+	}
+	else if (speed < 0) {
+		_speed = 0;
+		return;
+	}
+	_speed = speed;
 }
 
-void Crawler::Drive(int degree)
+uint8_t Crawler::getSpeed()
 {
-  DEBUG_INFO( "degree = %d speed = %d\n", degree, mSpeed);
-  byte value = (mSpeed / 10) * 25.5;	 //app contol hbot_speed is 0 ~ 100 ,pwm is 0~255
-  float f;
-  if (degree >= 0 && degree <= 90) {
-    f = (float)(degree) / 90;
-    if (degree <= 5) {
-      SetStatus(E_RIGHT);
-    } else  if (degree >= 85) {
-      SetStatus(E_FORWARD);
-    }
-    RunDrive(mLeftDrive, value, FORWARD);
-    RunDrive(mRightDrive, value * f, FORWARD);
-  } else if (degree > 90 && degree <= 180) {
-    f = (float)(180 - degree) / 90;
-    if (degree <= 95) {
-      SetStatus(E_FORWARD);
-    } else  if (degree >= 175) {
-      SetStatus(E_LEFT);
-    }
-    RunDrive(mLeftDrive, value * f, FORWARD);
-    RunDrive(mRightDrive, value, FORWARD);
-  } else if (degree > 180 && degree <= 270) {
-    f = (float)(degree - 180) / 90;
-    if (degree <= 185) {
-      SetStatus(E_LEFT);
-    } else  if (degree >= 265) {
-      SetStatus(E_BACK);
-    }
-    RunDrive(mLeftDrive, value * f, BACKWARD);
-    RunDrive(mRightDrive, value, BACKWARD);
-  } else if (degree > 270 && degree <= 360) {
-    f = (float)(360 - degree) / 90;
-    if (degree <= 275) {
-      SetStatus(E_BACK);
-    } else  if (degree >= 355) {
-      SetStatus(E_RIGHT);
-    }
-    RunDrive(mLeftDrive, value, BACKWARD);
-    RunDrive(mRightDrive, value * f, BACKWARD);
-  }
-  else {
-    Stop();
-    return;
-  }
+	return _speed;
 }
 
-void Crawler::SetSpeed(int8_t s)
+bool Crawler::speedUp(int8_t delta = 5)
 {
-  if (s > 100) {
-    mSpeed = 100;
-    return;
-  } else if (s < 0) {
-    mSpeed = 0;
-    return;
-  }
-  mSpeed = s;
+	_status = CrawlerStatus::SpeedUp;
+	uint8_t oldSpeed = _speed;
+	setSpeed(_speed + delta);
+
+	return oldSpeed != _speed;
 }
 
-int Crawler::GetSpeed(void)
+bool Crawler::speedDown(int8_t delta = 5)
 {
-   return mSpeed;
+	_status = CrawlerStatus::SpeedDown;
+	uint8_t oldSpeed = _speed;
+	setSpeed(_speed - delta);
+
+	return oldSpeed != _speed;
 }
 
-bool Crawler::SpeedUp(int8_t delta = 5)
+void Crawler::setStatus(CrawlerStatus status)
 {
-  mStatus = E_SPEED_UP;
-  uint8_t oldSpeed = mSpeed;
-  SetSpeed(mSpeed + delta);
-
-  return oldSpeed != mSpeed;
+	_status = status;
 }
 
-bool Crawler::SpeedDown(int8_t delta = 5)
+CrawlerStatus Crawler::getStatus()
 {
-  mStatus = E_SPEED_DOWN;  
-  uint8_t oldSpeed = mSpeed;
-  SetSpeed(mSpeed - delta);
-
-  return oldSpeed != mSpeed;
+	return _status;
 }
 
-void Crawler::SetStatus(E_CRAWLER_STATUS status)
+uint8_t Crawler::getBattery()
 {
-    mStatus = status;
+	return _batteryValue;
 }
 
-E_CRAWLER_STATUS Crawler::GetStatus(void)
+void Crawler::initIr()
 {
-    return mStatus;
+	_ir = (IRRemote*)_motorDriver.getSensor(E_IR);
 }
 
-uint8_t Crawler::GetBattery(void)
+IRKeyCode Crawler::getPressedIRKey()
 {
-    return mBatteryValue;
+	return (IRKeyCode) _ir->getCode();
 }
 
-void Crawler::InitIr(void)
+void Crawler::initBuzzer(void)
 {
-  IR = mMotorDriver.getSensor(E_IR);
+	Buzzer = (::Buzzer*)_motorDriver.getSensor(E_BUZZER);
 }
 
-void Crawler::InitBuzzer(void)
+void Crawler::playSound(byte songName)
 {
-  Buzzer = mMotorDriver.getSensor(E_BUZZER);
+	_sensors->Sing(songName);
 }
 
-void Crawler::Sing(byte songName)
+void Crawler::initRgb(void)
 {
-  Sensors->Sing(songName);
+	Rgb = (RGBLed*)_motorDriver.getSensor(E_RGB);
 }
 
-void Crawler::PianoSing(ST_MUSIC_TYPE music)
+void Crawler::setRgbColor(E_RGB_INDEX index, long Color)
 {
-  Buzzer->_tone(music.note, music.beat, 2);
+	_sensors->SetRgbColor(index, Color);
 }
 
-void Crawler::InitRgb(void)
+void Crawler::lightOff(void)
 {
-  Rgb = mMotorDriver.getSensor(E_RGB);
+	_sensors->SetRgbColor(E_RGB_ALL, RGB_BLACK);
 }
 
-void Crawler::SetRgbColor(E_RGB_INDEX index , long Color)
+void Crawler::setRgbEffect(E_RGB_INDEX index, long Color, CrawlerRgbEffect effect)
 {
-  Sensors->SetRgbColor(index, Color);
+	if (Rgb != NULL) {
+		switch (effect) {
+		case CrawlerRgbEffect::Breathing:
+			for (long i = 0; i < 256; i++) {
+				setRgbColor(index, (i << 16) | (i << 8) | i);
+				delay((i < 18) ? 18 : (256 / i));
+			}
+			for (long i = 255; i >= 0; i--) {
+				setRgbColor(index, (i << 16) | (i << 8) | i);
+				delay((i < 18) ? 18 : (256 / i));
+			}
+			break;
+		case CrawlerRgbEffect::Flash:
+			for (byte i = 0; i < 6; i++) {
+				setRgbColor(index, Color);
+				delay(100);
+				setRgbColor(index, 0);
+				delay(100);
+			}
+			break;
+		}
+	}
 }
 
-void Crawler::LightOff(void)
+void Crawler::initUltrasonic(void)
 {
-  Sensors->SetRgbColor(E_RGB_ALL, RGB_BLACK);
+	_motorDriver.getSensor(E_ULTRASONIC);
 }
 
-void Crawler::SetRgbEffect(E_RGB_INDEX index, long Color, uint8_t effect)
+byte Crawler::getUltrasonicValue(CrawlerUltrasonicServoDirection direction)
 {
-  if (Rgb != NULL) {
-    switch ((E_RGB_EFFECT)effect) {
-      case E_EFFECT_BREATHING:
-        for (long i = 0; i < 256; i++) {
-          SetRgbColor(index, (i << 16) | (i << 8) | i);
-          delay((i < 18) ? 18 : (256 / i));
-        }
-        for (long i = 255; i >= 0; i--) {
-          SetRgbColor(index, (i << 16) | (i << 8) | i);
-          delay((i < 18) ? 18 : (256 / i));
-        }
-        break;
-      case E_EFFECT_FLASH:
-        for (byte i = 0; i < 6; i++) {
-          SetRgbColor(index, Color);
-          delay(100);
-          SetRgbColor(index, 0);
-          delay(100);
-        }
-        break;
-    }
-  }
+	byte distance;
+	if (direction == CrawlerUltrasonicServoDirection::Front) {
+		setServoAngle(CrawlerServoKind::Ultrasonic, 90);
+		distance = _sensors->GetUltrasonicDistance();
+	}
+	else if (direction == CrawlerUltrasonicServoDirection::Left) {
+		setServoAngle(CrawlerServoKind::Ultrasonic, 180);
+		distance = _sensors->GetUltrasonicDistance();
+		delay(400);
+		setServoAngle(CrawlerServoKind::Ultrasonic, 90);
+	}
+	else if (direction == CrawlerUltrasonicServoDirection::Right) {
+		setServoAngle(CrawlerServoKind::Ultrasonic, 15);
+		distance = _sensors->GetUltrasonicDistance();
+		delay(400);
+		setServoAngle(CrawlerServoKind::Ultrasonic, 90);
+	}
+	return distance;
 }
 
-void Crawler::InitUltrasonic(void)
+void Crawler::initServo()
 {
-  mMotorDriver.getSensor(E_ULTRASONIC);
+	for (uint8_t i = 0; i < CRAWLER_SERVO_COUNT; i++)
+	{
+		_servos[i] = _motorDriver.getServo(i + 1);
+	}
 }
 
-byte Crawler::GetUltrasonicValue(E_SERVO_DIRECTION direction)
+void Crawler::setServoBaseAngle(uint8_t baseAngle)
 {
-  byte distance;
-  if (direction == E_SERVO_FRONT) {
-    SetServoDegree(ULTRASONIC_SERVO, 90);
-    distance = Sensors->GetUltrasonicDistance();
-  } else if (direction == E_SERVO_LEFT) {
-    SetServoDegree(ULTRASONIC_SERVO, 180);
-    distance = Sensors->GetUltrasonicDistance();
-    delay(400);
-    SetServoDegree(ULTRASONIC_SERVO, 90);
-  } else if (direction == E_SERVO_RIGHT) {
-    SetServoDegree(ULTRASONIC_SERVO, 15);
-    distance = Sensors->GetUltrasonicDistance();
-    delay(400);
-    SetServoDegree(ULTRASONIC_SERVO, 90);
-  }
-  return distance;
+	_servoBaseAngle = baseAngle;
 }
 
-void Crawler::InitServo(void)
+void Crawler::setServoAngle(CrawlerServoKind servoKind, byte angle)
 {
-  mServo1 = mMotorDriver.getServo(1);
-  mServo2 = mMotorDriver.getServo(2);
-  mServo3 = mMotorDriver.getServo(3);
-  mServo4 = mMotorDriver.getServo(4);
-  mServo5 = mMotorDriver.getServo(5);
-  mServo6 = mMotorDriver.getServo(6);
+	int servoAngle;
+	if (angle > 360) 
+	{
+		return;
+	}
+
+	if (angle == 90 || angle == 270) 
+	{
+		servoAngle = _servoBaseAngle;
+	}
+	else if (angle >= 0 && angle <= 180) 
+	{
+		servoAngle = _servoBaseAngle - 90 + angle;   // 180-degree-diff
+	}
+
+	uint8_t servoIndex = ((uint8_t)servoKind - 1);
+
+	_servos[servoIndex]->writeServo(servoAngle);
 }
 
-void Crawler::SetServoBaseDegree(uint8_t base)
+void Crawler::initNrf24L01(uint8_t* rxAddr)
 {
-  mServoBaseDegree = base;
-}
-
-void Crawler::SetServoDegree(byte pin, byte angle)
-{
-  int servo_degree;
-  if (angle > 360) {
-    return;
-  }
-  if (angle == 90 || angle == 270) {
-    servo_degree = mServoBaseDegree;
-  } else if (angle >= 0 && angle <= 180) {
-    servo_degree = mServoBaseDegree - 90 + angle;   // 180-degree-diff
-  }
-  if (pin == 1)
-    mServo1->writeServo(servo_degree);
-  else if (pin == 2)
-    mServo2->writeServo(servo_degree);
-  else if (pin == 3)
-    mServo3->writeServo(servo_degree);
-  else if (pin == 4)
-    mServo4->writeServo(servo_degree);
-  else if (pin == 5)
-    mServo5->writeServo(servo_degree);
-  else if (pin == 6)
-    mServo6->writeServo(servo_degree);
-}
-
-void Crawler::InitNrf24L01(char *Rxaddr)
-{
-  Nrf24L01 = mMotorDriver.getSensor(E_NRF24L01);
-  Nrf24L01->setRADDR(Rxaddr);
+	Nrf24L01 = (Nrf24l*) _motorDriver.getSensor(E_NRF24L01);
+	Nrf24L01->setRADDR(rxAddr);
 }

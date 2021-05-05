@@ -86,7 +86,7 @@ ISR(TIMER_INTR_NAME)
  * \param[in]
  *   None
  */
-IRremote::IRremote(int pin)
+IRRemote::IRRemote(int pin)
 {
   pinMode(pin,INPUT);
   irparams.recvpin = pin;
@@ -115,7 +115,7 @@ IRremote::IRremote(int pin)
  * \par Others
  *    None
  */
-void IRremote::begin()
+void IRRemote::begin()
 {
   cli();
   // setup pulse clock timer interrupt
@@ -150,7 +150,7 @@ void IRremote::begin()
  * \par Others
  *    None
  */
-void IRremote::end()
+void IRRemote::end()
 {
   EIMSK &= ~(1 << INT0);
 }
@@ -169,7 +169,7 @@ void IRremote::end()
  * \par Others
  *    Results of decoding are stored in results.
  */
-ErrorStatus IRremote::decode()
+ErrorStatus IRRemote::decode()
 {
   rawbuf = irparams.rawbuf;
   rawlen = irparams.rawlen;
@@ -202,7 +202,7 @@ ErrorStatus IRremote::decode()
  *    Results of decode NEC.
  */
 // NECs have a repeat only 4 items long
-ErrorStatus IRremote::decodeNEC()
+ErrorStatus IRRemote::decodeNEC()
 {
   static unsigned long repeat_value = 0xFFFFFFFF;
   static byte repeta_time = 0;
@@ -289,7 +289,7 @@ ErrorStatus IRremote::decodeNEC()
  * \par Others
  *    None
  */
-void IRremote::mark(uint16_t us)
+void IRRemote::mark(uint16_t us)
 {
   // Sends an IR mark for the specified number of microseconds.
   // The mark output is modulated at the PWM frequency.
@@ -312,7 +312,7 @@ void IRremote::mark(uint16_t us)
  *    None
  */
 /* Leave pin off for time (given in microseconds) */
-void IRremote::space(uint16_t us)
+void IRRemote::space(uint16_t us)
 {
   // Sends an IR space for the specified number of microseconds.
   // A space is no output, so the PWM output is disabled.
@@ -334,7 +334,7 @@ void IRremote::space(uint16_t us)
  * \par Others
  *    None
  */
-void IRremote::enableIROut(uint8_t khz)
+void IRRemote::enableIROut(uint8_t khz)
 {
   TIMER_DISABLE_INTR; //Timer2 disable Interrupt
   TIMER_CONFIG_KHZ(khz);
@@ -355,7 +355,7 @@ void IRremote::enableIROut(uint8_t khz)
  *    None
  */
 // initialization
-void IRremote::enableIRIn() {
+void IRRemote::enableIRIn() {
   cli();
   // setup pulse clock timer interrupt
   //Prescale /8 (16M/8 = 0.5 microseconds per tick)
@@ -396,7 +396,7 @@ void IRremote::enableIRIn() {
  * \par Others
  *    None
  */
-void IRremote::sendRaw(unsigned int buf[], int len, uint8_t hz)
+void IRRemote::sendRaw(unsigned int buf[], int len, uint8_t hz)
 {
   enableIROut(hz);
   for (int i = 0; i < len; i++)
@@ -427,7 +427,7 @@ void IRremote::sendRaw(unsigned int buf[], int len, uint8_t hz)
  * \par Others
  *    None
  */
-String IRremote::getString()
+String IRRemote::getString()
 {
   if(decode())
   {
@@ -482,7 +482,7 @@ String IRremote::getString()
  * \par Others
  *    None
  */
-unsigned char IRremote::getCode()
+unsigned char IRRemote::getCode()
 {
   irIndex = 0;
   loop();
@@ -503,7 +503,7 @@ unsigned char IRremote::getCode()
  * \par Others
  *    None
  */
-void IRremote::sendString(String s)
+void IRRemote::sendString(String s)
 {
   unsigned long l;
   uint8_t data;
@@ -536,7 +536,7 @@ void IRremote::sendString(String s)
  * \par Others
  *    None
  */
-void IRremote::sendString(float v)
+void IRRemote::sendString(float v)
 {
   dtostrf(v,5, 8, floatString);
   sendString(floatString);
@@ -558,7 +558,7 @@ void IRremote::sendString(float v)
  * \par Others
  *    None
  */
-void IRremote::sendNEC(unsigned long data, int nbits)
+void IRRemote::sendNEC(unsigned long data, int nbits)
 {
   
   enableIROut(38);
@@ -596,7 +596,7 @@ void IRremote::sendNEC(unsigned long data, int nbits)
  * \par Others
  *    None
  */
-void IRremote::loop()
+void IRRemote::loop()
 {
   if(decode())
   {
@@ -649,7 +649,7 @@ void IRremote::loop()
  * \par Others
  *    None
  */
-boolean IRremote::keyPressed(unsigned char r)
+boolean IRRemote::keyPressed(unsigned char r)
 {
   
   irIndex = 0;

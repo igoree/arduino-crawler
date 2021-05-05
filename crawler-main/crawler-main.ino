@@ -3,102 +3,102 @@
 #include "ProtocolParser.h"
 #include "IRKeyMap.h"
 
-ProtocolParser* mProtocol = new ProtocolParser();
-Crawler mCrawler(mProtocol);
-byte count = 0;
-bool secondSoundGroup = false;
+ProtocolParser _protocol = ProtocolParser();
+Crawler _crawler = Crawler();
+byte _count = 0;
+bool _secondSoundGroup = false;
 
 void setup()
 {
 	INIT_DEBUG();
-	mCrawler.Init(M2, M1);
-	mCrawler.InitServo();
-	mCrawler.InitRgb();
-	mCrawler.InitBuzzer();
-	mCrawler.InitIr();
-	mCrawler.SetSpeed(50);
-	mCrawler.SetServoBaseDegree(90);
-	mCrawler.SetServoDegree(ULTRASONIC_SERVO, 90);
-	mCrawler.InitUltrasonic();
+	_crawler.init(M2, M1);
+	_crawler.initServo();
+	_crawler.initRgb();
+	_crawler.initBuzzer();
+	_crawler.initIr();
+	_crawler.setSpeed(50);
+	_crawler.setServoBaseAngle(90);
+	_crawler.setServoAngle(CrawlerServoKind::Ultrasonic, 90);
+	_crawler.initUltrasonic();
 	DEBUG_INFO("init ok");
-	mCrawler.Sing(S_connection);
+	_crawler.playSound(S_connection);
 }
 
-void SingSound(uint8_t soundIndex) {
-	if (secondSoundGroup) {
+void playSound(uint8_t soundIndex) {
+	if (_secondSoundGroup) {
 		soundIndex = soundIndex + 9;
 	}
-	mCrawler.Sing(soundIndex);
+	_crawler.playSound(soundIndex);
 }
 
-void HandleInfaredRemote(IRKeyCode irKeyCode)
+void handleInfaredRemote(IRKeyCode irKeyCode)
 {
 	switch (irKeyCode) {
 	case IRKeyCode::Star:
-		mCrawler.Sing(S_connection);
-		mCrawler.SetRgbColor(E_RGB_ALL, mCrawler.GetSpeed() * 2.5);
-		mCrawler.SpeedUp(10);
-		DEBUG_INFO("Speed = %d \n", mCrawler.GetSpeed());
+		_crawler.playSound(S_connection);
+		_crawler.setRgbColor(E_RGB_ALL, _crawler.getSpeed() * 2.5);
+		_crawler.speedUp(10);
+		DEBUG_INFO("Speed = %d \n", _crawler.getSpeed());
 		break;
 	case IRKeyCode::Pound:
-		mCrawler.Sing(S_disconnection);
-		mCrawler.SetRgbColor(E_RGB_ALL, mCrawler.GetSpeed() * 2.5);
-		mCrawler.SpeedDown(10);
+		_crawler.playSound(S_disconnection);
+		_crawler.setRgbColor(E_RGB_ALL, _crawler.getSpeed() * 2.5);
+		_crawler.speedDown(10);
 		break;
 	case IRKeyCode::Up:
-		mCrawler.GoForward();
+		_crawler.goForward();
 		break;
 	case IRKeyCode::Down:
-		mCrawler.GoBack();
+		_crawler.goBack();
 		break;
 	case IRKeyCode::Ok:
-		mCrawler.Stop();
+		_crawler.stop();
 		break;
 	case IRKeyCode::Left:
-		mCrawler.TurnLeft();
+		_crawler.turnLeft();
 		break;
 	case IRKeyCode::Right:
-		mCrawler.TurnRight();
+		_crawler.turnRight();
 		break;
 
 	case IRKeyCode::Button1:
-		SingSound(2);
+		playSound(2);
 		break;
 
 	case IRKeyCode::Button2:
-		SingSound(3);
+		playSound(3);
 		break;
 
 	case IRKeyCode::Button3:
-		SingSound(4);
+		playSound(4);
 		break;
 
 	case IRKeyCode::Button4:
-		SingSound(5);
+		playSound(5);
 		break;
 
 	case IRKeyCode::Button5:
-		SingSound(6);
+		playSound(6);
 		break;
 
 	case IRKeyCode::Button6:
-		SingSound(7);
+		playSound(7);
 		break;
 
 	case IRKeyCode::Button7:
-		SingSound(8);
+		playSound(8);
 		break;
 
 	case IRKeyCode::Button8:
-		SingSound(9);
+		playSound(9);
 		break;
 
 	case IRKeyCode::Button9:
-		SingSound(10);
+		playSound(10);
 		break;
 
 	case IRKeyCode::Button0:
-		secondSoundGroup = !secondSoundGroup;
+		_secondSoundGroup = !_secondSoundGroup;
 		break;
 
 	default:
@@ -106,109 +106,109 @@ void HandleInfaredRemote(IRKeyCode irKeyCode)
 	}
 }
 
-void HandleUltrasonicAvoidance(void)
+void handleUltrasonicAvoidance(void)
 {
 	uint16_t UlFrontDistance, UlLeftDistance, UlRightDistance;
-	UlFrontDistance = mCrawler.GetUltrasonicValue(E_SERVO_FRONT);
-	if (count++ > 50) {
-		//mCrawler.SendUltrasonicData();
-		count = 0;
+	UlFrontDistance = _crawler.getUltrasonicValue(CrawlerUltrasonicServoDirection::Front);
+	if (_count++ > 50) {
+		//_crawler.SendUltrasonicData();
+		_count = 0;
 	}
 	DEBUG_INFO("UlFrontDistance = %d \n", UlFrontDistance);
 	if (UlFrontDistance < UL_LIMIT_MIN)
 	{
-		mCrawler.SetSpeed(80);
-		mCrawler.GoBack();
+		_crawler.setSpeed(80);
+		_crawler.goBack();
 		delay(200);
 	}
 	if (UlFrontDistance < UL_LIMIT_MID)
 	{
-		mCrawler.Stop();
+		_crawler.stop();
 		delay(100);
-		UlRightDistance = mCrawler.GetUltrasonicValue(E_SERVO_RIGHT);
+		UlRightDistance = _crawler.getUltrasonicValue(CrawlerUltrasonicServoDirection::Right);
 		delay(50);
-		UlLeftDistance = mCrawler.GetUltrasonicValue(E_SERVO_LEFT);
+		UlLeftDistance = _crawler.getUltrasonicValue(CrawlerUltrasonicServoDirection::Left);
 		if ((UlRightDistance > UL_LIMIT_MIN) && (UlRightDistance < UL_LIMIT_MAX)) {
-			mCrawler.SetSpeed(100);
-			mCrawler.TurnRight();
+			_crawler.setSpeed(100);
+			_crawler.turnRight();
 			delay(400);
 		}
 		else if ((UlLeftDistance > UL_LIMIT_MIN) && (UlLeftDistance < UL_LIMIT_MAX)) {
-			mCrawler.SetSpeed(100);
-			mCrawler.TurnLeft();
+			_crawler.setSpeed(100);
+			_crawler.turnLeft();
 			delay(400);
 		}
 		else if ((UlRightDistance < UL_LIMIT_MIN) && (UlLeftDistance < UL_LIMIT_MIN)) {
-			mCrawler.SetSpeed(400);
-			mCrawler.TurnLeft();
+			_crawler.setSpeed(400);
+			_crawler.turnLeft();
 			delay(800);
 		}
 	}
 	else {
-		mCrawler.SetSpeed(80);
-		mCrawler.GoForward();
+		_crawler.setSpeed(80);
+		_crawler.goForward();
 	}
 }
 
-void UltrasonicFollow()
+void ultrasonicFollow()
 {
-	mCrawler.SetSpeed(40);
-	uint16_t UlFrontDistance = mCrawler.GetUltrasonicValue(E_SERVO_FRONT);
+	_crawler.setSpeed(40);
+	uint16_t UlFrontDistance = _crawler.getUltrasonicValue(CrawlerUltrasonicServoDirection::Front);
 	delay(10);
 	if (UlFrontDistance < 10) {
-		mCrawler.GoBack();
+		_crawler.goBack();
 	}
 	else if (UlFrontDistance > 14) {
-		mCrawler.GoForward();
+		_crawler.goForward();
 	}
 	else if (10 <= UlFrontDistance <= 14) {
-		mCrawler.Stop();
+		_crawler.stop();
 	}
 }
 
 void loop()
 {
 	static bool recv_flag;
-	mProtocol->RecevData();
-	if (recv_flag = mProtocol->ParserPackage()) {
-		/*if (mProtocol->GetRobotControlFun() == E_CONTROL_MODE) {
+	_protocol.RecevData();
+	if (recv_flag = _protocol.ParserPackage()) {
+		/*if (_protocol->GetRobotControlFun() == E_CONTROL_MODE) {
 		}*/
 	}
 
-	IRKeyCode irKeyCode = (IRKeyCode)mCrawler.IR->getCode();
+	auto irKeyCode = _crawler.getPressedIRKey();
 	if (irKeyCode != IRKeyCode::Unknown)
 	{
 		DEBUG_INFO("irKeyCode = %x", (uint8_t) irKeyCode);
-		HandleInfaredRemote(irKeyCode);
+		handleInfaredRemote(irKeyCode);
 		delay(110);
 	}
 	else
 	{
-		if (mCrawler.GetStatus() != E_STOP) 
+		if (_crawler.getStatus() != CrawlerStatus::Stop) 
 		{
-			mCrawler.Stop();
+			_crawler.stop();
 		}
 	}
 
-	switch (mCrawler.GetStatus()) {
-	case E_FORWARD:
-		mCrawler.SetRgbColor(E_RGB_ALL, RGB_WHITE);
+	switch (_crawler.getStatus()) {
+	case CrawlerStatus::RunForward:
+		_crawler.setRgbColor(E_RGB_ALL, RGB_WHITE);
 		break;
 
-	case E_LEFT_ROTATE:
-		mCrawler.SetRgbColor(E_RGB_LEFT, RGB_WHITE);
+	case CrawlerStatus::TurnLeftRotate:
+		_crawler.setRgbColor(E_RGB_LEFT, RGB_WHITE);
 		break;
 
-	case E_RIGHT_ROTATE:
-		mCrawler.SetRgbColor(E_RGB_RIGHT, RGB_WHITE);
+	case CrawlerStatus::TurnRightRotate:
+		_crawler.setRgbColor(E_RGB_RIGHT, RGB_WHITE);
 		break;
 
-	case E_BACK:
-		mCrawler.SetRgbColor(E_RGB_ALL, RGB_RED);
+	case CrawlerStatus::RunBackward:
+		_crawler.setRgbColor(E_RGB_ALL, RGB_RED);
 		break;
 
-	case E_STOP:
-		mCrawler.LightOff();
+	case CrawlerStatus::Stop:
+		_crawler.lightOff();
 		break;
 
 	default:

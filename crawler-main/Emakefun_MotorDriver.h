@@ -81,7 +81,7 @@ class Emakefun_Sensor
 public:
   Emakefun_Sensor(void);
   friend class Emakefun_MotorDriver;
-  IRremote  *mIrRecv;
+  IRRemote  *mIrRecv;
   Buzzer *mBuzzer;
   RGBLed *mRgb;
   Nrf24l *mNrf24L01;
