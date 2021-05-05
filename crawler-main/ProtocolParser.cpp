@@ -2,12 +2,9 @@
 #include "ProtocolParser.h"
 #include "debug.h"
 
-#if ARDUINO > 10609
-ProtocolParser::ProtocolParser(byte startcode = PROTOCOL_START_CODE, byte endcode = PROTOCOL_END_CODE)
-#else
-ProtocolParser::ProtocolParser(byte startcode , byte endcode )
-#endif
+ProtocolParser::ProtocolParser(Stream* stream, byte startcode = PROTOCOL_START_CODE, byte endcode = PROTOCOL_END_CODE)
 {
+    _stream = stream;
     m_recv_flag = false;
     m_send_success = false;
     m_StartCode = startcode;
@@ -65,8 +62,8 @@ bool ProtocolParser::RecevData(void)
     static bool avilable = false;
     static byte preRecvLen = 0;
     byte dat;
-    while (Serial.available() > 0) {
-        dat = Serial.read();
+    while (_stream->available() > 0) {
+        dat = _stream->read();
         // DEBUG_INFO( "\n");
         // Serial.println(dat, HEX);
         delay(2);
@@ -347,8 +344,10 @@ bool ProtocolParser::SendPackage(ST_PROTOCOL *send_dat,int len)
     *(p_data + len + 1) = checksum & 0xFF;
     *(p_data + len + 2) = send_dat->end_code;
 
-    Serial.write(buffer,len+8);
-    Serial.flush();
+    _stream->write(buffer,len+8);
+    _stream->flush();
+
     delay(100);
+
     return true;
 }

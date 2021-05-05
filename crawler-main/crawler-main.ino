@@ -3,7 +3,7 @@
 #include "ProtocolParser.h"
 #include "IRKeyMap.h"
 
-ProtocolParser _protocol = ProtocolParser();
+ProtocolParser _protocol = ProtocolParser(&Serial);
 Crawler _crawler = Crawler();
 byte _count = 0;
 bool _secondSoundGroup = false;
