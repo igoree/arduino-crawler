@@ -1,6 +1,7 @@
 #include "debug.h"
-#include "Crawler.h"
+#include "CoroutineScheduler.h"
 #include "ProtocolParser.h"
+#include "Crawler.h"
 #include "IRKeyMap.h"
 
 ProtocolParser _protocol = ProtocolParser(&Serial);

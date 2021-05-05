@@ -107,48 +107,50 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Buzzer.h">
-      <FileType>CppCode</FileType>
+      <FileType>CppHeader</FileType>
     </ClInclude>
+    <ClInclude Include="CoroutineScheduler.h" />
     <ClInclude Include="Crawler.h">
-      <FileType>CppCode</FileType>
+      <FileType>CppHeader</FileType>
     </ClInclude>
     <ClInclude Include="debug.h">
-      <FileType>CppCode</FileType>
+      <FileType>CppHeader</FileType>
     </ClInclude>
     <ClInclude Include="Emakefun_MotorDriver.h">
-      <FileType>CppCode</FileType>
+      <FileType>CppHeader</FileType>
     </ClInclude>
     <ClInclude Include="Emakefun_MS_PWMServoDriver.h">
-      <FileType>CppCode</FileType>
+      <FileType>CppHeader</FileType>
     </ClInclude>
     <ClInclude Include="IRKeyMap.h">
-      <FileType>CppCode</FileType>
+      <FileType>CppHeader</FileType>
     </ClInclude>
     <ClInclude Include="IRRemote.h">
-      <FileType>CppCode</FileType>
+      <FileType>CppHeader</FileType>
     </ClInclude>
     <ClInclude Include="nRF24L01.h">
-      <FileType>CppCode</FileType>
+      <FileType>CppHeader</FileType>
     </ClInclude>
     <ClInclude Include="PinChangeInt.h">
-      <FileType>CppCode</FileType>
+      <FileType>CppHeader</FileType>
     </ClInclude>
     <ClInclude Include="Protocol.h">
-      <FileType>CppCode</FileType>
+      <FileType>CppHeader</FileType>
     </ClInclude>
     <ClInclude Include="ProtocolParser.h">
-      <FileType>CppCode</FileType>
+      <FileType>CppHeader</FileType>
     </ClInclude>
     <ClInclude Include="RGBLed.h">
-      <FileType>CppCode</FileType>
+      <FileType>CppHeader</FileType>
     </ClInclude>
     <ClInclude Include="Sounds.h">
-      <FileType>CppCode</FileType>
+      <FileType>CppHeader</FileType>
     </ClInclude>
     <ClInclude Include="__vm\.crawler-main.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Buzzer.cpp" />
+    <ClCompile Include="CoroutineScheduler.cpp" />
     <ClCompile Include="Crawler.cpp" />
     <ClCompile Include="debug.cpp" />
     <ClCompile Include="Emakefun_MotorDriver.cpp" />
