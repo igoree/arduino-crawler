@@ -9,13 +9,17 @@ typedef uint8_t CoroutineStep;
 
 typedef CoroutineStep(*AsyncFuncPointer)(CoroutineExecutionContext* context);
 
-struct CoroutineTask 
+struct CoroutineTask
 {
-	AsyncFuncPointer func;
+	CoroutineTask();
+	CoroutineTask(const AsyncFuncPointer func);
+	CoroutineTask(const AsyncFuncPointer func, void* data);
+
+	const AsyncFuncPointer func;
 	void* data;
 };
 
-struct CoroutineFuncState
+struct CoroutineTaskState
 {
 	CoroutineTask task;
 	uint8_t step;
@@ -25,14 +29,17 @@ struct CoroutineFuncState
 class Coroutine
 {
 private:
-	CoroutineFuncState* _stack;
-	uint8_t _stackSize;
+	CoroutineTaskState* _stack;
+	const uint8_t _stackSize;
 	uint8_t _currentFuncIndex;
 public:
 	Coroutine(uint8_t stackSize);
 	~Coroutine();
 
 	void start(CoroutineTask task);
+	void start(AsyncFuncPointer func, void* data);
+	void start(AsyncFuncPointer func);
+
 	void switchTo(CoroutineTask task);
 
 	void continueExecution();
@@ -42,9 +49,9 @@ class CoroutineExecutionContext
 {
 private:
 	Coroutine* _coroutine;
-	CoroutineFuncState* _funcState;
+	CoroutineTaskState* _funcState;
 public:
-	CoroutineExecutionContext(Coroutine* coroutine, CoroutineFuncState* funcState);
+	CoroutineExecutionContext(Coroutine* coroutine, CoroutineTaskState* funcState);
 	~CoroutineExecutionContext();
 
 	CoroutineStep getCurrentStep();
@@ -52,15 +59,15 @@ public:
 
 	CoroutineStep repeat();
 	CoroutineStep delayThenRepeat(unsigned long delayMs);
-	CoroutineStep executeThenRepeat(AsyncFuncPointer asyncFunc, void* data = NULL, unsigned long startDelayMs = 0);
+	CoroutineStep executeThenRepeat(AsyncFuncPointer asyncFunc, void* data = nullptr, unsigned long startDelayMs = 0);
 
 	CoroutineStep next();
 	CoroutineStep delayThenNext(unsigned long delayMs);
-	CoroutineStep executeThenNext(AsyncFuncPointer asyncFunc, void* data = NULL, unsigned long startDelayMs = 0);
+	CoroutineStep executeThenNext(AsyncFuncPointer asyncFunc, void* data = nullptr, unsigned long startDelayMs = 0);
 
 	CoroutineStep goTo(CoroutineStep step);
 	CoroutineStep delayThenGoTo(CoroutineStep step, unsigned long delayMs);
-	CoroutineStep executeThenGoTo(CoroutineStep step, AsyncFuncPointer asyncFunc, void* data = NULL, unsigned long startDelayMs = 0);
+	CoroutineStep executeThenGoTo(CoroutineStep step, AsyncFuncPointer asyncFunc, void* data = nullptr, unsigned long startDelayMs = 0);
 
 	CoroutineStep end();
 };

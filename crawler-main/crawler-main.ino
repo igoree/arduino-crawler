@@ -179,13 +179,13 @@ void loop()
 	auto irKeyCode = _crawler.getPressedIRKey();
 	if (irKeyCode != IRKeyCode::Unknown)
 	{
-		DEBUG_INFO("irKeyCode = %x", (uint8_t) irKeyCode);
+		DEBUG_INFO("irKeyCode = %x", (uint8_t)irKeyCode);
 		handleInfaredRemote(irKeyCode);
 		delay(110);
 	}
 	else
 	{
-		if (_crawler.getStatus() != CrawlerStatus::Stop) 
+		if (_crawler.getStatus() != CrawlerStatus::Stop)
 		{
 			_crawler.stop();
 		}

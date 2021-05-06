@@ -3,9 +3,9 @@
 #define EMPTY_ARRAY_INDEX UINT8_C(255)
 
 Coroutine::Coroutine(uint8_t stackSize)
+	: _stackSize(stackSize)
 {
-	_stackSize = stackSize;
-	_stack = new CoroutineFuncState[_stackSize];
+	_stack = new CoroutineTaskState[_stackSize];
 	_currentFuncIndex = EMPTY_ARRAY_INDEX;
 }
 
@@ -14,7 +14,7 @@ Coroutine::~Coroutine()
 	delete[] _stack;
 }
 
-CoroutineExecutionContext::CoroutineExecutionContext(Coroutine* coroutine, CoroutineFuncState* funcState)
+CoroutineExecutionContext::CoroutineExecutionContext(Coroutine* coroutine, CoroutineTaskState* funcState)
 {
 	_coroutine = coroutine;
 	_funcState = funcState;
@@ -31,5 +31,5 @@ CoroutineStep CoroutineExecutionContext::getCurrentStep()
 
 void* CoroutineExecutionContext::getData()
 {
-	return _funcState->data;
+	return _funcState->task.data;
 }
