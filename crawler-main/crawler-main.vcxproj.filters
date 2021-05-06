@@ -63,6 +63,9 @@
     <ClInclude Include="CoroutineScheduler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="debugLevels.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Buzzer.cpp">

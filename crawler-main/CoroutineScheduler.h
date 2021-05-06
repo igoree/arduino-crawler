@@ -2,44 +2,37 @@
 #define _COROUTINESCHEDULER_h
 
 #include "stdint.h"
+#include "WString.h"
 
 class CoroutineExecutionContext;
 
 typedef uint8_t CoroutineStep;
 
-typedef CoroutineStep(*AsyncFuncPointer)(CoroutineExecutionContext* context);
+typedef CoroutineStep(*AsyncFuncPointer)(const CoroutineExecutionContext* context);
 
 struct CoroutineTask
 {
 	CoroutineTask();
-	CoroutineTask(const AsyncFuncPointer func);
-	CoroutineTask(const AsyncFuncPointer func, void* data);
+	CoroutineTask(AsyncFuncPointer func, void* data = nullptr);
 
-	const AsyncFuncPointer func;
+	AsyncFuncPointer func;
 	void* data;
 };
 
-struct CoroutineTaskState
-{
-	CoroutineTask task;
-	uint8_t step;
-	unsigned long executeAfterMillis;
-};
+struct CoroutineTaskState;
 
 class Coroutine
 {
 private:
-	CoroutineTaskState* _stack;
+	const char* const _name;
 	const uint8_t _stackSize;
-	uint8_t _currentFuncIndex;
+	uint8_t _currentTaskIndex;
+	CoroutineTaskState* _stack;
 public:
-	Coroutine(uint8_t stackSize);
+	Coroutine(const char* name, uint8_t stackSize);
 	~Coroutine();
 
 	void start(CoroutineTask task);
-	void start(AsyncFuncPointer func, void* data);
-	void start(AsyncFuncPointer func);
-
 	void switchTo(CoroutineTask task);
 
 	void continueExecution();
@@ -48,40 +41,40 @@ public:
 class CoroutineExecutionContext
 {
 private:
-	Coroutine* _coroutine;
-	CoroutineTaskState* _funcState;
+	Coroutine* const _coroutine;
+	CoroutineTaskState* const _funcState;
 public:
 	CoroutineExecutionContext(Coroutine* coroutine, CoroutineTaskState* funcState);
 	~CoroutineExecutionContext();
 
-	CoroutineStep getCurrentStep();
-	void* getData();
+	CoroutineStep getCurrentStep() const;
+	void* getData() const;
 
-	CoroutineStep repeat();
-	CoroutineStep delayThenRepeat(unsigned long delayMs);
-	CoroutineStep executeThenRepeat(AsyncFuncPointer asyncFunc, void* data = nullptr, unsigned long startDelayMs = 0);
+	CoroutineStep repeat() const;
+	CoroutineStep delayThenRepeat(unsigned long delayMs) const;
+	CoroutineStep executeThenRepeat(CoroutineTask task) const;
 
-	CoroutineStep next();
-	CoroutineStep delayThenNext(unsigned long delayMs);
-	CoroutineStep executeThenNext(AsyncFuncPointer asyncFunc, void* data = nullptr, unsigned long startDelayMs = 0);
+	CoroutineStep next() const;
+	CoroutineStep delayThenNext(unsigned long delayMs) const;
+	CoroutineStep executeThenNext(CoroutineTask task) const;
 
-	CoroutineStep goTo(CoroutineStep step);
-	CoroutineStep delayThenGoTo(CoroutineStep step, unsigned long delayMs);
-	CoroutineStep executeThenGoTo(CoroutineStep step, AsyncFuncPointer asyncFunc, void* data = nullptr, unsigned long startDelayMs = 0);
+	CoroutineStep goTo(CoroutineStep step) const;
+	CoroutineStep delayThenGoTo(unsigned long delayMs, CoroutineStep step) const;
+	CoroutineStep executeThenGoTo(CoroutineTask task, CoroutineStep step) const;
 
-	CoroutineStep end();
+	CoroutineStep complete() const;
+	CoroutineStep completeThenExecute(CoroutineTask task) const;
 };
 
-class CoroutineScheduler
+template<uint8_t MaxCoroutines> class CoroutineScheduler
 {
 private:
-	Coroutine* _coroutines;
-	uint8_t _coroutineCount;
+	Coroutine* const _coroutines[MaxCoroutines];
 public:
-	CoroutineScheduler(Coroutine* coroutines, uint8_t coroutineCount);
+	CoroutineScheduler(Coroutine* const coroutines[MaxCoroutines]);
 	~CoroutineScheduler();
 
-	void continueCoroutines();
+	void continueCoroutines() const;
 };
 
 #endif

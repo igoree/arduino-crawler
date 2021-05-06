@@ -116,6 +116,7 @@
     <ClInclude Include="debug.h">
       <FileType>CppHeader</FileType>
     </ClInclude>
+    <ClInclude Include="debugLevels.h" />
     <ClInclude Include="Emakefun_MotorDriver.h">
       <FileType>CppHeader</FileType>
     </ClInclude>

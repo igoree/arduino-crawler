@@ -1,12 +1,10 @@
 #ifndef _DEBUG_H_
-#define _DEUBG_H_
+#define _DEBUG_H_
 
-#define  DEBUG_LEVEL_INFO  1
-#define  DEBUG_LEVEL_ERR   2
-#define  DEBUG_LEVEL_NONE  0xFF
+#include "debugLevels.h"
 
 #ifndef  DEBUG_LEVEL
-#define  DEBUG_LEVEL  DEBUG_LEVEL_INFO
+#define  DEBUG_LEVEL  DEBUG_LEVEL_NONE
 #endif
 
 #if DEBUG_LEVEL <= DEBUG_LEVEL_ERR

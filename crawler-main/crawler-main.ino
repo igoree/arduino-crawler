@@ -1,11 +1,17 @@
-#include "debug.h"
 #include "CoroutineScheduler.h"
 #include "ProtocolParser.h"
 #include "Crawler.h"
 #include "IRKeyMap.h"
 
-ProtocolParser _protocol = ProtocolParser(&Serial);
-Crawler _crawler = Crawler();
+#include "debugLevels.h"
+#define DEBUG_LEVEL DEBUG_LEVEL_INFO
+#include "debug.h"
+
+Coroutine _soundCoroutine("sound", 1);
+
+
+ProtocolParser _protocol(&Serial);
+Crawler _crawler;
 byte _count = 0;
 bool _secondSoundGroup = false;
 
@@ -115,7 +121,7 @@ void handleUltrasonicAvoidance(void)
 		//_crawler.SendUltrasonicData();
 		_count = 0;
 	}
-	DEBUG_INFO("UlFrontDistance = %d \n", UlFrontDistance);
+	
 	if (UlFrontDistance < UL_LIMIT_MIN)
 	{
 		_crawler.setSpeed(80);
