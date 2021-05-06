@@ -83,7 +83,7 @@ public:
 	CrawlerStatus getStatus();
 	uint8_t getBattery();
 
-	void initIr();
+	void initIR();
 	IRKeyCode getPressedIRKey();
 
 	void initBuzzer();

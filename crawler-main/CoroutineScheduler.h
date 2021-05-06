@@ -4,11 +4,10 @@
 #include "stdint.h"
 #include "WString.h"
 
-class CoroutineExecutionContext;
+class CoroutineTaskContext;
+struct CoroutineTaskResult;
 
-typedef uint8_t CoroutineStep;
-
-typedef CoroutineStep(*AsyncFuncPointer)(const CoroutineExecutionContext* context);
+typedef CoroutineTaskResult* (*AsyncFuncPointer)(const CoroutineTaskContext* context);
 
 struct CoroutineTask
 {
@@ -38,32 +37,31 @@ public:
 	void continueExecution();
 };
 
-class CoroutineExecutionContext
+class CoroutineTaskContext
 {
 private:
-	Coroutine* const _coroutine;
-	CoroutineTaskState* const _funcState;
+	CoroutineTaskResult* _result;
 public:
-	CoroutineExecutionContext(Coroutine* coroutine, CoroutineTaskState* funcState);
-	~CoroutineExecutionContext();
+	CoroutineTaskContext(const CoroutineTaskState* taskState, CoroutineTaskResult* defaultResult);
+	~CoroutineTaskContext();
 
-	CoroutineStep getCurrentStep() const;
-	void* getData() const;
+	uint8_t const step;
+	void* const data;
 
-	CoroutineStep repeat() const;
-	CoroutineStep delayThenRepeat(unsigned long delayMs) const;
-	CoroutineStep executeThenRepeat(CoroutineTask task) const;
+	CoroutineTaskResult* repeat() const;
+	CoroutineTaskResult* delayThenRepeat(unsigned long delayMs) const;
+	CoroutineTaskResult* executeThenRepeat(CoroutineTask task) const;
 
-	CoroutineStep next() const;
-	CoroutineStep delayThenNext(unsigned long delayMs) const;
-	CoroutineStep executeThenNext(CoroutineTask task) const;
+	CoroutineTaskResult* next() const;
+	CoroutineTaskResult* delayThenNext(unsigned long delayMs) const;
+	CoroutineTaskResult* executeThenNext(CoroutineTask task) const;
 
-	CoroutineStep goTo(CoroutineStep step) const;
-	CoroutineStep delayThenGoTo(unsigned long delayMs, CoroutineStep step) const;
-	CoroutineStep executeThenGoTo(CoroutineTask task, CoroutineStep step) const;
+	CoroutineTaskResult* goTo(uint8_t step) const;
+	CoroutineTaskResult* delayThenGoTo(unsigned long delayMs, uint8_t step) const;
+	CoroutineTaskResult* executeThenGoTo(CoroutineTask task, uint8_t step) const;
 
-	CoroutineStep complete() const;
-	CoroutineStep completeThenExecute(CoroutineTask task) const;
+	CoroutineTaskResult* complete() const;
+	CoroutineTaskResult* completeThenExecute(CoroutineTask task) const;
 };
 
 template<uint8_t MaxCoroutines> class CoroutineScheduler

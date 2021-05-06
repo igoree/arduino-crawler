@@ -21,7 +21,7 @@ void setup()
 	_crawler.initServo();
 	_crawler.initRgb();
 	_crawler.initBuzzer();
-	_crawler.initIr();
+	_crawler.initIR();
 	_crawler.setSpeed(50);
 	_crawler.setServoBaseAngle(90);
 	_crawler.setServoAngle(CrawlerServoKind::Ultrasonic, 90);
