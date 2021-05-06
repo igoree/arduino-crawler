@@ -9,7 +9,6 @@
 
 Coroutine _soundCoroutine("sound", 1);
 
-
 ProtocolParser _protocol(&Serial);
 Crawler _crawler;
 byte _count = 0;
@@ -45,7 +44,7 @@ void handleInfaredRemote(IRKeyCode irKeyCode)
 		_crawler.playSound(S_connection);
 		_crawler.setRgbColor(E_RGB_ALL, _crawler.getSpeed() * 2.5);
 		_crawler.speedUp(10);
-		DEBUG_INFO("Speed = %d \n", _crawler.getSpeed());
+		DEBUG_INFO("Speed = %d", _crawler.getSpeed());
 		break;
 	case IRKeyCode::Pound:
 		_crawler.playSound(S_disconnection);

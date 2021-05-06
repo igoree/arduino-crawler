@@ -1,8 +1,6 @@
 #include "CoroutineScheduler.h"
 #include "Arduino.h"
 
-#include "debugLevels.h"
-#define DEBUG_LEVEL DEBUG_LEVEL_INFO
 #include "debug.h"
 
 #define UNKNOWN_INDEX UINT8_C(255)
