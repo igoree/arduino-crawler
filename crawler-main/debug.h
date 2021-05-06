@@ -2,7 +2,6 @@
 #define _DEBUG_H_
 
 #include "debugLevels.h"
-#include "WString.h"
 
 #ifndef  DEBUG_LEVEL
 #define  DEBUG_LEVEL  DEBUG_LEVEL_NONE
@@ -37,6 +36,6 @@
 #define DEBUG_BUFFER_SIZE  128
 #endif
 
-void debug_printf(const String& fmt, ...);
+void debug_printf(const __FlashStringHelper* fmt, ...);
 
 #endif  /*  _DEBUG_H  */
