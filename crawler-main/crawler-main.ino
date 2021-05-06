@@ -1,4 +1,4 @@
-#include "CoroutineScheduler.h"
+#include "Coroutine.h"
 #include "ProtocolParser.h"
 #include "Crawler.h"
 #include "IRKeyMap.h"
@@ -7,6 +7,7 @@
 #define DEBUG_LEVEL DEBUG_LEVEL_INFO
 #include "debug.h"
 
+Coroutine _freeMemoryCoroutine("freeMemory", 1);
 Coroutine _soundCoroutine("sound", 1);
 
 ProtocolParser _protocol(&Serial);
@@ -26,8 +27,23 @@ void setup()
 	_crawler.setServoBaseAngle(90);
 	_crawler.setServoAngle(CrawlerServoKind::Ultrasonic, 90);
 	_crawler.initUltrasonic();
+
 	DEBUG_INFO("init ok");
+
 	_crawler.playSound(S_connection);
+
+	_freeMemoryCoroutine.start(CoroutineTask(&printFreeMemoryAsync));
+}
+
+CoroutineTaskResult* printFreeMemoryAsync(const CoroutineTaskContext* context)
+{
+#if DEBUG_LEVEL <= DEBUG_LEVEL_INFO
+	DEBUG_FREE_MEMORY();
+
+	return context->delayThenRepeat(5000);
+#else
+	return context->end();
+#endif
 }
 
 void playSound(uint8_t soundIndex) {

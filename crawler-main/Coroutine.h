@@ -2,7 +2,6 @@
 #define _COROUTINESCHEDULER_h
 
 #include "stdint.h"
-#include "WString.h"
 
 class CoroutineTaskContext;
 struct CoroutineTaskResult;
@@ -49,30 +48,21 @@ public:
 	void* const data;
 
 	CoroutineTaskResult* repeat() const;
-	CoroutineTaskResult* delayThenRepeat(unsigned long delayMs) const;
+	CoroutineTaskResult* delayThenRepeat(unsigned long delayMillis) const;
 	CoroutineTaskResult* executeThenRepeat(CoroutineTask task) const;
 
 	CoroutineTaskResult* next() const;
-	CoroutineTaskResult* delayThenNext(unsigned long delayMs) const;
+	CoroutineTaskResult* delayThenNext(unsigned long delayMillis) const;
 	CoroutineTaskResult* executeThenNext(CoroutineTask task) const;
 
-	CoroutineTaskResult* goTo(uint8_t step) const;
-	CoroutineTaskResult* delayThenGoTo(unsigned long delayMs, uint8_t step) const;
-	CoroutineTaskResult* executeThenGoTo(CoroutineTask task, uint8_t step) const;
+	CoroutineTaskResult* goTo(uint8_t nextStep) const;
+	CoroutineTaskResult* delayThenGoTo(unsigned long delayMillis, uint8_t nextStep) const;
+	CoroutineTaskResult* executeThenGoTo(CoroutineTask task, uint8_t nextStep) const;
 
-	CoroutineTaskResult* complete() const;
-	CoroutineTaskResult* completeThenExecute(CoroutineTask task) const;
+	CoroutineTaskResult* end() const;
+	CoroutineTaskResult* endThenExecute(CoroutineTask task) const;
 };
 
-template<uint8_t MaxCoroutines> class CoroutineScheduler
-{
-private:
-	Coroutine* const _coroutines[MaxCoroutines];
-public:
-	CoroutineScheduler(Coroutine* const coroutines[MaxCoroutines]);
-	~CoroutineScheduler();
-
-	void continueCoroutines() const;
-};
+#define CONTINUE_COROUTINES()
 
 #endif

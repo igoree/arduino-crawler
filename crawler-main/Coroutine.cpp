@@ -1,4 +1,4 @@
-#include "CoroutineScheduler.h"
+#include "Coroutine.h"
 #include "Arduino.h"
 
 #include "debug.h"
@@ -23,6 +23,21 @@ enum class CoroutineTaskResultKind : uint8_t
 
 struct CoroutineTaskResult
 {
+	CoroutineTaskResult()
+		: CoroutineTaskResult(CoroutineTaskResultKind::Continue)
+	{
+	}
+
+	CoroutineTaskResult(CoroutineTaskResultKind resultKind)
+		: CoroutineTaskResult(0, resultKind)
+	{
+	}
+
+	CoroutineTaskResult(uint8_t nextStep, CoroutineTaskResultKind resultKind)
+		: nextStep(nextStep), resultKind(resultKind)
+	{
+	}
+
 	uint8_t nextStep;
 	unsigned long delayMillis;
 	CoroutineTask taskToSwitch;
@@ -155,4 +170,99 @@ void Coroutine::continueExecution()
 	{
 		switchTo(result->taskToSwitch);
 	}
+}
+
+// CoroutineTaskContext
+
+CoroutineTaskContext::CoroutineTaskContext(const CoroutineTaskState* taskState, CoroutineTaskResult* defaultResult)
+	: step(taskState->step), data(taskState->task.data), _result(defaultResult)
+{
+}
+
+CoroutineTaskContext::~CoroutineTaskContext()
+{
+}
+
+CoroutineTaskResult* CoroutineTaskContext::repeat() const
+{
+	(*_result) = CoroutineTaskResult(step, CoroutineTaskResultKind::Continue);
+
+	return _result;
+}
+
+CoroutineTaskResult* CoroutineTaskContext::delayThenRepeat(unsigned long delayMillis) const
+{
+	(*_result) = CoroutineTaskResult(step, CoroutineTaskResultKind::Continue);
+	_result->delayMillis = delayMillis;
+
+	return _result;
+}
+
+CoroutineTaskResult* CoroutineTaskContext::executeThenRepeat(CoroutineTask task) const
+{
+	(*_result) = CoroutineTaskResult(step, CoroutineTaskResultKind::Continue);
+	_result->taskToSwitch = task;
+
+	return _result;
+}
+
+CoroutineTaskResult* CoroutineTaskContext::next() const
+{
+	(*_result) = CoroutineTaskResult(step + 1, CoroutineTaskResultKind::Continue);
+
+	return _result;
+}
+
+CoroutineTaskResult* CoroutineTaskContext::delayThenNext(unsigned long delayMillis) const
+{
+	(*_result) = CoroutineTaskResult(step + 1, CoroutineTaskResultKind::Continue);
+	_result->delayMillis = delayMillis;
+
+	return _result;
+}
+
+CoroutineTaskResult* CoroutineTaskContext::executeThenNext(CoroutineTask task) const
+{
+	(*_result) = CoroutineTaskResult(step + 1, CoroutineTaskResultKind::Continue);
+	_result->taskToSwitch = task;
+
+	return _result;
+}
+
+CoroutineTaskResult* CoroutineTaskContext::goTo(uint8_t nextStep) const
+{
+	(*_result) = CoroutineTaskResult(nextStep, CoroutineTaskResultKind::Continue);
+
+	return _result;
+}
+
+CoroutineTaskResult* CoroutineTaskContext::delayThenGoTo(unsigned long delayMillis, uint8_t nextStep) const
+{
+	(*_result) = CoroutineTaskResult(nextStep, CoroutineTaskResultKind::Continue);
+	_result->delayMillis = delayMillis;
+
+	return _result;
+}
+
+CoroutineTaskResult* CoroutineTaskContext::executeThenGoTo(CoroutineTask task, uint8_t nextStep) const
+{
+	(*_result) = CoroutineTaskResult(nextStep, CoroutineTaskResultKind::Continue);
+	_result->taskToSwitch = task;
+
+	return _result;
+}
+
+CoroutineTaskResult* CoroutineTaskContext::end() const
+{
+	(*_result) = CoroutineTaskResult(CoroutineTaskResultKind::Finish);
+
+	return _result;
+}
+
+CoroutineTaskResult* CoroutineTaskContext::endThenExecute(CoroutineTask task) const
+{
+	(*_result) = CoroutineTaskResult(CoroutineTaskResultKind::Finish);
+	_result->taskToSwitch = task;
+
+	return _result;
 }

@@ -60,7 +60,7 @@
     <ClInclude Include="__vm\.crawler-main.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CoroutineScheduler.h">
+    <ClInclude Include="Coroutine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="debugLevels.h">
@@ -95,7 +95,7 @@
     <ClCompile Include="RGBLed.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CoroutineScheduler.cpp">
+    <ClCompile Include="Coroutine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

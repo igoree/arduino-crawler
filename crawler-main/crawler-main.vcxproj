@@ -109,7 +109,7 @@
     <ClInclude Include="Buzzer.h">
       <FileType>CppHeader</FileType>
     </ClInclude>
-    <ClInclude Include="CoroutineScheduler.h" />
+    <ClInclude Include="Coroutine.h" />
     <ClInclude Include="Crawler.h">
       <FileType>CppHeader</FileType>
     </ClInclude>
@@ -151,7 +151,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Buzzer.cpp" />
-    <ClCompile Include="CoroutineScheduler.cpp" />
+    <ClCompile Include="Coroutine.cpp" />
     <ClCompile Include="Crawler.cpp" />
     <ClCompile Include="debug.cpp" />
     <ClCompile Include="Emakefun_MotorDriver.cpp" />
