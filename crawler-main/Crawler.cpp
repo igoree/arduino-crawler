@@ -173,11 +173,6 @@ IRKeyCode Crawler::getPressedIRKey()
 	return (IRKeyCode) _ir->getCode();
 }
 
-String Crawler::getIRString() 
-{
-	return _ir->getString();
-}
-
 void Crawler::initBuzzer(void)
 {
 	Buzzer = (::Buzzer*)_motorDriver.getSensor(E_BUZZER);

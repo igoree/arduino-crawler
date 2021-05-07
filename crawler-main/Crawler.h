@@ -85,7 +85,6 @@ public:
 
 	void initIR();
 	IRKeyCode getPressedIRKey();
-	String getIRString();
 
 	void initBuzzer();
 	void playSound(byte songName);

@@ -866,7 +866,6 @@ void *Emakefun_MotorDriver::getSensor(E_SENSOR_INDEX n)
       sensors.IrPin = IR_PIN;
       pinMode(IR_PIN, INPUT);
       sensors.mIrRecv = new IRRemote (IR_PIN);
-      sensors.mIrRecv->begin();  // Initialize the infrared receiver
     }
     return sensors.mIrRecv;
   }

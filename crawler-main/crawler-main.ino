@@ -188,7 +188,7 @@ CoroutineTaskResult* handleIRRemoteAsync(const CoroutineTaskContext* context)
 	auto keyCode = _crawler.getPressedIRKey();
 	if (keyCode != IRKeyCode::Unknown)
 	{
-		DEBUG_INFO("IRKeyCode = %u, IRString = %s", (uint8_t)keyCode, _crawler.getIRString());
+		DEBUG_INFO("IRKeyCode = %u", (uint8_t)keyCode);
 
 		crawlerHandleIRCommand(keyCode);
 

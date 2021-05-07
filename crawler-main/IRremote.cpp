@@ -93,10 +93,8 @@ IRRemote::IRRemote(int pin)
 	// attachInterrupt(INT0, irISR, CHANGE);
 
 	irDelayTime = 0;
-	irIndex = 0;
 	irRead = 0;
 	irReady = false;
-	irBuffer = "";
 	irPressed = false;
 	begin();
 }
@@ -380,96 +378,6 @@ void IRRemote::enableIRIn() {
 
 /**
  * \par Function
- *    sendRaw
- * \par Description
- *    Send the length of data with hz.
- * \param[in]
- *    buf[] - The data's buffer.
-  * \param[in]
- *    len - The data's length.
-  * \param[in]
- *    hz - The hz for sending data.
- * \par Output
- *    None
- * \par Return
- *    None
- * \par Others
- *    None
- */
-void IRRemote::sendRaw(unsigned int buf[], int len, uint8_t hz)
-{
-	enableIROut(hz);
-	for (int i = 0; i < len; i++)
-	{
-		if (i & 1)
-		{
-			space(buf[i]);
-		}
-		else
-		{
-			mark(buf[i]);
-		}
-	}
-	space(0); // Just to be sure
-}
-
-/**
- * \par Function
- *    getString
- * \par Description
- *    Get string in a INTR.
- * \param[in]
- *    None
- * \par Output
- *    None
- * \par Return
- *    Return the result in a IRQ.
- * \par Others
- *    None
- */
-String IRRemote::getString()
-{
-	if (decode())
-	{
-		irRead = ((value >> 8) >> 8) & 0xff;
-		if (irRead == 0xa || irRead == 0xd)
-		{
-			irIndex = 0;
-			irReady = true;
-		}
-		else
-		{
-			irBuffer += irRead;
-			irIndex++;
-		}
-		irDelayTime = millis();
-	}
-	else
-	{
-		if (irRead > 0)
-		{
-			if (millis() - irDelayTime > 100)
-			{
-				irPressed = false;
-				irRead = 0;
-				irDelayTime = millis();
-				Pre_Str = "";
-			}
-		}
-	}
-	if (irReady)
-	{
-		irReady = false;
-		String s = String(irBuffer);
-		Pre_Str = s;
-		irBuffer = "";
-		return s;
-	}
-	return Pre_Str;
-}
-
-/**
- * \par Function
  *    getCode
  * \par Description
  *    Get the reading code.
@@ -484,146 +392,22 @@ String IRRemote::getString()
  */
 unsigned char IRRemote::getCode()
 {
-	irIndex = 0;
-	loop();
-	return irRead;
-}
-
-/**
- * \par Function
- *    sendString
- * \par Description
- *    Send data.
- * \param[in]
- *    s - The string you want to send.
- * \par Output
- *    None
- * \par Return
- *    None
- * \par Others
- *    None
- */
-void IRRemote::sendString(String s)
-{
-	unsigned long l;
-	uint8_t data;
-	s.concat('\n');
-	for (int i = 0; i < s.length(); i++)
-	{
-		data = s.charAt(i);
-		l = 0x0000ffff & (uint8_t)(~data);
-		l = l << 8;
-		l = l + ((uint8_t)data);
-		l = l << 16;
-		l = l | 0x000000ff;
-		sendNEC(l, 32);
-		delay(20);
-	}
-	enableIRIn();
-}
-
-/**
- * \par Function
- *    sendString
- * \par Description
- *    Send data.
- * \param[in]
- *    v - The string you want to send.
- * \par Output
- *    None
- * \par Return
- *    None
- * \par Others
- *    None
- */
-void IRRemote::sendString(float v)
-{
-	dtostrf(v, 5, 8, floatString);
-	sendString(floatString);
-}
-
-/**
- * \par Function
- *    sendNEC
- * \par Description
- *    Send NEC.
- * \param[in]
- *    data - The data you want to send.
-  * \param[in]
- *    nbits - The data bit you want to send.
- * \par Output
- *    None
- * \par Return
- *    None
- * \par Others
- *    None
- */
-void IRRemote::sendNEC(unsigned long data, int nbits)
-{
-	enableIROut(38);
-	mark(NEC_HDR_MARK);
-	space(NEC_HDR_SPACE);
-	for (int i = 0; i < nbits; i++)
-	{
-		if (data & 1)
-		{
-			mark(NEC_BIT_MARK);
-			space(NEC_ONE_SPACE);
-		}
-		else
-		{
-			mark(NEC_BIT_MARK);
-			space(NEC_ZERO_SPACE);
-		}
-		data >>= 1;
-	}
-	mark(NEC_BIT_MARK);
-	space(0);
-}
-
-/**
- * \par Function
- *    loop
- * \par Description
- *    A circle of operation.
- * \param[in]
- *    None
- * \par Output0
- *    None
- * \par Return
- *    None
- * \par Others
- *    None
- */
-void IRRemote::loop()
-{
 	if (decode())
 	{
 		irRead = ((value >> 8) >> 8) & 0xff;
 		irPressed = true;
 		if (irRead == 0xa || irRead == 0xd)
 		{
-			irIndex = 0;
 			irReady = true;
 		}
-		else
-		{
-			irBuffer += irRead;
-			irIndex++;
-			if (irIndex > 64)
-			{
-				irIndex = 0;
-				irBuffer = "";
-			}
-		}
+
 		irDelayTime = millis();
 	}
 	else
 	{
 		if (irRead > 0)
 		{
-			// Serial.println(millis() - irDelayTime);
-			if (millis() - irDelayTime > 0)
+			if (millis() - irDelayTime > 50)
 			{
 				irPressed = false;
 				irRead = 0;
@@ -631,7 +415,8 @@ void IRRemote::loop()
 			}
 		}
 	}
-	// Serial.println(irRead, HEX);
+
+	return irRead;
 }
 
 /**
@@ -650,8 +435,6 @@ void IRRemote::loop()
  */
 boolean IRRemote::keyPressed(unsigned char r)
 {
-	irIndex = 0;
-	loop();
-	return irRead == r;
+	return getCode() == r;
 }
 #endif // !defined(__AVR_ATmega32U4__)
