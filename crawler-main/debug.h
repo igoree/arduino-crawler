@@ -32,8 +32,6 @@
 #define DEBUG_ERR(fmt, ...)
 #endif
 
-#define DEBUG_FREE_MEMORY() DEBUG_INFO("Free memory: %d", debug_freeMemory())
-
 #ifndef DEBUG_BUFFER_SIZE
 #define DEBUG_BUFFER_SIZE  128
 #endif

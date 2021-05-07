@@ -8,11 +8,14 @@
 #include "debug.h"
 
 Coroutine _freeMemoryCoroutine("freeMemory", 1);
+Coroutine _irRemoteCoroutine("IRRemote", 1);
 Coroutine _soundCoroutine("sound", 1);
 
 ProtocolParser _protocol(&Serial);
 Crawler _crawler;
-byte _count = 0;
+
+int _lastFreeMemory(0);
+
 bool _secondSoundGroup = false;
 
 void setup()
@@ -32,20 +35,69 @@ void setup()
 
 	_crawler.playSound(S_connection);
 
-	_freeMemoryCoroutine.start(CoroutineTask(&printFreeMemoryAsync));
+	_freeMemoryCoroutine.start(CoroutineTask(&monitorFreeMemoryAsync));
+	_irRemoteCoroutine.start(CoroutineTask(&handleIRRemoteAsync));
 }
 
-CoroutineTaskResult* printFreeMemoryAsync(const CoroutineTaskContext* context)
+CoroutineTaskResult* monitorFreeMemoryAsync(const CoroutineTaskContext* context)
 {
 #if DEBUG_LEVEL <= DEBUG_LEVEL_INFO
-	DEBUG_FREE_MEMORY();
+	auto freeMemory = debug_freeMemory();
+	if (freeMemory != _lastFreeMemory)
+	{
+		DEBUG_INFO("free memory: %d", freeMemory);
 
-	delay(500);
+		_lastFreeMemory = freeMemory;
+	}
 
-	return context->delayThenRepeat(5000);
+	return context->delayThenRepeat(500);
 #else
 	return context->end();
 #endif
+}
+
+void crawlerColorState()
+{
+	switch (_crawler.getStatus()) {
+	case CrawlerStatus::RunForward:
+		_crawler.setRgbColor(E_RGB_ALL, RGB_WHITE);
+		break;
+
+	case CrawlerStatus::TurnLeft:
+	case CrawlerStatus::TurnLeftRotate:
+		_crawler.setRgbColor(E_RGB_RIGHT, RGB_ORANGE);
+		break;
+
+	case CrawlerStatus::TurnRight:
+	case CrawlerStatus::TurnRightRotate:
+		_crawler.setRgbColor(E_RGB_LEFT, RGB_ORANGE);
+		break;
+
+	case CrawlerStatus::RunBackward:
+		_crawler.setRgbColor(E_RGB_ALL, RGB_RED);
+		break;
+
+	case CrawlerStatus::Stop:
+		_crawler.lightOff();
+		break;
+
+	default:
+		break;
+	}
+}
+
+void crawlerSpeedUp(uint8_t delta)
+{
+	_crawler.playSound(S_connection);
+	_crawler.setRgbColor(E_RGB_ALL, _crawler.getSpeed() * 2.5);
+	_crawler.speedUp(delta);
+}
+
+void crawlerSpeedDown(uint8_t delta)
+{
+	_crawler.playSound(S_disconnection);
+	_crawler.setRgbColor(E_RGB_ALL, _crawler.getSpeed() * 2.5);
+	_crawler.speedDown(delta);
 }
 
 void playSound(uint8_t soundIndex) {
@@ -55,32 +107,33 @@ void playSound(uint8_t soundIndex) {
 	_crawler.playSound(soundIndex);
 }
 
-void handleInfaredRemote(IRKeyCode irKeyCode)
+void crawlerHandleIRCommand(IRKeyCode irKeyCode)
 {
 	switch (irKeyCode) {
 	case IRKeyCode::Star:
-		_crawler.playSound(S_connection);
-		_crawler.setRgbColor(E_RGB_ALL, _crawler.getSpeed() * 2.5);
-		_crawler.speedUp(10);
-		DEBUG_INFO("Speed = %d", _crawler.getSpeed());
+		crawlerSpeedUp(10);
 		break;
+
 	case IRKeyCode::Pound:
-		_crawler.playSound(S_disconnection);
-		_crawler.setRgbColor(E_RGB_ALL, _crawler.getSpeed() * 2.5);
-		_crawler.speedDown(10);
+		crawlerSpeedDown(10);
 		break;
+
 	case IRKeyCode::Up:
 		_crawler.goForward();
 		break;
+
 	case IRKeyCode::Down:
 		_crawler.goBack();
 		break;
+
 	case IRKeyCode::Ok:
 		_crawler.stop();
 		break;
+
 	case IRKeyCode::Left:
 		_crawler.turnLeft();
 		break;
+
 	case IRKeyCode::Right:
 		_crawler.turnRight();
 		break;
@@ -130,114 +183,44 @@ void handleInfaredRemote(IRKeyCode irKeyCode)
 	}
 }
 
-void handleUltrasonicAvoidance(void)
+CoroutineTaskResult* handleIRRemoteAsync(const CoroutineTaskContext* context)
 {
-	uint16_t UlFrontDistance, UlLeftDistance, UlRightDistance;
-	UlFrontDistance = _crawler.getUltrasonicValue(CrawlerUltrasonicServoDirection::Front);
-	if (_count++ > 50) {
-		//_crawler.SendUltrasonicData();
-		_count = 0;
-	}
-	
-	if (UlFrontDistance < UL_LIMIT_MIN)
+	auto keyCode = _crawler.getPressedIRKey();
+	if (keyCode != IRKeyCode::Unknown)
 	{
-		_crawler.setSpeed(80);
-		_crawler.goBack();
-		delay(200);
-	}
-	if (UlFrontDistance < UL_LIMIT_MID)
-	{
-		_crawler.stop();
-		delay(100);
-		UlRightDistance = _crawler.getUltrasonicValue(CrawlerUltrasonicServoDirection::Right);
-		delay(50);
-		UlLeftDistance = _crawler.getUltrasonicValue(CrawlerUltrasonicServoDirection::Left);
-		if ((UlRightDistance > UL_LIMIT_MIN) && (UlRightDistance < UL_LIMIT_MAX)) {
-			_crawler.setSpeed(100);
-			_crawler.turnRight();
-			delay(400);
-		}
-		else if ((UlLeftDistance > UL_LIMIT_MIN) && (UlLeftDistance < UL_LIMIT_MAX)) {
-			_crawler.setSpeed(100);
-			_crawler.turnLeft();
-			delay(400);
-		}
-		else if ((UlRightDistance < UL_LIMIT_MIN) && (UlLeftDistance < UL_LIMIT_MIN)) {
-			_crawler.setSpeed(400);
-			_crawler.turnLeft();
-			delay(800);
-		}
-	}
-	else {
-		_crawler.setSpeed(80);
-		_crawler.goForward();
-	}
-}
+		DEBUG_INFO("IRKeyCode = %u, IRString = %s", (uint8_t)keyCode, _crawler.getIRString());
 
-void ultrasonicFollow()
-{
-	_crawler.setSpeed(40);
-	uint16_t UlFrontDistance = _crawler.getUltrasonicValue(CrawlerUltrasonicServoDirection::Front);
-	delay(10);
-	if (UlFrontDistance < 10) {
-		_crawler.goBack();
+		crawlerHandleIRCommand(keyCode);
+
+		crawlerColorState();
+
+		return context->delayThenGoTo(75, 1u);
 	}
-	else if (UlFrontDistance > 14) {
-		_crawler.goForward();
+	else if (context->step == 1u) 
+	{
+		return context->delayThenGoTo(75, 2u);
 	}
-	else if (10 <= UlFrontDistance <= 14) {
-		_crawler.stop();
+	else if (context->step == 2u)
+	{
+		if (_crawler.getStatus() != CrawlerStatus::Stop)
+		{
+			_crawler.stop();
+
+			crawlerColorState();
+		}
 	}
+
+	return context->goTo(0u);
 }
 
 void loop()
 {
 	_freeMemoryCoroutine.continueExecution();
+	_irRemoteCoroutine.continueExecution();
 
-	static bool recv_flag;
-	_protocol.RecevData();
+	/*_protocol.RecevData();
 	if (recv_flag = _protocol.ParserPackage()) {
-		/*if (_protocol->GetRobotControlFun() == E_CONTROL_MODE) {
-		}*/
-	}
-
-	auto irKeyCode = _crawler.getPressedIRKey();
-	if (irKeyCode != IRKeyCode::Unknown)
-	{
-		DEBUG_INFO("irKeyCode = %x", (uint8_t)irKeyCode);
-		handleInfaredRemote(irKeyCode);
-		delay(110);
-	}
-	else
-	{
-		if (_crawler.getStatus() != CrawlerStatus::Stop)
-		{
-			_crawler.stop();
+		if (_protocol->GetRobotControlFun() == E_CONTROL_MODE) {
 		}
-	}
-
-	switch (_crawler.getStatus()) {
-	case CrawlerStatus::RunForward:
-		_crawler.setRgbColor(E_RGB_ALL, RGB_WHITE);
-		break;
-
-	case CrawlerStatus::TurnLeftRotate:
-		_crawler.setRgbColor(E_RGB_LEFT, RGB_WHITE);
-		break;
-
-	case CrawlerStatus::TurnRightRotate:
-		_crawler.setRgbColor(E_RGB_RIGHT, RGB_WHITE);
-		break;
-
-	case CrawlerStatus::RunBackward:
-		_crawler.setRgbColor(E_RGB_ALL, RGB_RED);
-		break;
-
-	case CrawlerStatus::Stop:
-		_crawler.lightOff();
-		break;
-
-	default:
-		break;
-	}
+	}*/
 }

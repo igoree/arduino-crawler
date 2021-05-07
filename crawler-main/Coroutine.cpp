@@ -139,8 +139,6 @@ void Coroutine::continueExecution()
 	CoroutineTaskResult initialResult;
 	CoroutineTaskContext context(&_stack[_currentTaskIndex], &initialResult);
 
-	DEBUG_INFO("CR '%s' execute step %u", _name, context.step);
-
 	auto result = _stack[_currentTaskIndex].task.func(&context);
 
 	if (result->resultKind == CoroutineTaskResultKind::Finish)
@@ -160,10 +158,17 @@ void Coroutine::continueExecution()
 	}
 	else 
 	{
-		_stack[_currentTaskIndex].step = result->nextStep;
+		if (result->nextStep != _stack[_currentTaskIndex].step) 
+		{
+			DEBUG_INFO("CR '%s' go to step %u", _name, result->nextStep);
+
+			_stack[_currentTaskIndex].step = result->nextStep;
+		}
 		
 		if (result->delayMillis > 0) 
 		{
+			DEBUG_INFO("CR '%s' delay %u", _name, result->delayMillis);
+
 			_stack[_currentTaskIndex].executeAfterMillis = millis() + result->delayMillis;
 		}
 		else
