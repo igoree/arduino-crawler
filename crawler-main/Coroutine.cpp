@@ -166,6 +166,10 @@ void Coroutine::continueExecution()
 		{
 			_stack[_currentTaskIndex].executeAfterMillis = millis() + result->delayMillis;
 		}
+		else
+		{
+			_stack[_currentTaskIndex].executeAfterMillis = 0;
+		}
 	}
 
 	if (result->taskToSwitch.func != nullptr) 
