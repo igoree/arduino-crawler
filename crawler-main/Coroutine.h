@@ -63,6 +63,4 @@ public:
 	CoroutineTaskResult* endThenExecute(CoroutineTask task) const;
 };
 
-#define CONTINUE_COROUTINES()
-
 #endif

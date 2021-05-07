@@ -1,6 +1,8 @@
 #include "Coroutine.h"
 #include "Arduino.h"
 
+#include "debugLevels.h"
+#define DEBUG_LEVEL DEBUG_LEVEL_INFO
 #include "debug.h"
 
 #define UNKNOWN_INDEX UINT8_C(255)
@@ -34,7 +36,7 @@ struct CoroutineTaskResult
 	}
 
 	CoroutineTaskResult(uint8_t nextStep, CoroutineTaskResultKind resultKind)
-		: nextStep(nextStep), resultKind(resultKind)
+		: nextStep(nextStep), resultKind(resultKind), delayMillis(0), taskToSwitch(CoroutineTask())
 	{
 	}
 
@@ -59,12 +61,12 @@ CoroutineTask::CoroutineTask(AsyncFuncPointer func, void* data = nullptr)
 // CoroutineTaskState
 
 CoroutineTaskState::CoroutineTaskState()
-	: task()
+	: CoroutineTaskState(CoroutineTask())
 {
 }
 
 CoroutineTaskState::CoroutineTaskState(CoroutineTask task)
-	: task(task)
+	: task(task), step(0), executeAfterMillis(0)
 {
 }
 
@@ -123,7 +125,7 @@ void Coroutine::switchTo(CoroutineTask task)
 	_currentTaskIndex++;
 	_stack[_currentTaskIndex] = CoroutineTaskState(task);
 
-	DEBUG_INFO("CR '%s' switch task to %d", _name, _currentTaskIndex);
+	DEBUG_INFO("CR '%s' switch task to %u", _name, _currentTaskIndex);
 }
 
 void Coroutine::continueExecution()
@@ -131,19 +133,19 @@ void Coroutine::continueExecution()
 	if (_currentTaskIndex == UNKNOWN_INDEX)
 		return;
 
-	if (_stack[_currentTaskIndex].executeAfterMillis > 0 && _stack[_currentTaskIndex].executeAfterMillis < millis())
+	if (_stack[_currentTaskIndex].executeAfterMillis > 0ul && _stack[_currentTaskIndex].executeAfterMillis > millis())
 		return;
 
 	CoroutineTaskResult initialResult;
 	CoroutineTaskContext context(&_stack[_currentTaskIndex], &initialResult);
 
-	DEBUG_INFO("CR '$s' execute step %d", _name, context.step);
+	DEBUG_INFO("CR '%s' execute step %u", _name, context.step);
 
 	auto result = _stack[_currentTaskIndex].task.func(&context);
 
 	if (result->resultKind == CoroutineTaskResultKind::Finish)
 	{
-		DEBUG_INFO("CR '%s' complete task %d", _name, _currentTaskIndex);
+		DEBUG_INFO("CR '%s' complete task %u", _name, _currentTaskIndex);
 
 		if (_currentTaskIndex == 0)
 		{

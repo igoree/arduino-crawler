@@ -40,6 +40,8 @@ CoroutineTaskResult* printFreeMemoryAsync(const CoroutineTaskContext* context)
 #if DEBUG_LEVEL <= DEBUG_LEVEL_INFO
 	DEBUG_FREE_MEMORY();
 
+	delay(500);
+
 	return context->delayThenRepeat(5000);
 #else
 	return context->end();
@@ -190,6 +192,8 @@ void ultrasonicFollow()
 
 void loop()
 {
+	_freeMemoryCoroutine.continueExecution();
+
 	static bool recv_flag;
 	_protocol.RecevData();
 	if (recv_flag = _protocol.ParserPackage()) {
