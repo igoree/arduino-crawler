@@ -1,5 +1,8 @@
 #include "Crawler.h"
 #include "Sounds.h"
+
+#include "debugLevels.h"
+#define DEBUG_LEVEL DEBUG_LEVEL_INFO
 #include "debug.h"
 
 //MotorDriverBoard V4.0
@@ -87,15 +90,17 @@ void Crawler::stop(void)
 void Crawler::turnLeft(void)
 {
 	setStatus(CrawlerStatus::TurnLeft);
-	runDrive(_leftDrive, _speed / 3, FORWARD);
+
+	runDrive(_leftDrive, getOppositeDriveRotationSpeed(), FORWARD);
 	runDrive(_rightDrive, _speed, FORWARD);
 }
 
 void Crawler::turnRight(void)
 {
 	setStatus(CrawlerStatus::TurnRight);
+
 	runDrive(_leftDrive, _speed, FORWARD);
-	runDrive(_rightDrive, _speed / 3, FORWARD);
+	runDrive(_rightDrive, getOppositeDriveRotationSpeed(), FORWARD);
 }
 
 void Crawler::turnLeftRotate(void)
@@ -112,18 +117,40 @@ void Crawler::turnRightRotate(void)
 	runDrive(_rightDrive, _speed, BACKWARD);
 }
 
+void Crawler::turnLeftBackward()
+{
+	setStatus(CrawlerStatus::TurnLeftBackward);
+
+	runDrive(_leftDrive, getOppositeDriveRotationSpeed(), BACKWARD);
+	runDrive(_rightDrive, _speed, BACKWARD);
+}
+
+void Crawler::turnRightBackward()
+{
+	setStatus(CrawlerStatus::TurnRightBackward);
+
+	runDrive(_leftDrive, _speed, BACKWARD);
+	runDrive(_rightDrive, getOppositeDriveRotationSpeed(), BACKWARD);
+}
+
 void Crawler::setSpeed(int8_t speed)
 {
-	if (speed > 100) {
+	if (speed > 100) 
+	{
 		_speed = 100;
-		return;
 	}
-	else if (speed < 0) {
+	else if (speed < 0) 
+	{
 		_speed = 0;
-		return;
 	}
-	_speed = speed;
+	else 
+	{
+		_speed = speed;
+	}
+
+	validateState();
 }
+
 
 uint8_t Crawler::getSpeed()
 {
@@ -132,7 +159,6 @@ uint8_t Crawler::getSpeed()
 
 bool Crawler::speedUp(int8_t delta = 5)
 {
-	_status = CrawlerStatus::SpeedUp;
 	uint8_t oldSpeed = _speed;
 	setSpeed(_speed + delta);
 
@@ -141,7 +167,6 @@ bool Crawler::speedUp(int8_t delta = 5)
 
 bool Crawler::speedDown(int8_t delta = 5)
 {
-	_status = CrawlerStatus::SpeedDown;
 	uint8_t oldSpeed = _speed;
 	setSpeed(_speed - delta);
 
@@ -151,6 +176,52 @@ bool Crawler::speedDown(int8_t delta = 5)
 void Crawler::setStatus(CrawlerStatus status)
 {
 	_status = status;
+}
+
+void Crawler::validateState()
+{
+	switch (_status)
+	{
+	case CrawlerStatus::RunForward:
+		goForward();
+		break;
+
+	case CrawlerStatus::RunBackward:
+		goBack();
+		break;
+
+	case CrawlerStatus::TurnLeft:
+		turnLeft();
+		break;
+
+	case CrawlerStatus::TurnRight:
+		turnRight();
+		break;
+
+	case CrawlerStatus::TurnLeftRotate:
+		turnLeftRotate();
+		break;
+
+	case CrawlerStatus::TurnRightRotate:
+		turnRightRotate();
+		break;
+
+	case CrawlerStatus::TurnLeftBackward:
+		turnLeftBackward();
+		break;
+
+	case CrawlerStatus::TurnRightBackward:
+		turnRightBackward();
+		break;
+
+	default:
+		break;
+	}
+}
+
+uint8_t Crawler::getOppositeDriveRotationSpeed()
+{
+	return _speed / 3;
 }
 
 CrawlerStatus Crawler::getStatus()
@@ -173,7 +244,7 @@ IRKeyCode Crawler::getPressedIRKey()
 	return (IRKeyCode) _ir->getCode();
 }
 
-void Crawler::initBuzzer(void)
+void Crawler::initBuzzer()
 {
 	Buzzer = (::Buzzer*)_motorDriver.getSensor(E_BUZZER);
 }
@@ -183,7 +254,7 @@ void Crawler::playSound(byte songName)
 	_sensors->Sing(songName);
 }
 
-void Crawler::initRgb(void)
+void Crawler::initRgb()
 {
 	Rgb = (RGBLed*)_motorDriver.getSensor(E_RGB);
 }
@@ -193,7 +264,7 @@ void Crawler::setRgbColor(E_RGB_INDEX index, long Color)
 	_sensors->SetRgbColor(index, Color);
 }
 
-void Crawler::lightOff(void)
+void Crawler::lightOff()
 {
 	_sensors->SetRgbColor(E_RGB_ALL, RGB_BLACK);
 }
@@ -224,7 +295,7 @@ void Crawler::setRgbEffect(E_RGB_INDEX index, long Color, CrawlerRgbEffect effec
 	}
 }
 
-void Crawler::initUltrasonic(void)
+void Crawler::initUltrasonic()
 {
 	_motorDriver.getSensor(E_ULTRASONIC);
 }

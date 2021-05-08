@@ -7,14 +7,22 @@
 #define DEBUG_LEVEL DEBUG_LEVEL_INFO
 #include "debug.h"
 
+enum class CrawlerIRControlMode : uint8_t
+{
+	ContinuousPressing,
+	SinglePress
+};
+
 Coroutine _freeMemoryCoroutine("freeMemory", 1);
 Coroutine _irRemoteCoroutine("IRRemote", 1);
+Coroutine _speedLightCoroutine("speedLight", 1);
 Coroutine _soundCoroutine("sound", 1);
 
 ProtocolParser _protocol(&Serial);
 Crawler _crawler;
 
 int _lastFreeMemory(0);
+CrawlerIRControlMode _crawlerIRControlMode(CrawlerIRControlMode::ContinuousPressing);
 
 bool _secondSoundGroup = false;
 
@@ -33,7 +41,7 @@ void setup()
 
 	DEBUG_INFO("init ok");
 
-	_crawler.playSound(S_connection);
+	_crawler.playSound(S_mode3);
 
 	_freeMemoryCoroutine.start(CoroutineTask(&monitorFreeMemoryAsync));
 	_irRemoteCoroutine.start(CoroutineTask(&handleIRRemoteAsync));
@@ -56,7 +64,7 @@ CoroutineTaskResult* monitorFreeMemoryAsync(const CoroutineTaskContext* context)
 #endif
 }
 
-void crawlerColorState()
+void crawlerShowStatusLight()
 {
 	switch (_crawler.getStatus()) {
 	case CrawlerStatus::RunForward:
@@ -65,12 +73,14 @@ void crawlerColorState()
 
 	case CrawlerStatus::TurnLeft:
 	case CrawlerStatus::TurnLeftRotate:
+	case CrawlerStatus::TurnLeftBackward:
 		_crawler.setRgbColor(E_RGB_RIGHT, RGB_ORANGE);
 		_crawler.setRgbColor(E_RGB_LEFT, RGB_BLACK);
 		break;
 
 	case CrawlerStatus::TurnRight:
 	case CrawlerStatus::TurnRightRotate:
+	case CrawlerStatus::TurnRightBackward:
 		_crawler.setRgbColor(E_RGB_LEFT, RGB_ORANGE);
 		_crawler.setRgbColor(E_RGB_RIGHT, RGB_BLACK);
 		break;
@@ -88,18 +98,43 @@ void crawlerColorState()
 	}
 }
 
+CoroutineTaskResult* crawlerShowSpeedLightAsync(const CoroutineTaskContext* context)
+{
+	switch (context->step)
+	{
+	case 0:
+		_crawler.setRgbColor(E_RGB_ALL, _crawler.getSpeed() * 2.5);
+
+		return context->delayThenNext(100);
+
+	default:
+		crawlerShowStatusLight();
+
+		return context->end();
+	}
+}
+
+void crawlerShowSpeedLight() 
+{
+	_speedLightCoroutine.start(CoroutineTask(&crawlerShowSpeedLightAsync));
+}
+
 void crawlerSpeedUp(uint8_t delta)
 {
-	_crawler.playSound(S_connection);
-	_crawler.setRgbColor(E_RGB_ALL, _crawler.getSpeed() * 2.5);
-	_crawler.speedUp(delta);
+	if (_crawler.speedUp(delta))
+	{
+		_crawler.playSound(S_connection);
+	}
+	crawlerShowSpeedLight();
 }
 
 void crawlerSpeedDown(uint8_t delta)
 {
-	_crawler.playSound(S_disconnection);
-	_crawler.setRgbColor(E_RGB_ALL, _crawler.getSpeed() * 2.5);
-	_crawler.speedDown(delta);
+	if (_crawler.speedDown(delta))
+	{
+		_crawler.playSound(S_disconnection);
+	}
+	crawlerShowSpeedLight();
 }
 
 void playSound(uint8_t soundIndex) {
@@ -111,6 +146,14 @@ void playSound(uint8_t soundIndex) {
 
 void crawlerHandleIRCommand(IRKeyCode irKeyCode)
 {
+	auto crawlerStatus = _crawler.getStatus();
+	bool rotateTurnMode = _crawlerIRControlMode == CrawlerIRControlMode::ContinuousPressing ||
+		crawlerStatus == CrawlerStatus::Stop ||
+		crawlerStatus == CrawlerStatus::TurnLeftRotate ||
+		crawlerStatus == CrawlerStatus::TurnRightRotate;
+	bool backwardTurnMode = crawlerStatus == CrawlerStatus::RunBackward ||
+		crawlerStatus == CrawlerStatus::TurnLeftBackward ||
+		crawlerStatus == CrawlerStatus::TurnRightBackward;
 	switch (irKeyCode) {
 	case IRKeyCode::Star:
 		crawlerSpeedUp(10);
@@ -133,19 +176,47 @@ void crawlerHandleIRCommand(IRKeyCode irKeyCode)
 		break;
 
 	case IRKeyCode::Left:
-		_crawler.turnLeftRotate();
+		if (rotateTurnMode)
+		{
+			_crawler.turnLeftRotate();
+		}
+		else if (backwardTurnMode)
+		{
+			_crawler.turnLeftBackward();
+		}
+		else
+		{
+			_crawler.turnLeft();
+		}
 		break;
 
 	case IRKeyCode::Right:
-		_crawler.turnRightRotate();
+		if (rotateTurnMode)
+		{
+			_crawler.turnRightRotate();
+		}
+		else if (backwardTurnMode)
+		{
+			_crawler.turnRightBackward();
+		}
+		else
+		{
+			_crawler.turnRight();
+		}
 		break;
 
 	case IRKeyCode::Button1:
 		playSound(2);
+
+		DEBUG_INFO("IRControlMode=ContinuousPressing");
+		_crawlerIRControlMode = CrawlerIRControlMode::ContinuousPressing;
 		break;
 
 	case IRKeyCode::Button2:
 		playSound(3);
+
+		DEBUG_INFO("IRControlMode=SinglePress");
+		_crawlerIRControlMode = CrawlerIRControlMode::SinglePress;
 		break;
 
 	case IRKeyCode::Button3:
@@ -194,21 +265,21 @@ CoroutineTaskResult* handleIRRemoteAsync(const CoroutineTaskContext* context)
 
 		crawlerHandleIRCommand(keyCode);
 
-		crawlerColorState();
+		crawlerShowStatusLight();
 
 		return context->delayThenGoTo(75, 1u);
 	}
-	else if (context->step == 1u) 
+	else if (context->step == 1u)
 	{
-		return context->delayThenGoTo(75, 2u);
+		return context->delayThenNext(75);
 	}
 	else if (context->step == 2u)
 	{
-		if (_crawler.getStatus() != CrawlerStatus::Stop)
+		if (_crawlerIRControlMode == CrawlerIRControlMode::ContinuousPressing && _crawler.getStatus() != CrawlerStatus::Stop)
 		{
 			_crawler.stop();
 
-			crawlerColorState();
+			crawlerShowStatusLight();
 		}
 	}
 
@@ -219,6 +290,7 @@ void loop()
 {
 	_freeMemoryCoroutine.continueExecution();
 	_irRemoteCoroutine.continueExecution();
+	_speedLightCoroutine.continueExecution();
 
 	/*_protocol.RecevData();
 	if (recv_flag = _protocol.ParserPackage()) {

@@ -23,10 +23,10 @@ enum class CrawlerStatus : uint8_t
 	RunBackward,
 	TurnLeft,
 	TurnRight,
+	TurnLeftBackward,
+	TurnRightBackward,
 	TurnRightRotate,
 	TurnLeftRotate,
-	SpeedUp,
-	SpeedDown,
 	LowPower
 };
 
@@ -60,6 +60,8 @@ private:
 	void stopDrive(Emakefun_DCMotor* drive);
 	void runDrive(Emakefun_DCMotor* drive, uint8_t speed, uint8_t direction);
 	void setStatus(CrawlerStatus status);
+	void validateState();
+	uint8_t getOppositeDriveRotationSpeed();
 
 public:
 	Buzzer* Buzzer;
@@ -73,6 +75,8 @@ public:
 	void goBack();
 	void turnLeft();
 	void turnRight();
+	void turnLeftBackward();
+	void turnRightBackward();
 	void turnLeftRotate();
 	void turnRightRotate();
 	void stop();
