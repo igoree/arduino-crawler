@@ -27,7 +27,7 @@ private:
 	uint8_t _currentTaskIndex;
 	CoroutineTaskState* _stack;
 public:
-	Coroutine(const char* name, uint8_t stackSize);
+	Coroutine(const char* name, uint8_t stackSize = 1);
 	~Coroutine();
 
 	void start(CoroutineTask task);

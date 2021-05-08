@@ -13,10 +13,10 @@ enum class CrawlerIRControlMode : uint8_t
 	SinglePress
 };
 
-Coroutine _freeMemoryCoroutine("freeMemory", 1);
-Coroutine _irRemoteCoroutine("IRRemote", 1);
-Coroutine _speedLightCoroutine("speedLight", 1);
-Coroutine _soundCoroutine("sound", 1);
+Coroutine _freeMemoryCoroutine("freeMemory");
+Coroutine _irRemoteCoroutine("IRRemote");
+Coroutine _speedLightCoroutine("speedLight");
+Coroutine _soundCoroutine("sound");
 
 ProtocolParser _protocol(&Serial);
 Crawler _crawler;

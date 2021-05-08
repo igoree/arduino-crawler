@@ -72,7 +72,7 @@ CoroutineTaskState::CoroutineTaskState(CoroutineTask task)
 
 // Coroutine
 
-Coroutine::Coroutine(const char* name, uint8_t stackSize)
+Coroutine::Coroutine(const char* name, uint8_t stackSize = 1)
 	: _name(name), _stackSize(stackSize), _currentTaskIndex(UNKNOWN_INDEX), _stack(new CoroutineTaskState[stackSize])
 {
 }
