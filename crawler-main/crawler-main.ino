@@ -66,11 +66,13 @@ void crawlerColorState()
 	case CrawlerStatus::TurnLeft:
 	case CrawlerStatus::TurnLeftRotate:
 		_crawler.setRgbColor(E_RGB_RIGHT, RGB_ORANGE);
+		_crawler.setRgbColor(E_RGB_LEFT, RGB_BLACK);
 		break;
 
 	case CrawlerStatus::TurnRight:
 	case CrawlerStatus::TurnRightRotate:
 		_crawler.setRgbColor(E_RGB_LEFT, RGB_ORANGE);
+		_crawler.setRgbColor(E_RGB_RIGHT, RGB_BLACK);
 		break;
 
 	case CrawlerStatus::RunBackward:
@@ -131,11 +133,11 @@ void crawlerHandleIRCommand(IRKeyCode irKeyCode)
 		break;
 
 	case IRKeyCode::Left:
-		_crawler.turnLeft();
+		_crawler.turnLeftRotate();
 		break;
 
 	case IRKeyCode::Right:
-		_crawler.turnRight();
+		_crawler.turnRightRotate();
 		break;
 
 	case IRKeyCode::Button1:
