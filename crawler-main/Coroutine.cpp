@@ -2,7 +2,7 @@
 #include "Arduino.h"
 
 #include "debugLevels.h"
-#define DEBUG_LEVEL DEBUG_LEVEL_INFO
+//#define DEBUG_LEVEL DEBUG_LEVEL_INFO
 #include "debug.h"
 
 #define UNKNOWN_INDEX UINT8_C(255)
@@ -140,6 +140,14 @@ void Coroutine::continueExecution()
 	CoroutineTaskContext context(&_stack[_currentTaskIndex], &initialResult);
 
 	auto result = _stack[_currentTaskIndex].task.func(&context);
+	if (result != &initialResult) 
+	{
+		DEBUG_ERR("CR '%s' task %u invalid result", _name, context.step);
+		
+		_currentTaskIndex = UNKNOWN_INDEX;
+
+		return;
+	}
 
 	if (result->resultKind == CoroutineTaskResultKind::Finish)
 	{

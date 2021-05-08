@@ -90,12 +90,7 @@ IRRemote::IRRemote(int pin)
 {
 	pinMode(pin, INPUT);
 	irparams.recvpin = pin;
-	// attachInterrupt(INT0, irISR, CHANGE);
-
-	irDelayTime = 0;
 	irRead = 0;
-	irReady = false;
-	irPressed = false;
 	begin();
 }
 
@@ -176,13 +171,12 @@ ErrorStatus IRRemote::decode()
 		return ERROR;
 	}
 
-	if (decodeNEC())
-	{
-		begin();
-		return SUCCESS;
-	}
-	begin();
-	return ERROR;
+	auto result = decodeNEC();
+
+	irparams.rawlen = 0;
+	irparams.rcvstate = STATE_IDLE;
+
+	return result;
 }
 
 /**
@@ -203,7 +197,6 @@ ErrorStatus IRRemote::decode()
 ErrorStatus IRRemote::decodeNEC()
 {
 	static unsigned long repeat_value = 0xFFFFFFFF;
-	static byte repeta_time = 0;
 	uint32_t data = 0;
 	int offset = 0; // Skip first space
 	// Initial mark
@@ -219,16 +212,14 @@ ErrorStatus IRRemote::decodeNEC()
 	{
 		rawbuf[offset] = 0;
 		rawbuf[offset + 1] = 0;
-		repeta_time++;
-		// if(repeta_time > 1) {
-		repeta_time = 0;
+
 		bits = 0;
 		value = repeat_value;
-		// Serial.println("REPEAT");
 		decode_type = NEC;
+
 		return SUCCESS;
-		//  }
 	}
+
 	if (rawlen < (2 * NEC_BITS + 3))
 	{
 		return ERROR;
@@ -269,7 +260,7 @@ ErrorStatus IRRemote::decodeNEC()
 	value = data;
 	repeat_value = data;
 	decode_type = NEC;
-	repeta_time = 0;
+
 	return SUCCESS;
 }
 
@@ -395,25 +386,10 @@ unsigned char IRRemote::getCode()
 	if (decode())
 	{
 		irRead = ((value >> 8) >> 8) & 0xff;
-		irPressed = true;
-		if (irRead == 0xa || irRead == 0xd)
-		{
-			irReady = true;
-		}
-
-		irDelayTime = millis();
 	}
 	else
 	{
-		if (irRead > 0)
-		{
-			if (millis() - irDelayTime > 50)
-			{
-				irPressed = false;
-				irRead = 0;
-				irDelayTime = millis();
-			}
-		}
+		irRead = 0;
 	}
 
 	return irRead;

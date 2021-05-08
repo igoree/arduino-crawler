@@ -6,8 +6,6 @@
 #include <stdbool.h>
 #include <Arduino.h>
 
-#ifdef ME_PORT_DEFINED
-#endif // ME_PORT_DEFINED
 #ifndef __AVR_ATmega32U4__
 #define MARK  0
 #define SPACE 1
@@ -24,8 +22,6 @@ typedef enum { ERROR = 0, SUCCESS = !ERROR } ErrorStatus;
 #define NEC_ZERO_SPACE	560
 #define NEC_RPT_SPACE	2250
 #define NEC_RPT_PERIOD	110000
-
-#define _GAP 5000 // Minimum map between transmissions
 
 // receiver states
 #define STATE_IDLE     2
@@ -119,9 +115,6 @@ private:
 	volatile uint8_t* rawbuf; // Raw intervals in .5 us ticks
 	int rawlen; // Number of records in rawbuf.
 	char irRead;
-	boolean irReady;
-	boolean irPressed;
-	unsigned long irDelayTime;
 
 	ErrorStatus decodeNEC();
 	ErrorStatus decode();
