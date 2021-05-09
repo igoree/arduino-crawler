@@ -682,36 +682,36 @@ void Emakefun_Sensor::Sing(byte songName)
 {
   switch (songName) {
     case S_up:
-      mBuzzer->singleTone(note_E5, 50, 60);
-      mBuzzer->singleTone(note_E6, 55, 60);
-      mBuzzer->singleTone(note_A6, 60, 50);
+      mBuzzer->singleTone(NOTE_E5, 50, 60);
+      mBuzzer->singleTone(NOTE_E6, 55, 60);
+      mBuzzer->singleTone(NOTE_A6, 60, 50);
       //  _tone(9, 394);
       break;
 
     case S_down:
-      mBuzzer->singleTone(note_E5, 50, 60);
-      mBuzzer->singleTone(note_A6, 55, 60);
-      mBuzzer->singleTone(note_E6, 50, 50);
+      mBuzzer->singleTone(NOTE_E5, 50, 60);
+      mBuzzer->singleTone(NOTE_A6, 55, 60);
+      mBuzzer->singleTone(NOTE_E6, 50, 50);
       break;
 
     case S_buttonPushed:
-      mBuzzer->toneTransition (note_E6, note_G6, 1.03, 20, 20);
+      mBuzzer->toneTransition (NOTE_E6, NOTE_G6, 1.03, 20, 20);
       delay(30);
-      mBuzzer->toneTransition (note_E6, note_D7, 1.04, 10, 10);
+      mBuzzer->toneTransition (NOTE_E6, NOTE_D7, 1.04, 10, 10);
       break;
 
     case S_mode1:
-      mBuzzer->toneTransition (note_E6, note_A6, 1.02, 30, 20);  //1318.51 to 1760
+      mBuzzer->toneTransition (NOTE_E6, NOTE_A6, 1.02, 30, 20);  //1318.51 to 1760
       break;
 
     case S_mode2:
-      mBuzzer->toneTransition (note_G6, note_D7, 1.03, 30, 20);  //1567.98 to 2349.32
+      mBuzzer->toneTransition (NOTE_G6, NOTE_D7, 1.03, 30, 20);  //1567.98 to 2349.32
       break;
 
     case S_turn_on:
-      mBuzzer->singleTone(note_E6, 50, 150); //D6
-      mBuzzer->singleTone(note_G6, 50, 130); //E6
-      mBuzzer->singleTone(note_D7, 300, 0); //G6
+      mBuzzer->singleTone(NOTE_E6, 50, 150); //D6
+      mBuzzer->singleTone(NOTE_G6, 50, 130); //E6
+      mBuzzer->singleTone(NOTE_D7, 300, 0); //G6
       break;
 
     case S_surprise:
@@ -724,7 +724,7 @@ void Emakefun_Sensor::Sing(byte songName)
       delay(200);
 
       for (int i = 880; i < 2000; i = i * 1.04) {
-        mBuzzer->singleTone(note_B5, 5, 15);
+        mBuzzer->singleTone(NOTE_B5, 5, 15);
       }
       break;
 
@@ -733,7 +733,7 @@ void Emakefun_Sensor::Sing(byte songName)
       delay(200);
 
       for (int i = 1880; i < 3000; i = i * 1.03) {
-        mBuzzer->singleTone(note_C6, 10, 20);
+        mBuzzer->singleTone(NOTE_C6, 10, 20);
       }
       break;
 
@@ -789,9 +789,9 @@ void Emakefun_Sensor::Sing(byte songName)
       break;
 
     case S_didi:
-      mBuzzer->singleTone(note_C7, 50, 100);
+      mBuzzer->singleTone(NOTE_C7, 50, 100);
       delay(110);
-      mBuzzer->singleTone(note_C6, 50, 100);
+      mBuzzer->singleTone(NOTE_C6, 50, 100);
       break;
   }
 

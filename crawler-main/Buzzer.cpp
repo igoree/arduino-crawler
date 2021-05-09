@@ -9,10 +9,9 @@
 Buzzer::Buzzer(uint8_t pin)
 	: _pin(pin)
 {
-	_pin = pin;
 }
 
-void Buzzer::tone(float frequency, uint32_t duration)
+void Buzzer::tone(float frequency, uint32_t duration) const
 {
 	uint32_t period = 1000000ul / frequency;
 	uint32_t pulse = period / 2;
@@ -31,38 +30,39 @@ void Buzzer::tone(float frequency, uint32_t duration)
 	}
 }
 
-void Buzzer::singleTone(float noteFrequency, uint32_t noteDuration, uint32_t silentDuration)
+void Buzzer::singleTone(float noteFrequency, uint32_t noteDuration, uint32_t silenceDuration) const
 {
 	tone(noteFrequency, noteDuration);
 
-	if (silentDuration > 0)
+	if (silenceDuration > 0)
 	{
-		delay(silentDuration);
+		delay(silenceDuration);
 	}
 }
 
-void Buzzer::toneTransition(float initFrequency, float finalFrequency, float changeRatio, uint32_t noteDuration, uint32_t silentDuration) {
+void Buzzer::toneTransition(float initFrequency, float finalFrequency, float changeRatio, uint32_t noteDuration, uint32_t silenceDuration) const
+{
 	//Examples:
 	//  bendTones (880, 2093, 1.02, 18, 1);
-	//  bendTones (note_A5, note_C7, 1.02, 18, 0);
+	//  bendTones (NOTE_A5, NOTE_C7, 1.02, 18, 0);
 
 	if (initFrequency < finalFrequency)
 	{
 		for (int i = initFrequency; i < finalFrequency; i = i * changeRatio)
 		{
-			singleTone(i, noteDuration, silentDuration);
+			singleTone(i, noteDuration, silenceDuration);
 		}
 	}
 	else 
 	{
 		for (int i = initFrequency; i > finalFrequency; i = i / changeRatio)
 		{
-			singleTone(i, noteDuration, silentDuration);
+			singleTone(i, noteDuration, silenceDuration);
 		}
 	}
 }
 
-void Buzzer::noTone()
+void Buzzer::noTone() const
 {
 	pinMode(_pin, OUTPUT);
 	digitalWrite(_pin, LOW);

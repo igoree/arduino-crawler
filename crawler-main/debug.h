@@ -2,6 +2,7 @@
 #define _DEBUG_H_
 
 #include "debugLevels.h"
+#include "WString.h"
 
 #ifndef  DEBUG_LEVEL
 #define  DEBUG_LEVEL  DEBUG_LEVEL_NONE
