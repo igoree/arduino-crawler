@@ -2,10 +2,6 @@
 #include "Arduino.h"
 #include <avr/wdt.h>
 
-#include "debugLevels.h"
-#define DEBUG_LEVEL DEBUG_LEVEL_INFO
-#include "debug.h"
-
 Buzzer::Buzzer(uint8_t pin)
 	: _pin(pin)
 {
@@ -15,8 +11,6 @@ void Buzzer::tone(float frequency, uint32_t duration) const
 {
 	uint32_t period = 1000000ul / frequency;
 	uint32_t pulse = period / 2;
-
-	DEBUG_INFO("tone: frequency=%lu,duration=%lu,period=%lu", (uint32_t) frequency, duration, period);
 
 	pinMode(_pin, OUTPUT);
 

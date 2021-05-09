@@ -135,22 +135,21 @@ void Crawler::turnRightBackward()
 
 void Crawler::setSpeed(int8_t speed)
 {
-	if (speed > 100) 
+	if (speed > 100)
 	{
 		_speed = 100;
 	}
-	else if (speed < 0) 
+	else if (speed < 0)
 	{
 		_speed = 0;
 	}
-	else 
+	else
 	{
 		_speed = speed;
 	}
 
 	validateState();
 }
-
 
 uint8_t Crawler::getSpeed()
 {
@@ -241,7 +240,7 @@ void Crawler::initIR()
 
 IRKeyCode Crawler::getPressedIRKey()
 {
-	return (IRKeyCode) _ir->getCode();
+	return (IRKeyCode)_ir->getCode();
 }
 
 void Crawler::initBuzzer()
@@ -252,6 +251,16 @@ void Crawler::initBuzzer()
 void Crawler::playSound(byte songName)
 {
 	_sensors->Sing(songName);
+}
+
+void Crawler::initSoundPlayer(Coroutine* soundCoroutine)
+{
+	_soundPlayer = new SoundPlayer((::Buzzer*)_motorDriver.getSensor(E_BUZZER), soundCoroutine);
+}
+
+void Crawler::playSound(Sound sound)
+{
+	_soundPlayer->play(sound);
 }
 
 void Crawler::initRgb()
@@ -338,16 +347,16 @@ void Crawler::setServoBaseAngle(uint8_t baseAngle)
 void Crawler::setServoAngle(CrawlerServoKind servoKind, byte angle)
 {
 	int servoAngle;
-	if (angle > 360) 
+	if (angle > 360)
 	{
 		return;
 	}
 
-	if (angle == 90 || angle == 270) 
+	if (angle == 90 || angle == 270)
 	{
 		servoAngle = _servoBaseAngle;
 	}
-	else if (angle >= 0 && angle <= 180) 
+	else if (angle >= 0 && angle <= 180)
 	{
 		servoAngle = _servoBaseAngle - 90 + angle;   // 180-degree-diff
 	}
@@ -359,6 +368,6 @@ void Crawler::setServoAngle(CrawlerServoKind servoKind, byte angle)
 
 void Crawler::initNrf24L01(uint8_t* rxAddr)
 {
-	Nrf24L01 = (Nrf24l*) _motorDriver.getSensor(E_NRF24L01);
+	Nrf24L01 = (Nrf24l*)_motorDriver.getSensor(E_NRF24L01);
 	Nrf24L01->setRADDR(rxAddr);
 }

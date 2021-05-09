@@ -2,7 +2,7 @@
 #include "Arduino.h"
 
 #include "debugLevels.h"
-//#define DEBUG_LEVEL DEBUG_LEVEL_INFO
+#define DEBUG_LEVEL DEBUG_LEVEL_ERR
 #include "debug.h"
 
 #define UNKNOWN_INDEX UINT8_C(255)
@@ -36,7 +36,7 @@ struct CoroutineTaskResult
 	}
 
 	CoroutineTaskResult(uint8_t nextStep, CoroutineTaskResultKind resultKind)
-		: nextStep(nextStep), resultKind(resultKind), delayMillis(0), taskToSwitch(CoroutineTask())
+		: nextStep(nextStep), resultKind(resultKind), delayMillis(0), taskToSwitch()
 	{
 	}
 

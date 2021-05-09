@@ -2,6 +2,7 @@
 #include "ProtocolParser.h"
 #include "Crawler.h"
 #include "IRKeyMap.h"
+#include "SoundPlayer.h"
 
 #include "debugLevels.h"
 #define DEBUG_LEVEL DEBUG_LEVEL_INFO
@@ -16,15 +17,13 @@ enum class CrawlerIRControlMode : uint8_t
 Coroutine _freeMemoryCoroutine("freeMemory");
 Coroutine _irRemoteCoroutine("IRRemote");
 Coroutine _speedLightCoroutine("speedLight");
-Coroutine _soundCoroutine("sound");
+Coroutine _soundCoroutine("sound", 3);
 
 ProtocolParser _protocol(&Serial);
 Crawler _crawler;
 
 int _lastFreeMemory(0);
 CrawlerIRControlMode _crawlerIRControlMode(CrawlerIRControlMode::ContinuousPressing);
-
-bool _secondSoundGroup = false;
 
 void setup()
 {
@@ -33,6 +32,7 @@ void setup()
 	_crawler.initServo();
 	_crawler.initRgb();
 	_crawler.initBuzzer();
+	_crawler.initSoundPlayer(&_soundCoroutine);
 	_crawler.initIR();
 	_crawler.setSpeed(50);
 	_crawler.setServoBaseAngle(90);
@@ -137,14 +137,6 @@ void crawlerSpeedDown(uint8_t delta)
 	crawlerShowSpeedLight();
 }
 
-void playSound(uint8_t soundIndex) {
-	if (_secondSoundGroup) {
-		soundIndex = soundIndex + 9;
-	}
-	DEBUG_INFO("Play sound %u", soundIndex);
-	_crawler.playSound(soundIndex);
-}
-
 void crawlerHandleIRCommand(IRKeyCode irKeyCode)
 {
 	auto crawlerStatus = _crawler.getStatus();
@@ -207,52 +199,23 @@ void crawlerHandleIRCommand(IRKeyCode irKeyCode)
 		break;
 
 	case IRKeyCode::Button1:
-		playSound(2);
-		//playSound(13);
 		DEBUG_INFO("IRControlMode=ContinuousPressing");
 		_crawlerIRControlMode = CrawlerIRControlMode::ContinuousPressing;
+		_crawler.playSound(Sound::HappyShort);
 		break;
 
 	case IRKeyCode::Button2:
-		playSound(3);
-		//playSound(12);
 		DEBUG_INFO("IRControlMode=SinglePress");
 		_crawlerIRControlMode = CrawlerIRControlMode::SinglePress;
-		break;
-
-	case IRKeyCode::Button3:
-		playSound(4);
+		_crawler.playSound(Sound::SuperHappy);
 		break;
 
 	case IRKeyCode::Button4:
-		playSound(5);
+		_crawler.playSound(S_up);
 		break;
 
 	case IRKeyCode::Button5:
-		playSound(6);
-		break;
-
-	case IRKeyCode::Button6:
-		playSound(7);
-		break;
-
-	case IRKeyCode::Button7:
-		playSound(8);
-		break;
-
-	case IRKeyCode::Button8:
-		playSound(9);
-		break;
-
-	case IRKeyCode::Button9:
-		playSound(10);
-		break;
-
-	case IRKeyCode::Button0:
-		_secondSoundGroup = !_secondSoundGroup;
-		break;
-
-	default:
+		_crawler.playSound(Sound::Up);
 		break;
 	}
 }
@@ -292,6 +255,7 @@ void loop()
 	_freeMemoryCoroutine.continueExecution();
 	_irRemoteCoroutine.continueExecution();
 	_speedLightCoroutine.continueExecution();
+	_soundCoroutine.continueExecution();
 
 	/*_protocol.RecevData();
 	if (recv_flag = _protocol.ParserPackage()) {

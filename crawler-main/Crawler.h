@@ -3,6 +3,7 @@
 
 #include "Emakefun_MotorDriver.h"
 #include "IRKeyMap.h"
+#include "SoundPlayer.h"
 
 #define CRAWLER_SERVO_COUNT 1
 
@@ -56,6 +57,7 @@ private:
 	Emakefun_Servo* _servos[CRAWLER_SERVO_COUNT];
 	Emakefun_Sensor* _sensors;
 	IRRemote* _ir;
+	SoundPlayer* _soundPlayer;
 
 	void stopDrive(Emakefun_DCMotor* drive);
 	void runDrive(Emakefun_DCMotor* drive, uint8_t speed, uint8_t direction);
@@ -92,6 +94,9 @@ public:
 
 	void initBuzzer();
 	void playSound(byte songName);
+
+	void initSoundPlayer(Coroutine* soundCoroutine);
+	void playSound(Sound sound);
 
 	void initRgb();
 	void setRgbColor(E_RGB_INDEX index, long Color);
