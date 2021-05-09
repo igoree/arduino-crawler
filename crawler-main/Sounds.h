@@ -109,12 +109,12 @@
 #define  note_D8  4698.64  //D8
 #define  note_Eb8 4978.03  //D#8/Eb8
 
-#define S_connection 	0
-#define S_disconnection 1
+#define S_up 	0
+#define S_down 1
 #define S_buttonPushed 	2
 #define S_mode1 		3
 #define S_mode2 		4
-#define S_mode3 		5
+#define S_turn_on 		5
 #define S_surprise 		6
 #define S_OhOoh 		7
 #define S_OhOoh2 		8

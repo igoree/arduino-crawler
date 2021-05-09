@@ -41,7 +41,7 @@ void setup()
 
 	DEBUG_INFO("init ok");
 
-	_crawler.playSound(S_mode3);
+	_crawler.playSound(S_turn_on);
 
 	_freeMemoryCoroutine.start(CoroutineTask(&monitorFreeMemoryAsync));
 	_irRemoteCoroutine.start(CoroutineTask(&handleIRRemoteAsync));
@@ -123,7 +123,7 @@ void crawlerSpeedUp(uint8_t delta)
 {
 	if (_crawler.speedUp(delta))
 	{
-		_crawler.playSound(S_connection);
+		_crawler.playSound(S_up);
 	}
 	crawlerShowSpeedLight();
 }
@@ -132,7 +132,7 @@ void crawlerSpeedDown(uint8_t delta)
 {
 	if (_crawler.speedDown(delta))
 	{
-		_crawler.playSound(S_disconnection);
+		_crawler.playSound(S_down);
 	}
 	crawlerShowSpeedLight();
 }

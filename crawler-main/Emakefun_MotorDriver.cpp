@@ -681,117 +681,117 @@ void Emakefun_Sensor::SetRgbColor(E_RGB_INDEX index , long Color)
 void Emakefun_Sensor::Sing(byte songName)
 {
   switch (songName) {
-    case S_connection:
-      mBuzzer->_tone(note_E5, 50, 30);
-      mBuzzer->_tone(note_E6, 55, 25);
-      mBuzzer->_tone(note_A6, 60, 10);
+    case S_up:
+      mBuzzer->singleTone(note_E5, 50, 60);
+      mBuzzer->singleTone(note_E6, 55, 60);
+      mBuzzer->singleTone(note_A6, 60, 50);
       //  _tone(9, 394);
       break;
 
-    case S_disconnection:
-      mBuzzer->_tone(note_E5, 50, 30);
-      mBuzzer->_tone(note_A6, 55, 25);
-      mBuzzer->_tone(note_E6, 50, 10);
+    case S_down:
+      mBuzzer->singleTone(note_E5, 50, 60);
+      mBuzzer->singleTone(note_A6, 55, 60);
+      mBuzzer->singleTone(note_E6, 50, 50);
       break;
 
     case S_buttonPushed:
-      mBuzzer->bendTones (note_E6, note_G6, 1.03, 20, 2);
+      mBuzzer->toneTransition (note_E6, note_G6, 1.03, 20, 20);
       delay(30);
-      mBuzzer->bendTones (note_E6, note_D7, 1.04, 10, 2);
+      mBuzzer->toneTransition (note_E6, note_D7, 1.04, 10, 10);
       break;
 
     case S_mode1:
-      mBuzzer->bendTones (note_E6, note_A6, 1.02, 30, 10);  //1318.51 to 1760
+      mBuzzer->toneTransition (note_E6, note_A6, 1.02, 30, 20);  //1318.51 to 1760
       break;
 
     case S_mode2:
-      mBuzzer->bendTones (note_G6, note_D7, 1.03, 30, 10);  //1567.98 to 2349.32
+      mBuzzer->toneTransition (note_G6, note_D7, 1.03, 30, 20);  //1567.98 to 2349.32
       break;
 
-    case S_mode3:
-      mBuzzer->_tone(note_E6, 50, 100); //D6
-      mBuzzer->_tone(note_G6, 50, 80); //E6
-      mBuzzer->_tone(note_D7, 300, 0); //G6
+    case S_turn_on:
+      mBuzzer->singleTone(note_E6, 50, 150); //D6
+      mBuzzer->singleTone(note_G6, 50, 130); //E6
+      mBuzzer->singleTone(note_D7, 300, 0); //G6
       break;
 
     case S_surprise:
-      mBuzzer->bendTones(800, 2150, 1.02, 10, 1);
-      mBuzzer->bendTones(2149, 800, 1.03, 7, 1);
+      mBuzzer->toneTransition(800, 2150, 1.02, 10, 10);
+      mBuzzer->toneTransition(2149, 800, 1.03, 7, 8);
       break;
 
     case S_OhOoh:
-      mBuzzer->bendTones(880, 2000, 1.04, 8, 3); //A5 = 880
+      mBuzzer->toneTransition(880, 2000, 1.04, 8, 10); //A5 = 880
       delay(200);
 
       for (int i = 880; i < 2000; i = i * 1.04) {
-        mBuzzer->_tone(note_B5, 5, 10);
+        mBuzzer->singleTone(note_B5, 5, 15);
       }
       break;
 
     case S_OhOoh2:
-      mBuzzer->bendTones(1880, 3000, 1.03, 8, 3);
+      mBuzzer->toneTransition(1880, 3000, 1.03, 8, 10);
       delay(200);
 
       for (int i = 1880; i < 3000; i = i * 1.03) {
-        mBuzzer->_tone(note_C6, 10, 10);
+        mBuzzer->singleTone(note_C6, 10, 20);
       }
       break;
 
     case S_cuddly:
-      mBuzzer->bendTones(700, 900, 1.03, 16, 4);
-      mBuzzer->bendTones(899, 650, 1.01, 18, 7);
+      mBuzzer->toneTransition(700, 900, 1.03, 16, 20);
+      mBuzzer->toneTransition(899, 650, 1.01, 18, 25);
       break;
 
     case S_sleeping:
-      mBuzzer->bendTones(100, 500, 1.04, 10, 10);
+      mBuzzer->toneTransition(100, 500, 1.04, 10, 20);
       delay(500);
-      mBuzzer->bendTones(400, 100, 1.04, 10, 1);
+      mBuzzer->toneTransition(400, 100, 1.04, 10, 10);
       break;
 
     case S_happy:
-      mBuzzer->bendTones(1500, 2500, 1.05, 20, 8);
-      mBuzzer->bendTones(2499, 1500, 1.05, 25, 8);
+      mBuzzer->toneTransition(1500, 2500, 1.05, 20, 10);
+      mBuzzer->toneTransition(2499, 1500, 1.05, 25, 10);
       break;
 
     case S_superHappy:
-      mBuzzer->bendTones(2000, 6000, 1.05, 8, 3);
+      mBuzzer->toneTransition(2000, 6000, 1.05, 8, 10);
       delay(50);
-      mBuzzer->bendTones(5999, 2000, 1.05, 13, 2);
+      mBuzzer->toneTransition(5999, 2000, 1.05, 13, 15);
       break;
 
     case S_happy_short:
-      mBuzzer->bendTones(1500, 2000, 1.05, 15, 8);
+      mBuzzer->toneTransition(1500, 2000, 1.05, 15, 23);
       delay(100);
-      mBuzzer->bendTones(1900, 2500, 1.05, 10, 8);
+      mBuzzer->toneTransition(1900, 2500, 1.05, 10, 18);
       break;
 
     case S_sad:
-      mBuzzer->bendTones(880, 669, 1.02, 20, 200);
+      mBuzzer->toneTransition(880, 669, 1.02, 20, 150);
       break;
 
     case S_confused:
-      mBuzzer->bendTones(1000, 1700, 1.03, 8, 2);
-      mBuzzer->bendTones(1699, 500, 1.04, 8, 3);
-      mBuzzer->bendTones(1000, 1700, 1.05, 9, 10);
+      mBuzzer->toneTransition(1000, 1700, 1.03, 8, 2);
+      mBuzzer->toneTransition(1699, 500, 1.04, 8, 3);
+      mBuzzer->toneTransition(1000, 1700, 1.05, 9, 10);
       break;
 
     case S_fart1:
-      mBuzzer->bendTones(1600, 3000, 1.02, 2, 15);
+      mBuzzer->toneTransition(1600, 3000, 1.02, 2, 15);
       break;
 
     case S_fart2:
-      mBuzzer->bendTones(2000, 6000, 1.02, 2, 20);
+      mBuzzer->toneTransition(2000, 6000, 1.02, 2, 20);
       break;
 
     case S_fart3:
-      mBuzzer->bendTones(1600, 4000, 1.02, 2, 20);
-      mBuzzer->bendTones(4000, 3000, 1.02, 2, 20);
+      mBuzzer->toneTransition(1600, 4000, 1.02, 2, 20);
+      mBuzzer->toneTransition(4000, 3000, 1.02, 2, 20);
       break;
 
     case S_didi:
-      mBuzzer->_tone(note_C7, 50, 100);
+      mBuzzer->singleTone(note_C7, 50, 100);
       delay(110);
-      mBuzzer->_tone(note_C6, 50, 100);
+      mBuzzer->singleTone(note_C6, 50, 100);
       break;
   }
 

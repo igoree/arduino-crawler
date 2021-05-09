@@ -10,9 +10,9 @@ private:
 public:
 	Buzzer(uint8_t pin);
 
-	void tone(uint16_t frequency, uint32_t duration = 0);
-	void _tone(float noteFrequency, long noteDuration, int silentDuration);
-	void bendTones(float initFrequency, float finalFrequency, float prop, long noteDuration, int silentDuration);
+	void tone(float frequency, uint32_t duration);
+	void singleTone(float noteFrequency, uint32_t noteDuration, uint32_t silentDuration);
+	void toneTransition(float initFrequency, float finalFrequency, float changeRatio, uint32_t noteDuration, uint32_t silentDuration);
 	void noTone();
 };
 #endif
