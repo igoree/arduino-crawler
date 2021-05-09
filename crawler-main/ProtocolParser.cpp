@@ -196,41 +196,6 @@ int ProtocolParser::GetRobotDegree(void)
     }
 }
 
-E_BUZZER_TYPE ProtocolParser::GetBuzzerMode(void)
-{
-    if (recv->function == E_BUZZER_MODE) {
-        return (E_BUZZER_TYPE)(*(recv->data));
-    } else {
-        return E_BUZZER_TYPE_MAX;
-    }
-}
-
-uint16_t ProtocolParser::GetBuzzerNote(void)
-{
-    uint16_t note;
-    if (recv->function == E_BUZZER_MODE) {
-        note = (*(recv->data + 1) << 8) | (*(recv->data + 2));
-        return note;
-    }
-}
-
-uint8_t ProtocolParser::GetBuzzerSound(void)
-{
-    if (recv->function == E_BUZZER_MODE) {
-        return *(recv->data + 1) << 8;
-    }
-}
-
-ST_MUSIC_TYPE ProtocolParser::GetBuzzerMusic(void)
-{
-    ST_MUSIC_TYPE music;
-    if (recv->function == E_BUZZER_MODE) {
-        music.note = (*(recv->data + 1) << 8) |(*(recv->data + 2));
-        music.beat = (E_MUSIC_BEAT)*(recv->data + 3);
-    }
-    return music;
-}
-
 int ProtocolParser::GetServoDegree(void)
 {
     if (recv->function == E_SERVER_DEGREE ) {

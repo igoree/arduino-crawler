@@ -24,10 +24,6 @@ public:
 	int GetServoDegreeNum(void);
 	uint16_t GetBluetoothButton();
 	bool GetBluetoothButton(uint16_t Button);
-	E_BUZZER_TYPE GetBuzzerMode(void);
-	uint16_t GetBuzzerNote(void);
-	uint8_t GetBuzzerSound(void);
-	ST_MUSIC_TYPE GetBuzzerMusic(void);
 	long GetRgbValue(void);
 	byte GetRgbEffect(void);
 	byte GetRgbMode(void);

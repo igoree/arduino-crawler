@@ -141,6 +141,7 @@ void playSound(uint8_t soundIndex) {
 	if (_secondSoundGroup) {
 		soundIndex = soundIndex + 9;
 	}
+	DEBUG_INFO("Play sound %u", soundIndex);
 	_crawler.playSound(soundIndex);
 }
 
@@ -207,14 +208,14 @@ void crawlerHandleIRCommand(IRKeyCode irKeyCode)
 
 	case IRKeyCode::Button1:
 		playSound(2);
-
+		//playSound(13);
 		DEBUG_INFO("IRControlMode=ContinuousPressing");
 		_crawlerIRControlMode = CrawlerIRControlMode::ContinuousPressing;
 		break;
 
 	case IRKeyCode::Button2:
 		playSound(3);
-
+		//playSound(12);
 		DEBUG_INFO("IRControlMode=SinglePress");
 		_crawlerIRControlMode = CrawlerIRControlMode::SinglePress;
 		break;
