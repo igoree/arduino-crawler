@@ -12,17 +12,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NewTone", "libraries\NewTone\NewTone.vcxitems", "{6E5DF84B-ADCA-4392-961F-377D57182D48}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "coroutine", "libraries\coroutine\coroutine.vcxitems", "{BAC2F087-B0A5-4237-9FC4-A2FD264B24E6}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Coroutine", "libraries\Coroutine\Coroutine.vcxitems", "{BAC2F087-B0A5-4237-9FC4-A2FD264B24E6}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "debug-output", "libraries\debug-output\debug-output.vcxitems", "{AF7AC736-6911-4DF0-9608-789017658EB3}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DebugOutput", "libraries\DebugOutput\DebugOutput.vcxitems", "{AF7AC736-6911-4DF0-9608-789017658EB3}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		libraries\NewTone\NewTone.vcxitems*{6e5df84b-adca-4392-961f-377d57182d48}*SharedItemsImports = 9
-		libraries\debug-output\debug-output.vcxitems*{af7ac736-6911-4df0-9608-789017658eb3}*SharedItemsImports = 9
-		libraries\coroutine\coroutine.vcxitems*{bac2f087-b0a5-4237-9fc4-a2fd264b24e6}*SharedItemsImports = 9
-		libraries\coroutine\coroutine.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
-		libraries\debug-output\debug-output.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		libraries\DebugOutput\DebugOutput.vcxitems*{af7ac736-6911-4df0-9608-789017658eb3}*SharedItemsImports = 9
+		libraries\Coroutine\Coroutine.vcxitems*{bac2f087-b0a5-4237-9fc4-a2fd264b24e6}*SharedItemsImports = 9
+		libraries\Coroutine\Coroutine.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		libraries\DebugOutput\DebugOutput.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		libraries\NewTone\NewTone.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,9 +1,9 @@
 #include "Coroutine.h"
 #include "Arduino.h"
 
-#include "debugLevels.h"
+#include "DebugLevels.h"
 #define DEBUG_LEVEL DEBUG_LEVEL_ERR
-#include "debugOutput.h"
+#include "DebugOutput.h"
 
 #define UNKNOWN_INDEX UINT8_C(255)
 

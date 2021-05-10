@@ -1,8 +1,8 @@
 #include "SoundPlayer.h"
 
-#include "debugLevels.h"
+#include "DebugLevels.h"
 #define DEBUG_LEVEL DEBUG_LEVEL_INFO
-#include "debugOutput.h"
+#include "DebugOutput.h"
 
 // Reference:  This list was adapted from the table located here:
 //    http://www.phy.mtu.edu/~suits/notefreqs.html

@@ -4,6 +4,7 @@
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
     <HasSharedItems>true</HasSharedItems>
     <ItemsProjectGuid>{af7ac736-6911-4df0-9608-789017658eb3}</ItemsProjectGuid>
+    <ItemsProjectName>DebugOutput</ItemsProjectName>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
@@ -17,10 +18,10 @@
     <Text Include="$(MSBuildThisFileDirectory)library.properties" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\debugOutput.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\debugLevels.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\DebugOutput.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\DebugLevels.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\debugOutput.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\DebugOutput.cpp" />
   </ItemGroup>
 </Project>

@@ -1,9 +1,9 @@
 #include "Crawler.h"
 #include "Sounds.h"
 
-#include "debugLevels.h"
+#include "DebugLevels.h"
 #define DEBUG_LEVEL DEBUG_LEVEL_INFO
-#include "debugOutput.h"
+#include "DebugOutput.h"
 
 //MotorDriverBoard V4.0
 Crawler::Crawler()

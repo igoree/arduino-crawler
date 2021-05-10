@@ -11,7 +11,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\debugOutput.cpp">
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\DebugOutput.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -19,10 +19,10 @@
     <Text Include="$(MSBuildThisFileDirectory)library.properties" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\debugLevels.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\DebugLevels.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\debugOutput.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\DebugOutput.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

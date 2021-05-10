@@ -4,9 +4,9 @@
 #include "IRKeyMap.h"
 #include "SoundPlayer.h"
 
-#include "debugLevels.h"
+#include "DebugLevels.h"
 #define DEBUG_LEVEL DEBUG_LEVEL_INFO
-#include "debugOutput.h"
+#include "DebugOutput.h"
 
 enum class CrawlerIRControlMode : uint8_t
 {
