@@ -26,7 +26,8 @@ enum class Sound : uint8_t
 	Fart1 = 16,
 	Fart2 = 17,
 	Fart3 = 18,
-	Didi = 19
+	Didi = 19,
+	HappyBirthday = 20
 };
 
 struct SoundState;

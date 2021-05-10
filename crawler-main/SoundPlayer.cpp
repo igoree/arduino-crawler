@@ -1,4 +1,5 @@
 #include "SoundPlayer.h"
+#include "avr/pgmspace.h"
 
 #include "DebugLevels.h"
 #define DEBUG_LEVEL DEBUG_LEVEL_INFO
@@ -635,6 +636,33 @@ CoroutineTaskResult* playSoundDidiAsync(const CoroutineTaskContext* context)
 	}
 }
 
+CoroutineTaskResult* playSoundHappyBirthdayAsync(const CoroutineTaskContext* context)
+{
+	const static float PROGMEM notes[] =
+	{
+		NOTE_G4, NOTE_G4, NOTE_A4, NOTE_G4, NOTE_C5, NOTE_B4, NOTE_G4, NOTE_G4,
+		NOTE_A4, NOTE_G4, NOTE_D5, NOTE_C5, NOTE_G4, NOTE_G4, NOTE_G5, NOTE_E5,
+		NOTE_C5, NOTE_B4, NOTE_A4, NOTE_F5, NOTE_F5, NOTE_E5, NOTE_C5, NOTE_D5, NOTE_C5
+	};
+
+	const static uint8_t PROGMEM timings[] =
+	{
+	  1, 1, 2, 2, 2, 4, 1, 1,
+	  2, 2, 2, 4, 1, 1, 2, 2,
+	  2, 2, 2, 1, 1, 2, 2, 2, 4
+	};
+
+	auto state = (SoundState*)context->data;
+	auto noteCount = sizeof(notes) / sizeof(notes[0]);
+	if (context->step >= noteCount)
+	{
+		return context->end();
+	}
+
+	prepareSeparatedNote(state, pgm_read_float(&notes[context->step]), pgm_read_byte(&timings[context->step]) * 374u, 0);
+	return context->executeThenNext(CoroutineTask(&playSeparatedNoteAsync, state));
+}
+
 CoroutineTaskResult* playSoundAsync(const CoroutineTaskContext* context)
 {
 	auto state = (SoundState*)context->data;
@@ -729,6 +757,10 @@ void SoundPlayer::play(Sound sound)
 
 	case Sound::Didi:
 		soundFunc = &playSoundDidiAsync;
+		break;
+
+	case Sound::HappyBirthday:
+		soundFunc = &playSoundHappyBirthdayAsync;
 		break;
 
 	default:

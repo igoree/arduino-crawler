@@ -210,7 +210,7 @@ void crawlerHandleIRCommand(IRKeyCode irKeyCode)
 		break;
 
 	case IRKeyCode::Button5:
-		_crawler.playSound(Sound::ButtonPushed);
+		_crawler.playSound(Sound::HappyBirthday);
 		break;
 	}
 }
