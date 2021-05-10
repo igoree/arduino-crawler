@@ -41,7 +41,7 @@ void setup()
 
 	DEBUG_INFO("init ok");
 
-	_crawler.playSound(S_turn_on);
+	_crawler.playSound(Sound::TurnOn);
 
 	_freeMemoryCoroutine.start(CoroutineTask(&monitorFreeMemoryAsync));
 	_irRemoteCoroutine.start(CoroutineTask(&handleIRRemoteAsync));
@@ -123,7 +123,7 @@ void crawlerSpeedUp(uint8_t delta)
 {
 	if (_crawler.speedUp(delta))
 	{
-		_crawler.playSound(S_up);
+		_crawler.playSound(Sound::Up);
 	}
 	crawlerShowSpeedLight();
 }
@@ -132,7 +132,7 @@ void crawlerSpeedDown(uint8_t delta)
 {
 	if (_crawler.speedDown(delta))
 	{
-		_crawler.playSound(S_down);
+		_crawler.playSound(Sound::Down);
 	}
 	crawlerShowSpeedLight();
 }
@@ -211,11 +211,11 @@ void crawlerHandleIRCommand(IRKeyCode irKeyCode)
 		break;
 
 	case IRKeyCode::Button4:
-		_crawler.playSound(S_up);
+		_crawler.playSound(S_cuddly);
 		break;
 
 	case IRKeyCode::Button5:
-		_crawler.playSound(Sound::Up);
+		_crawler.playSound(Sound::Cuddly);
 		break;
 	}
 }

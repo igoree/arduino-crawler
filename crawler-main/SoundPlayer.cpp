@@ -188,7 +188,7 @@ CoroutineTaskResult* playNoteTransitionAsync(const CoroutineTaskContext* context
 		if (state->currentNote.frequency < state->currentNote.targetFrequency)
 		{
 			state->currentNote.frequency *= state->currentNote.frequencyChangeRatio;
-			if (state->currentNote.frequency > state->currentNote.targetFrequency) 
+			if (state->currentNote.frequency > state->currentNote.targetFrequency)
 			{
 				return context->end();
 			}
@@ -201,7 +201,7 @@ CoroutineTaskResult* playNoteTransitionAsync(const CoroutineTaskContext* context
 				return context->end();
 			}
 		}
-		else 
+		else
 		{
 			return context->end();
 		}
@@ -221,7 +221,7 @@ void prepareSeparatedNote(SoundState* state, float frequency, uint32_t duration,
 	state->currentNote.silenceDuration = silenceDuration;
 }
 
-void prepareNoteTransition(SoundState* state, float initialFrequency, float targetFrequency, float frequencyChangeRatio, uint32_t noteDuration, uint32_t silenceDuration) 
+void prepareNoteTransition(SoundState* state, float initialFrequency, float targetFrequency, float frequencyChangeRatio, uint32_t noteDuration, uint32_t silenceDuration)
 {
 	state->currentNote.frequency = initialFrequency;
 	state->currentNote.targetFrequency = targetFrequency;
@@ -229,17 +229,6 @@ void prepareNoteTransition(SoundState* state, float initialFrequency, float targ
 	state->currentNote.duration = 0;
 	state->currentNote.targetDuration = noteDuration;
 	state->currentNote.silenceDuration = silenceDuration;
-}
-
-CoroutineTaskResult* playSoundAsync(const CoroutineTaskContext* context)
-{
-	auto state = (SoundState*)context->data;
-
-	switch (context->step)
-	{
-	default:
-		return context->end();
-	}
 }
 
 CoroutineTaskResult* playSoundUpAsync(const CoroutineTaskContext* context)
@@ -267,6 +256,211 @@ CoroutineTaskResult* playSoundUpAsync(const CoroutineTaskContext* context)
 	return context->executeThenNext(CoroutineTask(&playSeparatedNoteAsync, state));
 }
 
+CoroutineTaskResult* playSoundDownAsync(const CoroutineTaskContext* context)
+{
+	auto state = (SoundState*)context->data;
+
+	switch (context->step)
+	{
+	case 0:
+		prepareSeparatedNote(state, NOTE_E5, 50, 60);
+		break;
+
+	case 1:
+		prepareSeparatedNote(state, NOTE_A6, 55, 60);
+		break;
+
+	case 2:
+		prepareSeparatedNote(state, NOTE_E6, 50, 50);
+		break;
+
+	default:
+		return context->end();
+	}
+
+	return context->executeThenNext(CoroutineTask(&playSeparatedNoteAsync, state));
+}
+
+CoroutineTaskResult* playSoundButtonPushedAsync(const CoroutineTaskContext* context)
+{
+	auto state = (SoundState*)context->data;
+
+	switch (context->step)
+	{
+	case 0:
+		prepareNoteTransition(state, NOTE_E6, NOTE_G6, 1.03, 20, 20);
+		return context->executeThenNext(CoroutineTask(&playNoteTransitionAsync, state));
+
+	case 1:
+		return context->delayThenNext(30);
+
+	case 2:
+		prepareNoteTransition(state, NOTE_E6, NOTE_D7, 1.04, 10, 10);
+		return context->executeThenNext(CoroutineTask(&playNoteTransitionAsync, state));
+
+	default:
+		return context->end();
+	}
+}
+
+CoroutineTaskResult* playSoundMode1Async(const CoroutineTaskContext* context)
+{
+	auto state = (SoundState*)context->data;
+
+	switch (context->step)
+	{
+	case 0:
+		prepareNoteTransition(state, NOTE_E6, NOTE_A6, 1.02, 30, 20);  //1318.51 to 1760
+		return context->executeThenNext(CoroutineTask(&playNoteTransitionAsync, state));
+
+	default:
+		return context->end();
+	}
+}
+
+CoroutineTaskResult* playSoundMode2Async(const CoroutineTaskContext* context)
+{
+	auto state = (SoundState*)context->data;
+
+	switch (context->step)
+	{
+	case 0:
+		prepareNoteTransition(state, NOTE_G6, NOTE_D7, 1.03, 30, 20);  //1318.51 to 1760
+		return context->executeThenNext(CoroutineTask(&playNoteTransitionAsync, state));
+
+	default:
+		return context->end();
+	}
+}
+
+CoroutineTaskResult* playSoundTurnOnAsync(const CoroutineTaskContext* context)
+{
+	auto state = (SoundState*)context->data;
+
+	switch (context->step)
+	{
+	case 0:
+		prepareSeparatedNote(state, NOTE_E6, 50, 150); //D6
+		break;
+
+	case 1:
+		prepareSeparatedNote(state, NOTE_G6, 50, 130); //E6
+		break;
+
+	case 2:
+		prepareSeparatedNote(state, NOTE_D7, 300, 0); //G6
+		break;
+
+	default:
+		return context->end();
+	}
+
+	return context->executeThenNext(CoroutineTask(&playSeparatedNoteAsync, state));
+}
+
+CoroutineTaskResult* playSoundSurpriseAsync(const CoroutineTaskContext* context)
+{
+	auto state = (SoundState*)context->data;
+
+	switch (context->step)
+	{
+	case 0:
+		prepareNoteTransition(state, 800, 2150, 1.02, 10, 10);
+		break;
+
+	case 1:
+		prepareNoteTransition(state, 2149, 800, 1.03, 7, 8);
+		break;
+
+	default:
+		return context->end();
+	}
+
+	return context->executeThenNext(CoroutineTask(&playNoteTransitionAsync, state));
+}
+
+CoroutineTaskResult* playSoundOhOohAsync(const CoroutineTaskContext* context)
+{
+	auto state = (SoundState*)context->data;
+
+	switch (context->step)
+	{
+	case 0:
+		prepareNoteTransition(state, 880, 2000, 1.04, 8, 10); //A5 = 880
+		return context->executeThenNext(CoroutineTask(&playNoteTransitionAsync, state));
+
+	case 1:
+		return context->delayThenNext(200);
+
+	default:
+		if (context->step <= 23)
+		{
+			prepareSeparatedNote(state, NOTE_B5, 5, 15);
+			return context->executeThenNext(CoroutineTask(&playSeparatedNoteAsync, state));
+		}
+		break;
+	}
+
+	return context->end();
+}
+
+CoroutineTaskResult* playSoundOhOoh2Async(const CoroutineTaskContext* context)
+{
+	auto state = (SoundState*)context->data;
+
+	switch (context->step)
+	{
+	case 0:
+		prepareNoteTransition(state, 1880, 3000, 1.03, 8, 10); //A5 = 880
+		return context->executeThenNext(CoroutineTask(&playNoteTransitionAsync, state));
+
+	case 1:
+		return context->delayThenNext(200);
+
+	default:
+		if (context->step <= 18)
+		{
+			prepareSeparatedNote(state, NOTE_C6, 10, 20);
+			return context->executeThenNext(CoroutineTask(&playSeparatedNoteAsync, state));
+		}
+		break;
+	}
+
+	return context->end();
+}
+
+CoroutineTaskResult* playSoundCuddlyAsync(const CoroutineTaskContext* context)
+{
+	auto state = (SoundState*)context->data;
+
+	switch (context->step)
+	{
+	case 0:
+		prepareNoteTransition(state, 700, 900, 1.03, 16, 20);
+		break;
+
+	case 1:
+		prepareNoteTransition(state, 899, 650, 1.01, 18, 25);
+		break;
+
+	default:
+		return context->end();
+	}
+
+	return context->executeThenNext(CoroutineTask(&playNoteTransitionAsync, state));
+}
+
+CoroutineTaskResult* playSoundAsync(const CoroutineTaskContext* context)
+{
+	auto state = (SoundState*)context->data;
+
+	switch (context->step)
+	{
+	default:
+		return context->end();
+	}
+}
+
 void SoundPlayer::play(Sound sound)
 {
 	AsyncFuncPointer soundFunc;
@@ -274,6 +468,42 @@ void SoundPlayer::play(Sound sound)
 	{
 	case Sound::Up:
 		soundFunc = &playSoundUpAsync;
+		break;
+
+	case Sound::Down:
+		soundFunc = &playSoundDownAsync;
+		break;
+
+	case Sound::ButtonPushed:
+		soundFunc = &playSoundButtonPushedAsync;
+		break;
+
+	case Sound::Mode1:
+		soundFunc = &playSoundMode1Async;
+		break;
+
+	case Sound::Mode2:
+		soundFunc = &playSoundMode2Async;
+		break;
+
+	case Sound::TurnOn:
+		soundFunc = &playSoundTurnOnAsync;
+		break;
+
+	case Sound::Surprise:
+		soundFunc = &playSoundSurpriseAsync;
+		break;
+
+	case Sound::OhOoh:
+		soundFunc = &playSoundOhOohAsync;
+		break;
+
+	case Sound::OhOoh2:
+		soundFunc = &playSoundOhOoh2Async;
+		break;
+
+	case Sound::Cuddly:
+		soundFunc = &playSoundCuddlyAsync;
 		break;
 
 	default:
