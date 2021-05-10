@@ -24,9 +24,6 @@
     <ClInclude Include="Crawler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="debug.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Emakefun_MotorDriver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -57,12 +54,6 @@
     <ClInclude Include="__vm\.crawler-main.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Coroutine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="debugLevels.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SoundPlayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -72,9 +63,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Crawler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="debug.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Emakefun_MotorDriver.cpp">
@@ -93,9 +81,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RGBLed.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Coroutine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SoundPlayer.cpp">

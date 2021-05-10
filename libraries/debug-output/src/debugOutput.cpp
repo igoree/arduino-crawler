@@ -1,6 +1,6 @@
 #include "Arduino.h"
 #include "stdio.h"
-#include "debug.h"
+#include "debugOutput.h"
 
 extern unsigned int __bss_end;
 extern unsigned int __heap_start;

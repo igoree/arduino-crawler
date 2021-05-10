@@ -3,7 +3,7 @@
 
 #include "debugLevels.h"
 #define DEBUG_LEVEL DEBUG_LEVEL_ERR
-#include "debug.h"
+#include "debugOutput.h"
 
 #define UNKNOWN_INDEX UINT8_C(255)
 
@@ -140,10 +140,10 @@ void Coroutine::continueExecution()
 	CoroutineTaskContext context(&_stack[_currentTaskIndex], &initialResult);
 
 	auto result = _stack[_currentTaskIndex].task.func(&context);
-	if (result != &initialResult) 
+	if (result != &initialResult)
 	{
 		DEBUG_ERR("CR '%s' task %u invalid result", _name, context.step);
-		
+
 		_currentTaskIndex = UNKNOWN_INDEX;
 
 		return;
@@ -164,16 +164,16 @@ void Coroutine::continueExecution()
 			_currentTaskIndex--;
 		}
 	}
-	else 
+	else
 	{
-		if (result->nextStep != _stack[_currentTaskIndex].step) 
+		if (result->nextStep != _stack[_currentTaskIndex].step)
 		{
 			DEBUG_INFO("CR '%s' go to step %u", _name, result->nextStep);
 
 			_stack[_currentTaskIndex].step = result->nextStep;
 		}
-		
-		if (result->delayMillis > 0) 
+
+		if (result->delayMillis > 0)
 		{
 			DEBUG_INFO("CR '%s' delay %u", _name, result->delayMillis);
 
@@ -185,7 +185,7 @@ void Coroutine::continueExecution()
 		}
 	}
 
-	if (result->taskToSwitch.func != nullptr) 
+	if (result->taskToSwitch.func != nullptr)
 	{
 		switchTo(result->taskToSwitch);
 	}

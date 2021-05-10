@@ -6,7 +6,7 @@
 
 #include "debugLevels.h"
 #define DEBUG_LEVEL DEBUG_LEVEL_INFO
-#include "debug.h"
+#include "debugOutput.h"
 
 enum class CrawlerIRControlMode : uint8_t
 {

@@ -3,7 +3,7 @@
 
 #include "debugLevels.h"
 #define DEBUG_LEVEL DEBUG_LEVEL_INFO
-#include "debug.h"
+#include "debugOutput.h"
 
 //MotorDriverBoard V4.0
 Crawler::Crawler()
