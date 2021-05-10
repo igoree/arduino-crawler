@@ -13,7 +13,6 @@ Crawler::Crawler()
 	_speed = 0;
 	_leftDrive = _rightDrive = NULL;
 	_ir = NULL;
-	Buzzer = NULL;
 	Rgb = NULL;
 	Nrf24L01 = NULL;
 
@@ -30,7 +29,6 @@ Crawler::~Crawler()
 	delete _leftDrive;
 	delete _rightDrive;
 	delete _ir;
-	delete Buzzer;
 	delete Rgb;
 	delete Nrf24L01;
 
@@ -241,16 +239,6 @@ void Crawler::initIR()
 IRKeyCode Crawler::getPressedIRKey()
 {
 	return (IRKeyCode)_ir->getCode();
-}
-
-void Crawler::initBuzzer()
-{
-	Buzzer = (::Buzzer*)_motorDriver.getSensor(E_BUZZER);
-}
-
-void Crawler::playSound(byte songName)
-{
-	_sensors->Sing(songName);
 }
 
 void Crawler::initSoundPlayer(Coroutine* soundCoroutine)

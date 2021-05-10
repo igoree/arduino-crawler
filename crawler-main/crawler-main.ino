@@ -31,7 +31,6 @@ void setup()
 	_crawler.init(M2, M1);
 	_crawler.initServo();
 	_crawler.initRgb();
-	_crawler.initBuzzer();
 	_crawler.initSoundPlayer(&_soundCoroutine);
 	_crawler.initIR();
 	_crawler.setSpeed(50);
@@ -210,12 +209,8 @@ void crawlerHandleIRCommand(IRKeyCode irKeyCode)
 		_crawler.playSound(Sound::SuperHappy);
 		break;
 
-	case IRKeyCode::Button4:
-		_crawler.playSound(S_cuddly);
-		break;
-
 	case IRKeyCode::Button5:
-		_crawler.playSound(Sound::Cuddly);
+		_crawler.playSound(Sound::Didi);
 		break;
 	}
 }

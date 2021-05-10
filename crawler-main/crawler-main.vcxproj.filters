@@ -54,9 +54,6 @@
     <ClInclude Include="RGBLed.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Sounds.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="__vm\.crawler-main.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>

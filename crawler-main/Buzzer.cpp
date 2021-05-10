@@ -24,38 +24,6 @@ void Buzzer::tone(float frequency, uint32_t duration) const
 	}
 }
 
-void Buzzer::singleTone(float noteFrequency, uint32_t noteDuration, uint32_t silenceDuration) const
-{
-	tone(noteFrequency, noteDuration);
-
-	if (silenceDuration > 0)
-	{
-		delay(silenceDuration);
-	}
-}
-
-void Buzzer::toneTransition(float initFrequency, float finalFrequency, float changeRatio, uint32_t noteDuration, uint32_t silenceDuration) const
-{
-	//Examples:
-	//  bendTones (880, 2093, 1.02, 18, 1);
-	//  bendTones (NOTE_A5, NOTE_C7, 1.02, 18, 0);
-
-	if (initFrequency < finalFrequency)
-	{
-		for (int i = initFrequency; i < finalFrequency; i = i * changeRatio)
-		{
-			singleTone(i, noteDuration, silenceDuration);
-		}
-	}
-	else 
-	{
-		for (int i = initFrequency; i > finalFrequency; i = i / changeRatio)
-		{
-			singleTone(i, noteDuration, silenceDuration);
-		}
-	}
-}
-
 void Buzzer::noTone() const
 {
 	pinMode(_pin, OUTPUT);

@@ -66,7 +66,6 @@ private:
 	uint8_t getOppositeDriveRotationSpeed();
 
 public:
-	Buzzer* Buzzer;
 	RGBLed* Rgb;
 	Nrf24l* Nrf24L01;
 
@@ -91,9 +90,6 @@ public:
 
 	void initIR();
 	IRKeyCode getPressedIRKey();
-
-	void initBuzzer();
-	void playSound(byte songName);
 
 	void initSoundPlayer(Coroutine* soundCoroutine);
 	void playSound(Sound sound);

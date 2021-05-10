@@ -26,7 +26,7 @@
 #if DEBUG_LEVEL <= DEBUG_LEVEL_ERR
 #define DEBUG_ERR(fmt, ...) \
     do{\
-        debug_printf(F("[Error][%s:%s:%d]"),__FILE__,__FUNCTION__,__LINE__);\
+        debug_printf(F("[Error][" __FILE__ ":%s:%d]"), __FUNCTION__, __LINE__);\
         debug_printf(F(fmt), ##__VA_ARGS__);\
     } while(0)
 #else

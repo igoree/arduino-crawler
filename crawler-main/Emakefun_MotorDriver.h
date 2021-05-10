@@ -8,7 +8,6 @@
 #include "IRremote.h"
 #include "Buzzer.h"
 #include "RGBLed.h"
-#include "Sounds.h"
 #include "nRF24L01.h"
 //#define MOTORDEBUG
 
@@ -86,7 +85,6 @@ public:
   RGBLed *mRgb;
   Nrf24l *mNrf24L01;
   void SetRgbColor(E_RGB_INDEX index, long Color);
-  void Sing(byte songName);
   uint16_t GetUltrasonicDistance(void);
   int  GetNrf24L01(char *RxaddrName);
   void sendNrf24l01(char *TxaddrName,int SendNrfData);
