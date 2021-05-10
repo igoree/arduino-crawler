@@ -31,20 +31,6 @@ enum class CrawlerStatus : uint8_t
 	LowPower
 };
 
-enum class CrawlerUltrasonicServoDirection : uint8_t
-{
-	Front = 0,
-	Left,
-	Right
-};
-
-enum class CrawlerRgbEffect : uint8_t
-{
-	Breathing = 0,
-	Rotate = 1,
-	Flash = 2
-};
-
 class Crawler {
 private:
 	CrawlerStatus _status;
@@ -98,11 +84,9 @@ public:
 
 	void initRgb();
 	void setRgbColor(E_RGB_INDEX index, long Color);
-	void setRgbEffect(E_RGB_INDEX index, long Color, CrawlerRgbEffect effect);
 	void lightOff();
 
 	void initUltrasonic();
-	byte getUltrasonicValue(CrawlerUltrasonicServoDirection direction);
 
 	void initServo();
 	void setServoBaseAngle(uint8_t baseAngle);

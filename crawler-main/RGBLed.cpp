@@ -508,7 +508,6 @@ void RGBLed::show(void)
   {
     rgbled_sendarray_mask(pixels, 3 * count_led, pinMask, (uint8_t*)ws2812_port);
     memcpy(pixels_bak,pixels,3 * count_led);
-    delayMicroseconds(500);
   }
 }
 

@@ -44,7 +44,6 @@ void Crawler::init(int leftDrive, int rightDrive)
 	_sensors = (Emakefun_Sensor*)_motorDriver.getSensor(E_SENSOR_MAX);
 	_leftDrive = _motorDriver.getMotor(leftDrive);
 	_rightDrive = _motorDriver.getMotor(rightDrive);
-	delay(200);
 	_motorDriver.begin(50);
 }
 
@@ -276,57 +275,9 @@ void Crawler::lightOff()
 	_sensors->SetRgbColor(E_RGB_ALL, RGB_BLACK);
 }
 
-void Crawler::setRgbEffect(E_RGB_INDEX index, long Color, CrawlerRgbEffect effect)
-{
-	if (Rgb != NULL) {
-		switch (effect) {
-		case CrawlerRgbEffect::Breathing:
-			for (long i = 0; i < 256; i++) {
-				setRgbColor(index, (i << 16) | (i << 8) | i);
-				delay((i < 18) ? 18 : (256 / i));
-			}
-			for (long i = 255; i >= 0; i--) {
-				setRgbColor(index, (i << 16) | (i << 8) | i);
-				delay((i < 18) ? 18 : (256 / i));
-			}
-			break;
-		case CrawlerRgbEffect::Flash:
-			for (byte i = 0; i < 6; i++) {
-				setRgbColor(index, Color);
-				delay(100);
-				setRgbColor(index, 0);
-				delay(100);
-			}
-			break;
-		}
-	}
-}
-
 void Crawler::initUltrasonic()
 {
 	_motorDriver.getSensor(E_ULTRASONIC);
-}
-
-byte Crawler::getUltrasonicValue(CrawlerUltrasonicServoDirection direction)
-{
-	byte distance;
-	if (direction == CrawlerUltrasonicServoDirection::Front) {
-		setServoAngle(CrawlerServoKind::Ultrasonic, 90);
-		distance = _sensors->GetUltrasonicDistance();
-	}
-	else if (direction == CrawlerUltrasonicServoDirection::Left) {
-		setServoAngle(CrawlerServoKind::Ultrasonic, 180);
-		distance = _sensors->GetUltrasonicDistance();
-		delay(400);
-		setServoAngle(CrawlerServoKind::Ultrasonic, 90);
-	}
-	else if (direction == CrawlerUltrasonicServoDirection::Right) {
-		setServoAngle(CrawlerServoKind::Ultrasonic, 15);
-		distance = _sensors->GetUltrasonicDistance();
-		delay(400);
-		setServoAngle(CrawlerServoKind::Ultrasonic, 90);
-	}
-	return distance;
 }
 
 void Crawler::initServo()
