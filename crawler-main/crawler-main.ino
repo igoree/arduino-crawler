@@ -17,7 +17,7 @@ enum class CrawlerIRControlMode : uint8_t
 Coroutine _freeMemoryCoroutine("freeMemory");
 Coroutine _irRemoteCoroutine("IRRemote");
 Coroutine _speedLightCoroutine("speedLight");
-Coroutine _soundCoroutine("sound", 3);
+Coroutine _soundCoroutine("sound", 4);
 
 ProtocolParser _protocol(&Serial);
 Crawler _crawler;
@@ -211,6 +211,10 @@ void crawlerHandleIRCommand(IRKeyCode irKeyCode)
 
 	case IRKeyCode::Button5:
 		_crawler.playSound(Sound::HappyBirthday);
+		break;
+
+	case IRKeyCode::Button0:
+		_crawler.repeatSound(Sound::Police);
 		break;
 	}
 }

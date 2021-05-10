@@ -251,6 +251,16 @@ void Crawler::playSound(Sound sound)
 	_soundPlayer->play(sound);
 }
 
+void Crawler::repeatSound(Sound sound)
+{
+	_soundPlayer->repeat(sound);
+}
+
+void Crawler::stopSoundRepeating()
+{
+	_soundPlayer->stop();
+}
+
 void Crawler::initRgb()
 {
 	Rgb = (RGBLed*)_motorDriver.getSensor(E_RGB);

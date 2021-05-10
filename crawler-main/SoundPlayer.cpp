@@ -125,11 +125,12 @@ struct SoundNoteState
 struct SoundState
 {
 	SoundState(const Buzzer* buzzer)
-		: buzzer(buzzer), currentNote()
+		: buzzer(buzzer), repeatedSoundFunc(), currentNote()
 	{
 	}
 
 	const Buzzer* const buzzer;
+	AsyncFuncPointer repeatedSoundFunc;
 	SoundNoteState currentNote;
 };
 
@@ -663,110 +664,138 @@ CoroutineTaskResult* playSoundHappyBirthdayAsync(const CoroutineTaskContext* con
 	return context->executeThenNext(CoroutineTask(&playSeparatedNoteAsync, state));
 }
 
-CoroutineTaskResult* playSoundAsync(const CoroutineTaskContext* context)
+CoroutineTaskResult* playSoundPoliceAsync(const CoroutineTaskContext* context)
 {
 	auto state = (SoundState*)context->data;
 
 	switch (context->step)
 	{
+	case 0:
+		prepareNoteTransition(state, 400, 1350, 1.04, 10, 0);
+		return context->executeThenNext(CoroutineTask(&playNoteTransitionAsync, state));
+
+	case 1:
+		prepareNoteTransition(state, 1350, 400, 1.04, 10, 0);
+		return context->executeThenNext(CoroutineTask(&playNoteTransitionAsync, state));
+
 	default:
 		return context->end();
 	}
 }
 
-void SoundPlayer::play(Sound sound)
+CoroutineTaskResult* repeatSoundAsync(const CoroutineTaskContext* context)
 {
-	AsyncFuncPointer soundFunc;
+	auto state = (SoundState*)context->data;
+	if (state->repeatedSoundFunc == nullptr)
+		return context->end();
+
+	return context->executeThenRepeat(CoroutineTask(state->repeatedSoundFunc, state));
+}
+
+AsyncFuncPointer getSoundFunc(Sound sound) 
+{
 	switch (sound)
 	{
 	case Sound::Up:
-		soundFunc = &playSoundUpAsync;
-		break;
+		return &playSoundUpAsync;
 
 	case Sound::Down:
-		soundFunc = &playSoundDownAsync;
-		break;
+		return &playSoundDownAsync;
 
 	case Sound::ButtonPushed:
-		soundFunc = &playSoundButtonPushedAsync;
-		break;
+		return &playSoundButtonPushedAsync;
 
 	case Sound::Mode1:
-		soundFunc = &playSoundMode1Async;
-		break;
+		return &playSoundMode1Async;
 
 	case Sound::Mode2:
-		soundFunc = &playSoundMode2Async;
-		break;
+		return &playSoundMode2Async;
 
 	case Sound::TurnOn:
-		soundFunc = &playSoundTurnOnAsync;
-		break;
+		return &playSoundTurnOnAsync;
 
 	case Sound::Surprise:
-		soundFunc = &playSoundSurpriseAsync;
-		break;
+		return &playSoundSurpriseAsync;
 
 	case Sound::OhOoh:
-		soundFunc = &playSoundOhOohAsync;
-		break;
+		return &playSoundOhOohAsync;
 
 	case Sound::OhOoh2:
-		soundFunc = &playSoundOhOoh2Async;
-		break;
+		return &playSoundOhOoh2Async;
 
 	case Sound::Cuddly:
-		soundFunc = &playSoundCuddlyAsync;
-		break;
+		return &playSoundCuddlyAsync;
 
 	case Sound::Sleeping:
-		soundFunc = &playSoundSleepingAsync;
-		break;
+		return &playSoundSleepingAsync;
 
 	case Sound::Happy:
-		soundFunc = &playSoundHappyAsync;
-		break;
+		return &playSoundHappyAsync;
 
 	case Sound::SuperHappy:
-		soundFunc = &playSoundSuperHappyAsync;
-		break;
+		return &playSoundSuperHappyAsync;
 
 	case Sound::HappyShort:
-		soundFunc = &playSoundHappyShortAsync;
-		break;
+		return &playSoundHappyShortAsync;
 
 	case Sound::Sad:
-		soundFunc = &playSoundSadAsync;
-		break;
+		return &playSoundSadAsync;
 
 	case Sound::Confused:
-		soundFunc = &playSoundConfusedAsync;
-		break;
+		return &playSoundConfusedAsync;
 
 	case Sound::Fart1:
-		soundFunc = &playSoundFart1Async;
-		break;
+		return &playSoundFart1Async;
 
 	case Sound::Fart2:
-		soundFunc = &playSoundFart2Async;
-		break;
+		return &playSoundFart2Async;
 
 	case Sound::Fart3:
-		soundFunc = &playSoundFart3Async;
-		break;
+		return &playSoundFart3Async;
 
 	case Sound::Didi:
-		soundFunc = &playSoundDidiAsync;
-		break;
+		return &playSoundDidiAsync;
 
 	case Sound::HappyBirthday:
-		soundFunc = &playSoundHappyBirthdayAsync;
-		break;
+		return &playSoundHappyBirthdayAsync;
+
+	case Sound::Police:
+		return &playSoundPoliceAsync;
 
 	default:
 		DEBUG_ERR("unsupported sound %u", (uint8_t)sound);
-		return;
+		return nullptr;
 	}
+}
 
-	_soundCoroutine->start(CoroutineTask(soundFunc, _currentSoundState));
+void SoundPlayer::play(Sound sound)
+{
+	auto soundFunc = getSoundFunc(sound);
+	if (soundFunc == nullptr)
+		return;
+
+	if (_currentSoundState->repeatedSoundFunc != nullptr) 
+	{
+		_soundCoroutine->start(CoroutineTask(&repeatSoundAsync, _currentSoundState));
+		_soundCoroutine->switchTo(CoroutineTask(soundFunc, _currentSoundState));
+	}
+	else 
+	{
+		_soundCoroutine->start(CoroutineTask(soundFunc, _currentSoundState));
+	}
+}
+
+void SoundPlayer::repeat(Sound sound)
+{
+	auto soundFunc = getSoundFunc(sound);
+	if (soundFunc == nullptr)
+		return;
+
+	_currentSoundState->repeatedSoundFunc = soundFunc;
+	_soundCoroutine->start(CoroutineTask(&repeatSoundAsync, _currentSoundState));
+}
+
+void SoundPlayer::stop()
+{
+	_currentSoundState->repeatedSoundFunc = nullptr;
 }

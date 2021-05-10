@@ -27,7 +27,8 @@ enum class Sound : uint8_t
 	Fart2 = 17,
 	Fart3 = 18,
 	Didi = 19,
-	HappyBirthday = 20
+	HappyBirthday = 20,
+	Police = 21
 };
 
 struct SoundState;
@@ -42,6 +43,8 @@ public:
 	~SoundPlayer();
 
 	void play(Sound sound);
+	void repeat(Sound sound);
+	void stop();
 };
 
 #endif

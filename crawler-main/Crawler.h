@@ -93,6 +93,8 @@ public:
 
 	void initSoundPlayer(Coroutine* soundCoroutine);
 	void playSound(Sound sound);
+	void repeatSound(Sound sound);
+	void stopSoundRepeating();
 
 	void initRgb();
 	void setRgbColor(E_RGB_INDEX index, long Color);
