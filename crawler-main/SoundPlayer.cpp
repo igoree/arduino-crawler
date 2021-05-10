@@ -107,12 +107,10 @@
 #define  NOTE_D8  4698.64  //D8
 #define  NOTE_Eb8 4978.03  //D#8/Eb8
 
-#define MAX_NOTE_DURATION 25u
-
 struct SoundNoteState
 {
 	SoundNoteState()
-		: frequency(0), targetFrequency(0), frequencyChangeRatio(0), duration(0), targetDuration(0), silenceDuration(0)
+		: frequency(0), targetFrequency(0), frequencyChangeRatio(0), duration(0), silenceDuration(0)
 	{
 	}
 
@@ -120,7 +118,6 @@ struct SoundNoteState
 	float targetFrequency;
 	float frequencyChangeRatio;
 	uint32_t duration;
-	uint32_t targetDuration;
 	uint32_t silenceDuration;
 };
 
@@ -147,37 +144,30 @@ SoundPlayer::~SoundPlayer()
 
 CoroutineTaskResult* playSeparatedNoteAsync(const CoroutineTaskContext* context)
 {
-	if (context->step > 0)
-		return context->end();
-
 	auto state = (SoundState*)context->data;
-	auto duration = MAX_NOTE_DURATION;
-	if (state->currentNote.duration + duration > state->currentNote.targetDuration)
-	{
-		duration = state->currentNote.targetDuration - state->currentNote.duration;
-	}
 
-	state->buzzer->tone(state->currentNote.frequency, duration);
-
-	state->currentNote.duration += duration;
-	if (state->currentNote.duration < state->currentNote.targetDuration)
+	switch (context->step)
 	{
-		return context->repeat();
-	}
+	case 0:
+		state->buzzer->tone(state->currentNote.frequency, state->currentNote.duration);
+		return context->delayThenNext(state->currentNote.duration);
 
-	if (state->currentNote.silenceDuration > 0)
-	{
+	case 1:
+		state->buzzer->noTone();
+		if (state->currentNote.silenceDuration == 0)
+		{
+			return context->next();
+		}
 		return context->delayThenNext(state->currentNote.silenceDuration);
-	}
 
-	return context->end();
+	default:
+		return context->end();
+	}
 }
 
 CoroutineTaskResult* playNoteTransitionAsync(const CoroutineTaskContext* context)
 {
 	auto state = (SoundState*)context->data;
-
-	state->currentNote.duration = 0;
 
 	switch (context->step)
 	{
@@ -216,8 +206,7 @@ CoroutineTaskResult* playNoteTransitionAsync(const CoroutineTaskContext* context
 void prepareSeparatedNote(SoundState* state, float frequency, uint32_t duration, uint32_t silenceDuration)
 {
 	state->currentNote.frequency = frequency;
-	state->currentNote.duration = 0;
-	state->currentNote.targetDuration = duration;
+	state->currentNote.duration = duration;
 	state->currentNote.silenceDuration = silenceDuration;
 }
 
@@ -226,8 +215,7 @@ void prepareNoteTransition(SoundState* state, float initialFrequency, float targ
 	state->currentNote.frequency = initialFrequency;
 	state->currentNote.targetFrequency = targetFrequency;
 	state->currentNote.frequencyChangeRatio = frequencyChangeRatio;
-	state->currentNote.duration = 0;
-	state->currentNote.targetDuration = noteDuration;
+	state->currentNote.duration = noteDuration;
 	state->currentNote.silenceDuration = silenceDuration;
 }
 
@@ -462,7 +450,7 @@ CoroutineTaskResult* playSoundSleepingAsync(const CoroutineTaskContext* context)
 
 	case 1:
 		return context->delayThenNext(500);
-		
+
 	case 2:
 		prepareNoteTransition(state, 400, 100, 1.04, 10, 10);
 		return context->executeThenNext(CoroutineTask(&playNoteTransitionAsync, state));
