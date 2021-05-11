@@ -1,192 +1,50 @@
 #include "RGBLed.h"
 
-/**
- * Alternate Constructor which can call your own function to map the RGBLed to arduino port,
- * it will assigned the LED display buffer and initialization the GPIO of LED lights. You can
- * set any arduino digital pin for the LED data PIN, and reset the LED number by this constructor.
- * \param[in]
- *   port - arduino port
- * \param[in]
- *   ledCount - The LED number
- */
 RGBLed::RGBLed(uint8_t port, uint8_t ledCount)
 	: ledCount(ledCount)
 {
 	pinMask = digitalPinToBitMask(port);
 	ws2812_port = portOutputRegister(digitalPinToPort(port));
-	// set pinMode OUTPUT */
 	pinMode(port, OUTPUT);
 
-	auto bufferSize = ledCount * 3;
-	_pixels = (uint8_t*)malloc(bufferSize);
-	memset(_pixels, 0, bufferSize);
+	_pixels = new RGBColor[ledCount];
 }
 
-/**
- * Destructor which can call your own function, it will release the LED buffer
- */
 RGBLed::~RGBLed()
 {
-	free(_pixels);
-	_pixels = nullptr;
+	delete[] _pixels;
 }
 
-/**
- * \par Function
- *   getColorAt
- * \par Description
- *   Get the LED color value from its index
- * \param[in]
- *   index - The LED index number you want to read its value
- * \par Output
- *   None
- * \return
- *   The LED color value, include the R,G,B
- * \par Others
- *   The index value from 1 to the max
- */
-RGBColor RGBLed::getColorAt(uint8_t index)
+RGBColor RGBLed::getColor(uint8_t ledIndex)
 {
-	RGBColor px_value;
-
-	if (index < ledCount)
+	if (ledIndex < ledCount)
 	{
-		uint8_t tmp;
-		tmp = (index - 1) * 3;
-
-		px_value.green = _pixels[tmp];
-		px_value.red = _pixels[tmp + 1];
-		px_value.blue = _pixels[tmp + 2];
+		return _pixels[ledIndex];
 	}
-	return(px_value);
+
+	return RGBColor();
 }
 
-/**
- * \par Function
- *   setColorAt
- * \par Description
- *   Set the LED color for any LED.
- * \param[in]
- *   index - The LED index number you want to set its color
- * \param[in]
- *   red - Red values
- * \param[in]
- *   green - green values
- * \param[in]
- *   blue - blue values
- * \par Output
- *   None
- * \return
- *   TRUE: Successful implementation
- *   FALSE: Wrong execution
- * \par Others
- *   The index value from 0 to the max.
- */
-bool RGBLed::setColorAt(uint8_t index, uint8_t red, uint8_t green, uint8_t blue)
+bool RGBLed::setColor(uint8_t ledIndex, uint8_t red, uint8_t green, uint8_t blue)
 {
-	if (index < ledCount)
+	return setColor(ledIndex, RGBColor(red, green, blue));
+}
+
+bool RGBLed::setColor(uint8_t ledIndex, RGBColor color) 
+{
+	if (ledIndex < ledCount)
 	{
-		uint8_t tmp = index * 3;
-		_pixels[tmp] = green;
-		_pixels[tmp + 1] = red;
-		_pixels[tmp + 2] = blue;
+		_pixels[ledIndex] = color;
 
 		return true;
 	}
+
 	return false;
 }
 
-/**
- * \par Function
- *   setColor
- * \par Description
- *   Set the LED color for any LED.
- * \param[in]
- *   index - The LED index number you want to set its color
- * \param[in]
- *   red - Red values
- * \param[in]
- *   green - green values
- * \param[in]
- *   blue - blue values
- * \par Output
- *   None
- * \return
- *   TRUE: Successful implementation
- *   FALSE: Wrong execution
- * \par Others
- *   The index value from 1 to the max, if you set the index 0, all the LED will be lit
- */
-bool RGBLed::setColor(uint8_t index, uint8_t red, uint8_t green, uint8_t blue)
+void RGBLed::show()
 {
-	if (index == 0)
-	{
-		for (int16_t i = 0; i < ledCount; i++)
-		{
-			setColorAt(i, red, green, blue);
-		}
-		return(true);
-	}
-	else
-	{
-		setColorAt(index - 1, red, green, blue);
-	}
-	return(false);
-}
-
-/**
- * \par Function
- *   setColor
- * \par Description
- *   Set the LED color for all LED.
- * \param[in]
- *   red - Red values
- * \param[in]
- *   green - green values
- * \param[in]
- *   blue - blue values
- * \par Output
- *   None
- * \return
- *   TRUE: Successful implementation
- *   FALSE: Wrong execution
- * \par Others
- *   All the LED will be lit.
- */
-bool RGBLed::setColor(uint8_t red, uint8_t green, uint8_t blue)
-{
-	return setColor(0, red, green, blue);
-}
-
-/**
- * \par Function
- *   setColor
- * \par Description
- *   Set the LED color for any LED.
- * \param[in]
- *   value - the LED color defined as long type, for example (white) = 0xFFFFFF
- * \par Output
- *   None
- * \return
- *   TRUE: Successful implementation
- *   FALSE: Wrong execution
- * \par Others
- *   The index value from 1 to the max, if you set the index 0, all the LED will be lit
- */
-bool RGBLed::setColor(uint8_t index, long value)
-{
-	uint8_t red = (value & 0xff0000) >> 16;
-	uint8_t green = (value & 0xff00) >> 8;
-	uint8_t blue = value & 0xff;
-
-	if (index == 0)
-	{
-		return(setColor(0, red, green, blue));
-	}
-	else if (index <= ledCount) {
-		return(setColor(index, red, green, blue));
-	}
-	return(false);
+	rgbled_sendarray_mask((uint8_t*)_pixels, sizeof(RGBColor) * ledCount, pinMask, (uint8_t*)ws2812_port);
 }
 
 /*
@@ -350,21 +208,4 @@ bool RGBLed::setColor(uint8_t index, long value)
 	}
 
 	SREG = oldSREG;
-}
-
-/**
- * \par Function
- *   show
- * \par Description
- *   Transmission the data to WS2812
- * \par Output
- *   None
- * \return
- *   None
- * \par Others
- *   None
- */
-void RGBLed::show()
-{
-	rgbled_sendarray_mask(_pixels, 3 * ledCount, pinMask, (uint8_t*)ws2812_port);
 }
