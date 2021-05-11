@@ -74,7 +74,7 @@ public:
 	CrawlerStatus getStatus();
 	uint8_t getBattery();
 
-	void initIR();
+	void initIRRemote();
 	IRKeyCode getPressedIRKey();
 
 	void initSoundPlayer(Coroutine* soundCoroutine);

@@ -230,7 +230,7 @@ uint8_t Crawler::getBattery()
 	return _batteryValue;
 }
 
-void Crawler::initIR()
+void Crawler::initIRRemote()
 {
 	_ir = (IRRemote*)_motorDriver.getSensor(E_IR);
 }

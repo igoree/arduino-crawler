@@ -33,7 +33,7 @@ void setup()
 	_crawler.initServo();
 	_crawler.initRgb();
 	_crawler.initSoundPlayer(&_soundCoroutine);
-	_crawler.initIR();
+	_crawler.initIRRemote();
 	_crawler.setSpeed(50);
 	_crawler.setServoBaseAngle(90);
 	_crawler.setServoAngle(CrawlerServoKind::Ultrasonic, 90);
