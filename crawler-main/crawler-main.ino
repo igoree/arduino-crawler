@@ -1,3 +1,4 @@
+#include "Storage.h"
 #include "Coroutine.h"
 #include "ProtocolParser.h"
 #include "Crawler.h"
@@ -28,7 +29,7 @@ CrawlerIRControlMode _crawlerIRControlMode(CrawlerIRControlMode::ContinuousPress
 void setup()
 {
 	INIT_DEBUG();
-	_crawler.init(M2, M1);
+	_crawler.init();
 	_crawler.initServo();
 	_crawler.initRgb();
 	_crawler.initSoundPlayer(&_soundCoroutine);
@@ -207,6 +208,17 @@ void crawlerHandleIRCommand(IRKeyCode irKeyCode)
 		DEBUG_INFO("IRControlMode=SinglePress");
 		_crawlerIRControlMode = CrawlerIRControlMode::SinglePress;
 		_crawler.playSound(Sound::SuperHappy);
+		break;
+
+	case IRKeyCode::Button3:
+		if (_crawler.isMuted()) 
+		{
+			_crawler.unmute();
+		}
+		else 
+		{
+			_crawler.mute();
+		}
 		break;
 
 	case IRKeyCode::Button5:

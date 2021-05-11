@@ -38,12 +38,12 @@ Crawler::~Crawler()
 	}
 }
 
-void Crawler::init(int leftDrive, int rightDrive)
+void Crawler::init()
 {
 	_motorDriver = Emakefun_MotorDriver(0x60, MOTOR_DRIVER_BOARD_V5);
 	_sensors = (Emakefun_Sensor*)_motorDriver.getSensor(E_SENSOR_MAX);
-	_leftDrive = _motorDriver.getMotor(leftDrive);
-	_rightDrive = _motorDriver.getMotor(rightDrive);
+	_leftDrive = _motorDriver.getMotor(M2);
+	_rightDrive = _motorDriver.getMotor(M1);
 	_motorDriver.begin(50);
 }
 
@@ -258,6 +258,21 @@ void Crawler::repeatSound(Sound sound)
 void Crawler::stopSoundRepeating()
 {
 	_soundPlayer->stop();
+}
+
+void Crawler::mute()
+{
+	_soundPlayer->mute();
+}
+
+void Crawler::unmute()
+{
+	_soundPlayer->unmute();
+}
+
+bool Crawler::isMuted()
+{
+	return _soundPlayer->isMuted();
 }
 
 void Crawler::initRgb()

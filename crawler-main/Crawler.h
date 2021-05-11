@@ -57,7 +57,7 @@ public:
 
 	Crawler();
 	~Crawler();
-	void init(int leftDrive, int rightDrive);
+	void init();
 	void goForward();
 	void goBack();
 	void turnLeft();
@@ -81,9 +81,12 @@ public:
 	void playSound(Sound sound);
 	void repeatSound(Sound sound);
 	void stopSoundRepeating();
+	void mute();
+	void unmute();
+	bool isMuted();
 
 	void initRgb();
-	void setRgbColor(E_RGB_INDEX index, long Color);
+	void setRgbColor(E_RGB_INDEX index, long color);
 	void lightOff();
 
 	void initUltrasonic();

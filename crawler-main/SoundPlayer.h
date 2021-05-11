@@ -45,6 +45,10 @@ public:
 	void play(Sound sound);
 	void repeat(Sound sound);
 	void stop();
+
+	void mute();
+	void unmute();
+	bool isMuted();
 };
 
 #endif

@@ -143,6 +143,7 @@
       <FileType>CppHeader</FileType>
     </ClInclude>
     <ClInclude Include="SoundPlayer.h" />
+    <ClInclude Include="Storage.h" />
     <ClInclude Include="__vm\.crawler-main.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
@@ -155,6 +156,7 @@
     <ClCompile Include="ProtocolParser.cpp" />
     <ClCompile Include="RGBLed.cpp" />
     <ClCompile Include="SoundPlayer.cpp" />
+    <ClCompile Include="Storage.cpp" />
   </ItemGroup>
   <PropertyGroup>
     <DebuggerFlavor>VisualMicroDebugger</DebuggerFlavor>

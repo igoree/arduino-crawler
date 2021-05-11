@@ -1,8 +1,9 @@
 #include "SoundPlayer.h"
 #include "avr/pgmspace.h"
+#include "Storage.h"
 
 #include "DebugLevels.h"
-#define DEBUG_LEVEL DEBUG_LEVEL_INFO
+//#define DEBUG_LEVEL DEBUG_LEVEL_INFO
 #include "DebugOutput.h"
 
 // Reference:  This list was adapted from the table located here:
@@ -151,7 +152,10 @@ CoroutineTaskResult* playSeparatedNoteAsync(const CoroutineTaskContext* context)
 	switch (context->step)
 	{
 	case 0:
-		state->buzzer->tone(state->currentNote.frequency, state->currentNote.duration);
+		if (storage.getSoundEnabled()) 
+		{
+			state->buzzer->tone(state->currentNote.frequency, state->currentNote.duration);
+		}
 		return context->delayThenNext(state->currentNote.duration);
 
 	case 1:
@@ -798,4 +802,24 @@ void SoundPlayer::repeat(Sound sound)
 void SoundPlayer::stop()
 {
 	_currentSoundState->repeatedSoundFunc = nullptr;
+}
+
+void SoundPlayer::mute()
+{
+	storage.setSoundEnabled(false);
+	_currentSoundState->buzzer->noTone();
+
+	DEBUG_INFO("sound muted");
+}
+
+void SoundPlayer::unmute()
+{
+	storage.setSoundEnabled(true);
+
+	DEBUG_INFO("sound unmuted");
+}
+
+bool SoundPlayer::isMuted()
+{
+	return !storage.getSoundEnabled();
 }
