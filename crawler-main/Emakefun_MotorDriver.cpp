@@ -668,7 +668,7 @@ Emakefun_Sensor::Emakefun_Sensor(void) {
   P1 = P2 = P3 = P4 = P5 = 0;
 }
 
-void Emakefun_Sensor::SetRgbColor(E_RGB_INDEX index , long Color)
+void Emakefun_Sensor::setRgbColor(E_RGB_INDEX index , long Color)
 {
   if (index == E_RGB_ALL) {
     mRgb->setColor(0, Color);

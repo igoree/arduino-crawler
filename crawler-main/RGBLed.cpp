@@ -1,21 +1,4 @@
-
 #include "RGBLed.h"
-
-/**
- * Alternate Constructor which can call your own function to map the RGBLed to arduino port,
- * it will assigned the LED display buffer and initialization the GPIO of LED lights. You can
- * set any arduino digital pin for the LED data PIN, The default number of light strips is 32.
- * \param[in]
- *   port - arduino port
- */
-RGBLed::RGBLed(uint8_t port)
-{
-  pinMask       = digitalPinToBitMask(port);
-  ws2812_port   = portOutputRegister(digitalPinToPort(port) );
-  // set pinMode OUTPUT */
-  pinMode(port, OUTPUT);
-  setNumber(DEFAULT_MAX_LED_NUMBER);
-}
 
 /**
  * Alternate Constructor which can call your own function to map the RGBLed to arduino port,
@@ -24,79 +7,28 @@ RGBLed::RGBLed(uint8_t port)
  * \param[in]
  *   port - arduino port
  * \param[in]
- *   led_num - The LED number
+ *   ledCount - The LED number
  */
-RGBLed::RGBLed(uint8_t port, uint8_t led_num)
+RGBLed::RGBLed(uint8_t port, uint8_t ledCount)
+	: ledCount(ledCount)
 {
-  pinMask       = digitalPinToBitMask(port);
-  ws2812_port   = portOutputRegister(digitalPinToPort(port) );
-  brightness = 255;
-  // set pinMode OUTPUT */
-  pinMode(port, OUTPUT);
-  setNumber(led_num);
+	pinMask = digitalPinToBitMask(port);
+	ws2812_port = portOutputRegister(digitalPinToPort(port));
+	// set pinMode OUTPUT */
+	pinMode(port, OUTPUT);
+
+	auto bufferSize = ledCount * 3;
+	_pixels = (uint8_t*)malloc(bufferSize);
+	memset(_pixels, 0, bufferSize);
 }
 
 /**
- * \par Function
- *   setpin
- * \par Description
- *   Reset the LED available data PIN by its arduino port.
- * \param[in]
- *   port - arduino port(should digital pin)
- * \par Output
- *   None
- * \return
- *   None
- * \par Others
- *   None
+ * Destructor which can call your own function, it will release the LED buffer
  */
-void RGBLed::setpin(uint8_t port)
+RGBLed::~RGBLed()
 {
-  setColor(0,0,0,0);
-  fillPixelsBak(0, 0, 0);
-  pinMask   = digitalPinToBitMask(port);
-  ws2812_port = portOutputRegister(digitalPinToPort(port) );
-  pinMode(port, OUTPUT);
- // _port = 0;
- // _slot = SLOT2;
-}
-
-/**
- * \par Function
- *   setNumber
- * \par Description
- *   Assigned the LED display buffer by the LED number
- * \param[in]
- *   num_leds - The LED number you used
- * \par Output
- *   None
- * \return
- *   None
- * \par Others
- *   None
- */
-void RGBLed::setNumber(uint8_t num_leds)
-{
-  count_led = num_leds;
-  pixels    = (uint8_t*)malloc(count_led * 3);
-  if(!pixels)
-  {
-    printf("There is not enough space!\r\n");
-  }
-  for(int16_t i = 0; i < count_led * 3; i++)
-  {
-    pixels[i] = 0;
-  }
-
-  pixels_bak    = (uint8_t*)malloc(count_led * 3);
-  if(!pixels_bak)
-  {
-    printf("There is not enough space!\r\n");
-  }
-  for(int16_t i = 0; i < count_led * 3; i++)
-  {
-    pixels_bak[i] = 0;
-  }
+	free(_pixels);
+	_pixels = nullptr;
 }
 
 /**
@@ -113,66 +45,20 @@ void RGBLed::setNumber(uint8_t num_leds)
  * \par Others
  *   The index value from 1 to the max
  */
-cRGB RGBLed::getColorAt(uint8_t index)
+RGBColor RGBLed::getColorAt(uint8_t index)
 {
-  cRGB px_value;
+	RGBColor px_value;
 
-  if(index < count_led)
-  {
-    uint8_t tmp;
-    tmp = (index-1) * 3;
+	if (index < ledCount)
+	{
+		uint8_t tmp;
+		tmp = (index - 1) * 3;
 
-    px_value.g = pixels[tmp];
-    px_value.r = pixels[tmp + 1];
-    px_value.b = pixels[tmp + 2];
-  }
-  return(px_value);
-}
-
-/**
- * \par Function
- *   getNumber
- * \par Description
- *   Get the LED number you can light it.
- * \par Output
- *   None
- * \return
- *   The total number of LED's
- * \par Others
- *   The index value from 1 to the max
- */
-uint8_t RGBLed::getNumber(void)
-{
-  return(count_led);
-}
-
-/**
- * \par Function
- *   fillPixelsBak
- * \par Description
- *   fill the LED color data to pixels_bak.
- * \param[in]
- *   red - Red values
- * \param[in]
- *   green - green values
- * \param[in]
- *   blue - blue values
- * \par Output
- *   None
- * \return
- *   None
- * \par Others
- *   None
- */
-void RGBLed::fillPixelsBak(uint8_t red, uint8_t green, uint8_t blue)
-{
-  for(int16_t i = 0; i < count_led; i++)
-  {
-    uint8_t tmp = i * 3;
-    pixels_bak[tmp] = green;
-    pixels_bak[tmp + 1] = red;
-    pixels_bak[tmp + 2] = blue;
-  }
+		px_value.green = _pixels[tmp];
+		px_value.red = _pixels[tmp + 1];
+		px_value.blue = _pixels[tmp + 2];
+	}
+	return(px_value);
 }
 
 /**
@@ -198,20 +84,16 @@ void RGBLed::fillPixelsBak(uint8_t red, uint8_t green, uint8_t blue)
  */
 bool RGBLed::setColorAt(uint8_t index, uint8_t red, uint8_t green, uint8_t blue)
 {
-  if(index < count_led)
-  {
-    uint8_t tmp = index * 3;
-    if(brightness) { // See notes in setBrightness()
-      red = (red * brightness) >> 8;
-      green = (green * brightness) >> 8;
-      blue = (blue * brightness) >> 8;
-    }
-    pixels[tmp] = green;
-    pixels[tmp + 1] = red;
-    pixels[tmp + 2] = blue;
-    return(true);
-  }
-  return(false);
+	if (index < ledCount)
+	{
+		uint8_t tmp = index * 3;
+		_pixels[tmp] = green;
+		_pixels[tmp + 1] = red;
+		_pixels[tmp + 2] = blue;
+
+		return true;
+	}
+	return false;
 }
 
 /**
@@ -237,19 +119,19 @@ bool RGBLed::setColorAt(uint8_t index, uint8_t red, uint8_t green, uint8_t blue)
  */
 bool RGBLed::setColor(uint8_t index, uint8_t red, uint8_t green, uint8_t blue)
 {
-  if(index == 0)
-  {
-    for(int16_t i = 0; i < count_led; i++)
-    {
-      setColorAt(i,red,green,blue);
-    }
-    return(true);
-  }
-  else
-  {
-    setColorAt(index-1,red,green,blue);
-  }
-  return(false);
+	if (index == 0)
+	{
+		for (int16_t i = 0; i < ledCount; i++)
+		{
+			setColorAt(i, red, green, blue);
+		}
+		return(true);
+	}
+	else
+	{
+		setColorAt(index - 1, red, green, blue);
+	}
+	return(false);
 }
 
 /**
@@ -273,7 +155,7 @@ bool RGBLed::setColor(uint8_t index, uint8_t red, uint8_t green, uint8_t blue)
  */
 bool RGBLed::setColor(uint8_t red, uint8_t green, uint8_t blue)
 {
-  return(setColor(0, red, green, blue));
+	return setColor(0, red, green, blue);
 }
 
 /**
@@ -293,24 +175,25 @@ bool RGBLed::setColor(uint8_t red, uint8_t green, uint8_t blue)
  */
 bool RGBLed::setColor(uint8_t index, long value)
 {
-  uint8_t red    = (value & 0xff0000) >> 16;
-  uint8_t green  = (value & 0xff00) >> 8;
-  uint8_t blue   = value & 0xff;
+	uint8_t red = (value & 0xff0000) >> 16;
+	uint8_t green = (value & 0xff00) >> 8;
+	uint8_t blue = value & 0xff;
 
-  if(index == 0)
-  {
-      return(setColor(0, red, green, blue));
-  } else if(index <= count_led) {
-      return(setColor(index, red, green, blue));
-  }
-  return(false);
+	if (index == 0)
+	{
+		return(setColor(0, red, green, blue));
+	}
+	else if (index <= ledCount) {
+		return(setColor(index, red, green, blue));
+	}
+	return(false);
 }
 
 /*
   This routine writes an array of bytes with RGB values to the Dataout pin
   using the fast 800kHz clockless WS2811/2812 protocol.
  */
-/* Timing in ns */
+ /* Timing in ns */
 #define w_zeropulse (350)
 #define w_onepulse  (900)
 #define w_totalperiod (1250)
@@ -389,105 +272,84 @@ bool RGBLed::setColor(uint8_t index, long value)
  * \par Others
  *   None
  */
-void RGBLed::rgbled_sendarray_mask(uint8_t *data, uint16_t datlen, uint8_t maskhi, uint8_t *port)
+	void RGBLed::rgbled_sendarray_mask(uint8_t * data, uint16_t datlen, uint8_t maskhi, uint8_t * port)
 {
-  uint8_t curbyte, ctr, masklo;
-  uint8_t oldSREG = SREG;
-  cli(); // Disables all interrupts
+	uint8_t curbyte, ctr, masklo;
+	uint8_t oldSREG = SREG;
+	cli(); // Disables all interrupts
 
-  masklo  = *port & ~maskhi;
-  maskhi  = *port | maskhi;
+	masklo = *port & ~maskhi;
+	maskhi = *port | maskhi;
 
-  while(datlen--)
-  {
-    curbyte = *data++;
+	while (datlen--)
+	{
+		curbyte = *data++;
 
-    asm volatile (
-            "       ldi   %0,8  \n\t"
-            "loop%=:            \n\t"
-            "       st    X,%3 \n\t"        //  '1' [02] '0' [02] - re
+		asm volatile (
+			"       ldi   %0,8  \n\t"
+			"loop%=:            \n\t"
+			"       st    X,%3 \n\t"        //  '1' [02] '0' [02] - re
 #if (w1_nops & 1)
-            w_nop1
+			w_nop1
 #endif
 #if (w1_nops & 2)
-            w_nop2
+			w_nop2
 #endif
 #if (w1_nops & 4)
-            w_nop4
+			w_nop4
 #endif
 #if (w1_nops & 8)
-            w_nop8
+			w_nop8
 #endif
 #if (w1_nops & 16)
-            w_nop16
+			w_nop16
 #endif
-            "       sbrs  %1,7  \n\t"       //  '1' [04] '0' [03]
-            "       st    X,%4 \n\t"        //  '1' [--] '0' [05] - fe-low
-            "       lsl   %1    \n\t"       //  '1' [05] '0' [06]
+			"       sbrs  %1,7  \n\t"       //  '1' [04] '0' [03]
+			"       st    X,%4 \n\t"        //  '1' [--] '0' [05] - fe-low
+			"       lsl   %1    \n\t"       //  '1' [05] '0' [06]
 #if (w2_nops & 1)
-            w_nop1
+			w_nop1
 #endif
 #if (w2_nops & 2)
-            w_nop2
+			w_nop2
 #endif
 #if (w2_nops & 4)
-            w_nop4
+			w_nop4
 #endif
 #if (w2_nops & 8)
-            w_nop8
+			w_nop8
 #endif
 #if (w2_nops & 16)
-            w_nop16
+			w_nop16
 #endif
-            "       brcc skipone%= \n\t"    /*  '1' [+1] '0' [+2] - */
-            "       st   X,%4      \n\t"    /*  '1' [+3] '0' [--] - fe-high */
-            "skipone%=:               "     /*  '1' [+3] '0' [+2] - */
+			"       brcc skipone%= \n\t"    /*  '1' [+1] '0' [+2] - */
+			"       st   X,%4      \n\t"    /*  '1' [+3] '0' [--] - fe-high */
+			"skipone%=:               "     /*  '1' [+3] '0' [+2] - */
 
 #if (w3_nops & 1)
-            w_nop1
+			w_nop1
 #endif
 #if (w3_nops & 2)
-            w_nop2
+			w_nop2
 #endif
 #if (w3_nops & 4)
-            w_nop4
+			w_nop4
 #endif
 #if (w3_nops & 8)
-            w_nop8
+			w_nop8
 #endif
 #if (w3_nops & 16)
-            w_nop16
+			w_nop16
 #endif
 
-            "       dec   %0    \n\t"       //  '1' [+4] '0' [+3]
-            "       brne  loop%=\n\t"       //  '1' [+5] '0' [+4]
-            : "=&d" (ctr)
-            : "r" (curbyte), "x" (port), "r" (maskhi), "r" (masklo)
-    );
-  }
+			"       dec   %0    \n\t"       //  '1' [+4] '0' [+3]
+			"       brne  loop%=\n\t"       //  '1' [+5] '0' [+4]
+			: "=&d" (ctr)
+			: "r" (curbyte), "x" (port), "r" (maskhi), "r" (masklo)
+			);
+	}
 
-  SREG = oldSREG;
-}
-
-void RGBLed::setBrightness(uint8_t b) {
-  static uint8_t oldBrightness = 0;
-  uint8_t newBrightness = b + 1;
-  uint16_t scale = 0;
-  if(newBrightness != brightness) { // Compare against prior value
-    // Brightness has changed -- re-scale existing data in RAM
-    uint8_t  c,
-            *ptr           = pixels,
-             oldBrightness = brightness - 1; // De-wrap old brightness value
-    uint16_t scale;
-    if(oldBrightness == 0) scale = 0; // Avoid /0
-    else if(b == 255) scale = 65535 / oldBrightness;
-    else scale = (((uint16_t)newBrightness << 8) - 1) / oldBrightness;
-    for(uint16_t i=0; i < (3 * count_led); i++) {
-      c      = *ptr;
-      *ptr++ = (c * scale) >> 8;
-    }
-    brightness = newBrightness;
-  }
+	SREG = oldSREG;
 }
 
 /**
@@ -502,33 +364,7 @@ void RGBLed::setBrightness(uint8_t b) {
  * \par Others
  *   None
  */
-void RGBLed::show(void)
+void RGBLed::show()
 {
-  if(memcmp(pixels_bak,pixels,3 * count_led) != 0)
-  {
-    rgbled_sendarray_mask(pixels, 3 * count_led, pinMask, (uint8_t*)ws2812_port);
-    memcpy(pixels_bak,pixels,3 * count_led);
-  }
-}
-
-void RGBLed::SetRgbColor(E_RGB_INDEX index , long Color)
-{
-  if (index == E_RGB_ALL) {
-    setColor(0, Color);
-  } else {
-    setColor(index, Color);
-  }
-  show();
-}
-
-
-/**
- * Destructor which can call your own function, it will release the LED buffer
- */
-RGBLed::~RGBLed(void)
-{
-  free(pixels);
-  pixels = NULL;
-  free(pixels_bak);
-  pixels_bak = NULL;
+	rgbled_sendarray_mask(_pixels, 3 * ledCount, pinMask, (uint8_t*)ws2812_port);
 }

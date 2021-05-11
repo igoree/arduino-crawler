@@ -267,12 +267,12 @@ void Crawler::initRgb()
 
 void Crawler::setRgbColor(E_RGB_INDEX index, long Color)
 {
-	_sensors->SetRgbColor(index, Color);
+	_sensors->setRgbColor(index, Color);
 }
 
 void Crawler::lightOff()
 {
-	_sensors->SetRgbColor(E_RGB_ALL, RGB_BLACK);
+	_sensors->setRgbColor(E_RGB_ALL, RGB_BLACK);
 }
 
 void Crawler::initUltrasonic()
