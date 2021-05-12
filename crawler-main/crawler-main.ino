@@ -1,3 +1,4 @@
+#include "CrawlerBehaviuor.h"
 #include "Storage.h"
 #include "Coroutine.h"
 #include "ProtocolParser.h"

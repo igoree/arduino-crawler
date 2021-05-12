@@ -1,9 +1,7 @@
 #ifndef _STORAGE_h
 #define _STORAGE_h
 
-#include "arduino.h"
-
-class Storage 
+class Storage
 {
 public:
 	void setSoundEnabled(bool enabled) const;

@@ -1,7 +1,8 @@
 #ifndef _KEYMAY_H_
 #define _KEYMAY_H_
 
-enum class IRKeyCode : uint8_t {
+enum class IRKeyCode : uint8_t 
+{
 	Unknown = 0,
 	Button1 = 0x45,
 	Button2 = 0x46,
