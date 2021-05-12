@@ -16,12 +16,12 @@ bool Storage::getSoundEnabled() const
 	return (bool)eeprom_read_byte(&soundEnabled);
 }
 
-void Storage::setCrawlerBehaviourKind(uint8_t behaviourKind)
+void Storage::setCrawlerBehaviourKind(uint8_t behaviourKind) const
 {
 	eeprom_update_byte(&crawlerBehaviourKind, behaviourKind);
 }
 
-uint8_t Storage::getCrawlerBehaviourKind()
+uint8_t Storage::getCrawlerBehaviourKind() const
 {
 	return eeprom_read_byte(&crawlerBehaviourKind);
 }

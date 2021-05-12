@@ -1,5 +1,15 @@
 #include "RGBLed.h"
 
+bool RGBColor::operator==(const RGBColor& otherColor) const
+{
+	return red == otherColor.red && green == otherColor.green && blue == otherColor.blue;
+}
+
+bool RGBColor::operator!=(const RGBColor& otherColor) const
+{
+	return !operator==(otherColor);
+}
+
 RGBLed::RGBLed(uint8_t port, uint8_t ledCount)
 	: ledCount(ledCount)
 {
@@ -209,3 +219,5 @@ void RGBLed::show()
 
 	SREG = oldSREG;
 }
+
+

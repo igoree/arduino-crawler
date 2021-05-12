@@ -60,7 +60,7 @@
     <ClInclude Include="Storage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CrawlerBehaviuor.h">
+    <ClInclude Include="CrawlerBehaviour.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LightController.h">
@@ -98,7 +98,7 @@
     <ClCompile Include="Storage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CrawlerBehaviuor.cpp">
+    <ClCompile Include="CrawlerBehaviour.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LightController.cpp">

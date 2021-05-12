@@ -127,7 +127,7 @@ struct SoundNoteState
 struct SoundState
 {
 	SoundState(const Buzzer* buzzer)
-		: buzzer(buzzer), repeatedSoundFunc(), currentNote()
+		: buzzer(buzzer), repeatedSoundFunc(nullptr), currentNote()
 	{
 	}
 

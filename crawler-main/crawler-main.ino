@@ -14,7 +14,7 @@ enum class CrawlerIRControlMode : uint8_t
 
 Coroutine _freeMemoryCoroutine("freeMemory");
 Coroutine _irRemoteCoroutine("IRRemote");
-Coroutine _speedLightCoroutine("speedLight");
+Coroutine _lightCoroutine("speedLight");
 Coroutine _soundCoroutine("sound", 4);
 
 ProtocolParser _protocol(&Serial);
@@ -113,7 +113,7 @@ CoroutineTaskResult* crawlerShowSpeedLightAsync(const CoroutineTaskContext* cont
 
 void crawlerShowSpeedLight() 
 {
-	_speedLightCoroutine.start(CoroutineTask(&crawlerShowSpeedLightAsync));
+	_lightCoroutine.start(CoroutineTask(&crawlerShowSpeedLightAsync));
 }
 
 void crawlerSpeedUp(uint8_t delta)
@@ -262,7 +262,7 @@ void loop()
 {
 	_freeMemoryCoroutine.continueExecution();
 	_irRemoteCoroutine.continueExecution();
-	_speedLightCoroutine.continueExecution();
+	_lightCoroutine.continueExecution();
 	_soundCoroutine.continueExecution();
 
 	/*_protocol.RecevData();

@@ -28,6 +28,9 @@ struct RGBColor
 	uint8_t green;
 	uint8_t red;
 	uint8_t blue;
+
+	bool operator == (const RGBColor& otherColor) const;
+	bool operator != (const RGBColor& otherColor) const;
 };
 
 class RGBLed

@@ -115,7 +115,7 @@
     <ClInclude Include="Crawler.h">
       <FileType>CppHeader</FileType>
     </ClInclude>
-    <ClInclude Include="CrawlerBehaviuor.h" />
+    <ClInclude Include="CrawlerBehaviour.h" />
     <ClInclude Include="Emakefun_MotorDriver.h">
       <FileType>CppHeader</FileType>
     </ClInclude>
@@ -151,7 +151,7 @@
   <ItemGroup>
     <ClCompile Include="Buzzer.cpp" />
     <ClCompile Include="Crawler.cpp" />
-    <ClCompile Include="CrawlerBehaviuor.cpp" />
+    <ClCompile Include="CrawlerBehaviour.cpp" />
     <ClCompile Include="Emakefun_MotorDriver.cpp" />
     <ClCompile Include="Emakefun_MS_PWMServoDriver.cpp" />
     <ClCompile Include="IRRemote.cpp" />

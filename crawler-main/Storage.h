@@ -8,8 +8,8 @@ class Storage
 public:
 	void setSoundEnabled(bool enabled) const;
 	bool getSoundEnabled() const;
-	void setCrawlerBehaviourKind(uint8_t behaviourKind);
-	uint8_t getCrawlerBehaviourKind();
+	void setCrawlerBehaviourKind(uint8_t behaviourKind) const;
+	uint8_t getCrawlerBehaviourKind() const;
 };
 
 extern const Storage storage;

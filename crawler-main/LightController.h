@@ -6,6 +6,8 @@
 #include "stdint.h"
 #include "Coroutine.h"
 
+#define MAX_BRIGHTNESS 100u
+
 enum class LightEffect : uint8_t
 {
 	Command,
@@ -30,8 +32,8 @@ public:
 	LightController(RGBLed* rgbLed, Coroutine* lightCoroutine);
 	~LightController();
 
-	void show(LightEffect effect);
-	void repeat(LightEffect effect);
+	void show(LightEffect effect, uint8_t brightness = MAX_BRIGHTNESS);
+	void repeat(LightEffect effect, uint8_t brightness = MAX_BRIGHTNESS);
 	void lightOff();
 };
 
