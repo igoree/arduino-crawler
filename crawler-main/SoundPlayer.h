@@ -3,34 +3,34 @@
 
 #include "stdint.h"
 #include "Coroutine.h"
-#include "Buzzer.h"
 
 enum class Sound : uint8_t
 {
-	Up = 0,
-	Down = 1,
-	ButtonPushed = 2,
-	Mode1 = 3,
-	Mode2 = 4,
-	TurnOn = 5,
-	Surprise = 6,
-	OhOoh = 7,
-	OhOoh2 = 8,
-	Cuddly = 9,
-	Sleeping = 10,
-	Happy = 11,
-	SuperHappy = 12,
-	HappyShort = 13,
-	Sad = 14,
-	Confused = 15,
-	Fart1 = 16,
-	Fart2 = 17,
-	Fart3 = 18,
-	Didi = 19,
-	HappyBirthday = 20,
-	Police = 21
+	Up,
+	Down,
+	ButtonPushed,
+	Mode1,
+	Mode2,
+	TurnOn,
+	Surprise,
+	OhOoh,
+	OhOoh2,
+	Cuddly,
+	Sleeping,
+	Happy,
+	SuperHappy,
+	HappyShort,
+	Sad,
+	Confused,
+	Fart1,
+	Fart2,
+	Fart3,
+	Command,
+	HappyBirthday,
+	Police
 };
 
+class Buzzer;
 struct SoundState;
 
 class SoundPlayer 

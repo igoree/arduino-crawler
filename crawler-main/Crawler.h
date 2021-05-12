@@ -4,6 +4,7 @@
 #include "Emakefun_MotorDriver.h"
 #include "IRKeyMap.h"
 #include "SoundPlayer.h"
+#include "LightController.h"
 
 #define CRAWLER_SERVO_COUNT 1
 

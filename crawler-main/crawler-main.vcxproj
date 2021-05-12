@@ -128,6 +128,7 @@
     <ClInclude Include="IRRemote.h">
       <FileType>CppHeader</FileType>
     </ClInclude>
+    <ClInclude Include="LightController.h" />
     <ClInclude Include="nRF24L01.h">
       <FileType>CppHeader</FileType>
     </ClInclude>
@@ -154,6 +155,7 @@
     <ClCompile Include="Emakefun_MotorDriver.cpp" />
     <ClCompile Include="Emakefun_MS_PWMServoDriver.cpp" />
     <ClCompile Include="IRRemote.cpp" />
+    <ClCompile Include="LightController.cpp" />
     <ClCompile Include="nRF24L01.cpp" />
     <ClCompile Include="ProtocolParser.cpp" />
     <ClCompile Include="RGBLed.cpp" />

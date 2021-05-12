@@ -1,6 +1,7 @@
 #include "SoundPlayer.h"
-#include "avr/pgmspace.h"
+#include "Buzzer.h"
 #include "Storage.h"
+#include "avr/pgmspace.h"
 
 #include "DebugLevels.h"
 //#define DEBUG_LEVEL DEBUG_LEVEL_INFO
@@ -619,7 +620,7 @@ CoroutineTaskResult* playSoundFart3Async(const CoroutineTaskContext* context)
 	return context->executeThenNext(CoroutineTask(&playNoteTransitionAsync, state));
 }
 
-CoroutineTaskResult* playSoundDidiAsync(const CoroutineTaskContext* context)
+CoroutineTaskResult* playSoundCommandAsync(const CoroutineTaskContext* context)
 {
 	auto state = (SoundState*)context->data;
 
@@ -757,8 +758,8 @@ AsyncFuncPointer getSoundFunc(Sound sound)
 	case Sound::Fart3:
 		return &playSoundFart3Async;
 
-	case Sound::Didi:
-		return &playSoundDidiAsync;
+	case Sound::Command:
+		return &playSoundCommandAsync;
 
 	case Sound::HappyBirthday:
 		return &playSoundHappyBirthdayAsync;
