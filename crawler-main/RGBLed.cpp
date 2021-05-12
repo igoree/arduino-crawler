@@ -35,11 +35,6 @@ RGBColor RGBLed::getColor(uint8_t ledIndex)
 	return RGBColor();
 }
 
-bool RGBLed::setColor(uint8_t ledIndex, uint8_t red, uint8_t green, uint8_t blue)
-{
-	return setColor(ledIndex, RGBColor(red, green, blue));
-}
-
 bool RGBLed::setColor(uint8_t ledIndex, RGBColor color) 
 {
 	if (ledIndex < ledCount)

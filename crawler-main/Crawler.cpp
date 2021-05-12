@@ -1,5 +1,5 @@
 #include "Crawler.h"
-#include "Sounds.h"
+#include "Emakefun_MotorDriver.h"
 
 #include "DebugLevels.h"
 #define DEBUG_LEVEL DEBUG_LEVEL_INFO
@@ -7,30 +7,24 @@
 
 //MotorDriverBoard V4.0
 Crawler::Crawler()
+	: _status(CrawlerStatus::Stop), _batteryValue(0), _servoBaseAngle(90), _speed(0), _motorDriver(nullptr), _leftDrive(nullptr), _rightDrive(nullptr), 
+	  _sensors(nullptr), _ir(nullptr), _soundPlayer(nullptr), _lightController(nullptr), _behaviour(nullptr)
 {
-	_status = CrawlerStatus::Stop;
-	_batteryValue = 0;
-	_speed = 0;
-	_leftDrive = _rightDrive = NULL;
-	_ir = NULL;
-	Rgb = NULL;
-	Nrf24L01 = NULL;
-
 	for (uint8_t i = 0; i < CRAWLER_SERVO_COUNT; i++)
 	{
 		_servos[i] = NULL;
 	}
-
-	setStatus(CrawlerStatus::Stop);
 }
 
 Crawler::~Crawler()
 {
+	delete _motorDriver;
 	delete _leftDrive;
 	delete _rightDrive;
 	delete _ir;
-	delete Rgb;
-	delete Nrf24L01;
+	delete _soundPlayer;
+	delete _lightController;
+	delete _behaviour;
 
 	for (uint8_t i = 0; i < CRAWLER_SERVO_COUNT; i++)
 	{
@@ -40,11 +34,11 @@ Crawler::~Crawler()
 
 void Crawler::init()
 {
-	_motorDriver = Emakefun_MotorDriver(0x60, MOTOR_DRIVER_BOARD_V5);
-	_sensors = (Emakefun_Sensor*)_motorDriver.getSensor(E_SENSOR_MAX);
-	_leftDrive = _motorDriver.getMotor(M2);
-	_rightDrive = _motorDriver.getMotor(M1);
-	_motorDriver.begin(50);
+	_motorDriver = new Emakefun_MotorDriver(0x60, MOTOR_DRIVER_BOARD_V5);
+	_sensors = (Emakefun_Sensor*)_motorDriver->getSensor(E_SENSOR_MAX);
+	_leftDrive = _motorDriver->getMotor(M2);
+	_rightDrive = _motorDriver->getMotor(M1);
+	_motorDriver->begin(50);
 }
 
 void Crawler::stopDrive(Emakefun_DCMotor* drive)
@@ -132,6 +126,7 @@ void Crawler::turnRightBackward()
 
 void Crawler::setSpeed(int8_t speed)
 {
+	auto oldSpeed = _speed;
 	if (speed > 100)
 	{
 		_speed = 100;
@@ -145,7 +140,15 @@ void Crawler::setSpeed(int8_t speed)
 		_speed = speed;
 	}
 
+	if (oldSpeed == _speed)
+		return;
+
 	validateState();
+
+	if (_behaviour != nullptr)
+	{
+		_behaviour->onSpeedChanged(_speed, oldSpeed);
+	}
 }
 
 uint8_t Crawler::getSpeed()
@@ -155,7 +158,7 @@ uint8_t Crawler::getSpeed()
 
 bool Crawler::speedUp(int8_t delta = 5)
 {
-	uint8_t oldSpeed = _speed;
+	auto oldSpeed = _speed;
 	setSpeed(_speed + delta);
 
 	return oldSpeed != _speed;
@@ -163,7 +166,7 @@ bool Crawler::speedUp(int8_t delta = 5)
 
 bool Crawler::speedDown(int8_t delta = 5)
 {
-	uint8_t oldSpeed = _speed;
+	auto oldSpeed = _speed;
 	setSpeed(_speed - delta);
 
 	return oldSpeed != _speed;
@@ -171,7 +174,15 @@ bool Crawler::speedDown(int8_t delta = 5)
 
 void Crawler::setStatus(CrawlerStatus status)
 {
+	if (_status == status)
+		return;
+
 	_status = status;
+
+	if (_behaviour != nullptr)
+	{
+		_behaviour->onStatusChanged(status);
+	}
 }
 
 void Crawler::validateState()
@@ -232,7 +243,7 @@ uint8_t Crawler::getBattery()
 
 void Crawler::initIRRemote()
 {
-	_ir = (IRRemote*)_motorDriver.getSensor(E_IR);
+	_ir = (IRRemote*)_motorDriver->getSensor(E_IR);
 }
 
 IRKeyCode Crawler::getPressedIRKey()
@@ -242,22 +253,12 @@ IRKeyCode Crawler::getPressedIRKey()
 
 void Crawler::initSoundPlayer(Coroutine* soundCoroutine)
 {
-	_soundPlayer = new SoundPlayer((::Buzzer*)_motorDriver.getSensor(E_BUZZER), soundCoroutine);
+	_soundPlayer = new SoundPlayer((::Buzzer*)_motorDriver->getSensor(E_BUZZER), soundCoroutine);
 }
 
 void Crawler::playSound(Sound sound)
 {
 	_soundPlayer->play(sound);
-}
-
-void Crawler::repeatSound(Sound sound)
-{
-	_soundPlayer->repeat(sound);
-}
-
-void Crawler::stopSoundRepeating()
-{
-	_soundPlayer->stop();
 }
 
 void Crawler::mute()
@@ -275,31 +276,26 @@ bool Crawler::isMuted()
 	return _soundPlayer->isMuted();
 }
 
-void Crawler::initRgb()
+void Crawler::initLights(Coroutine* lightCoroutine)
 {
-	Rgb = (RGBLed*)_motorDriver.getSensor(E_RGB);
+	_lightController = new LightController((RGBLed*)_motorDriver->getSensor(E_RGB), lightCoroutine);
 }
 
-void Crawler::setRgbColor(E_RGB_INDEX index, long Color)
+void Crawler::showLightEffect(LightEffect effect)
 {
-	_sensors->setRgbColor(index, Color);
-}
-
-void Crawler::lightOff()
-{
-	_sensors->setRgbColor(E_RGB_ALL, RGB_BLACK);
+	_lightController->show(effect);
 }
 
 void Crawler::initUltrasonic()
 {
-	_motorDriver.getSensor(E_ULTRASONIC);
+	_motorDriver->getSensor(E_ULTRASONIC);
 }
 
 void Crawler::initServo()
 {
 	for (uint8_t i = 0; i < CRAWLER_SERVO_COUNT; i++)
 	{
-		_servos[i] = _motorDriver.getServo(i + 1);
+		_servos[i] = _motorDriver->getServo(i + 1);
 	}
 }
 
@@ -330,8 +326,12 @@ void Crawler::setServoAngle(CrawlerServoKind servoKind, byte angle)
 	_servos[servoIndex]->writeServo(servoAngle);
 }
 
-void Crawler::initNrf24L01(uint8_t* rxAddr)
+void Crawler::initBehaviour()
 {
-	Nrf24L01 = (Nrf24l*)_motorDriver.getSensor(E_NRF24L01);
-	Nrf24L01->setRADDR(rxAddr);
+	_behaviour = new CrawlerBehaviour(_soundPlayer, _lightController);
+}
+
+void Crawler::useBehaviour(CrawlerBehaviourKind behaviourKind)
+{
+	_behaviour->switchTo(behaviourKind, _status);
 }

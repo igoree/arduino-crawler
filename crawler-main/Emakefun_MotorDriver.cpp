@@ -264,26 +264,6 @@ Emakefun_Sensor::Emakefun_Sensor(void) {
 	IrPin = BuzzerPin = RgbPin = EchoPin = TrigPin = 0;
 }
 
-void Emakefun_Sensor::setRgbColor(E_RGB_INDEX index, long color)
-{
-	uint8_t red = (color & 0xff0000) >> 16;
-	uint8_t green = (color & 0xff00) >> 8;
-	uint8_t blue = color & 0xff;
-
-	if (index == E_RGB_ALL)
-	{
-		for (int8_t i = 0; i < mRgb->ledCount; i++)
-		{
-			mRgb->setColor(i, red, green, blue);
-		}
-	}
-	else
-	{
-		mRgb->setColor((uint8_t)index - 1, red, green, blue);
-	}
-	mRgb->show();
-}
-
 uint16_t Emakefun_Sensor::GetUltrasonicDistance(void)
 {
 	uint16_t FrontDistance;

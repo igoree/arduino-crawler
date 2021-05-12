@@ -5,7 +5,7 @@
 #include <Wire.h>
 #include <SPI.h>
 #include "Emakefun_MS_PWMServoDriver.h"
-#include "IRremote.h"
+#include "IRRemote.h"
 #include "Buzzer.h"
 #include "RGBLed.h"
 #include "nRF24L01.h"
@@ -55,13 +55,6 @@ typedef enum
 	E_SENSOR_MAX,
 } E_SENSOR_INDEX;
 
-typedef enum
-{
-	E_RGB_ALL = 0,
-	E_RGB_RIGHT = 1,
-	E_RGB_LEFT = 2
-} E_RGB_INDEX;
-
 typedef void (*FuncPtr)(void);
 
 class Emakefun_MotorDriver;
@@ -75,7 +68,6 @@ public:
 	Buzzer* mBuzzer;
 	RGBLed* mRgb;
 	Nrf24l* mNrf24L01;
-	void setRgbColor(E_RGB_INDEX index, long Color);
 	uint16_t GetUltrasonicDistance(void);
 	int  GetNrf24L01(char* RxaddrName);
 	void sendNrf24l01(char* TxaddrName, int SendNrfData);

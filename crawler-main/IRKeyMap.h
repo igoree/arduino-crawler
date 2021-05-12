@@ -1,6 +1,8 @@
 #ifndef _KEYMAY_H_
 #define _KEYMAY_H_
 
+#include "stdint.h"
+
 enum class IRKeyCode : uint8_t 
 {
 	Unknown = 0,

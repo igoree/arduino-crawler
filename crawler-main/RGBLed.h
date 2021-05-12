@@ -2,17 +2,6 @@
 #define RGBLed_h
 #include <Arduino.h>
 
-#define RGB_RED     0xFF0000
-#define RGB_GREEN   0x00FF00
-#define RGB_BLUE    0x0000FF
-#define RGB_YELLOW  0xFFFF00
-#define RGB_PURPLE  0xFF00FF
-#define RGB_ORANGE  0xFFA500
-#define RGB_INDIGO  0x4b0082
-#define RGB_VIOLET  0x8a2be2
-#define RGB_WHITE   0xFFFFFF
-#define RGB_BLACK   0
-
 struct RGBColor
 {
 	RGBColor()
@@ -42,7 +31,6 @@ public:
 	~RGBLed();
 
 	RGBColor getColor(uint8_t ledIndex);
-	bool setColor(uint8_t ledIndex, uint8_t red, uint8_t green, uint8_t blue);
 	bool setColor(uint8_t ledIndex, RGBColor color);
 	void show();
 

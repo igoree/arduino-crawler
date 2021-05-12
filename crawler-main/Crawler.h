@@ -1,10 +1,11 @@
 #ifndef _PANTHER_TANK_H_
 #define _PANTHER_TANK_H_
 
-#include "Emakefun_MotorDriver.h"
 #include "IRKeyMap.h"
+#include "IRRemote.h"
 #include "SoundPlayer.h"
 #include "LightController.h"
+#include "CrawlerBehaviour.h"
 
 #define CRAWLER_SERVO_COUNT 1
 
@@ -32,6 +33,11 @@ enum class CrawlerStatus : uint8_t
 	LowPower
 };
 
+class Emakefun_MotorDriver;
+class Emakefun_DCMotor;
+class Emakefun_Servo;
+class Emakefun_Sensor;
+
 class Crawler {
 private:
 	CrawlerStatus _status;
@@ -39,12 +45,14 @@ private:
 	uint8_t _batteryValue;
 	uint8_t _servoBaseAngle;
 	uint8_t _speed;
-	Emakefun_MotorDriver _motorDriver;
+	Emakefun_MotorDriver* _motorDriver;
 	Emakefun_DCMotor* _leftDrive, * _rightDrive;
 	Emakefun_Servo* _servos[CRAWLER_SERVO_COUNT];
 	Emakefun_Sensor* _sensors;
 	IRRemote* _ir;
 	SoundPlayer* _soundPlayer;
+	LightController* _lightController;
+	CrawlerBehaviour* _behaviour;
 
 	void stopDrive(Emakefun_DCMotor* drive);
 	void runDrive(Emakefun_DCMotor* drive, uint8_t speed, uint8_t direction);
@@ -53,9 +61,6 @@ private:
 	uint8_t getOppositeDriveRotationSpeed();
 
 public:
-	RGBLed* Rgb;
-	Nrf24l* Nrf24L01;
-
 	Crawler();
 	~Crawler();
 	void init();
@@ -80,15 +85,12 @@ public:
 
 	void initSoundPlayer(Coroutine* soundCoroutine);
 	void playSound(Sound sound);
-	void repeatSound(Sound sound);
-	void stopSoundRepeating();
 	void mute();
 	void unmute();
 	bool isMuted();
 
-	void initRgb();
-	void setRgbColor(E_RGB_INDEX index, long color);
-	void lightOff();
+	void initLights(Coroutine* lightCoroutine);
+	void showLightEffect(LightEffect effect);
 
 	void initUltrasonic();
 
@@ -96,7 +98,8 @@ public:
 	void setServoBaseAngle(uint8_t baseAngle);
 	void setServoAngle(CrawlerServoKind servoKind, uint8_t angle);
 
-	void initNrf24L01(uint8_t* rxAddr);
+	void initBehaviour();
+	void useBehaviour(CrawlerBehaviourKind behaviourKind);
 };
 
 #endif  /* _CRAWLER_H_ */
