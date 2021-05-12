@@ -137,13 +137,13 @@ struct SoundState
 };
 
 SoundPlayer::SoundPlayer(const Buzzer* buzzer, Coroutine* soundCoroutine)
-	: _soundCoroutine(soundCoroutine), _currentSoundState(new SoundState(buzzer))
+	: _coroutine(soundCoroutine), _state(new SoundState(buzzer))
 {
 }
 
 SoundPlayer::~SoundPlayer()
 {
-	delete _currentSoundState;
+	delete _state;
 }
 
 CoroutineTaskResult* playSeparatedNoteAsync(const CoroutineTaskContext* context)
@@ -779,14 +779,14 @@ void SoundPlayer::play(Sound sound)
 	if (soundFunc == nullptr)
 		return;
 
-	if (_currentSoundState->repeatedSoundFunc != nullptr) 
+	if (_state->repeatedSoundFunc != nullptr) 
 	{
-		_soundCoroutine->start(CoroutineTask(&repeatSoundAsync, _currentSoundState));
-		_soundCoroutine->switchTo(CoroutineTask(soundFunc, _currentSoundState));
+		_coroutine->start(CoroutineTask(&repeatSoundAsync, _state));
+		_coroutine->switchTo(CoroutineTask(soundFunc, _state));
 	}
 	else 
 	{
-		_soundCoroutine->start(CoroutineTask(soundFunc, _currentSoundState));
+		_coroutine->start(CoroutineTask(soundFunc, _state));
 	}
 }
 
@@ -796,19 +796,19 @@ void SoundPlayer::repeat(Sound sound)
 	if (soundFunc == nullptr)
 		return;
 
-	_currentSoundState->repeatedSoundFunc = soundFunc;
-	_soundCoroutine->start(CoroutineTask(&repeatSoundAsync, _currentSoundState));
+	_state->repeatedSoundFunc = soundFunc;
+	_coroutine->start(CoroutineTask(&repeatSoundAsync, _state));
 }
 
 void SoundPlayer::stop()
 {
-	_currentSoundState->repeatedSoundFunc = nullptr;
+	_state->repeatedSoundFunc = nullptr;
 }
 
 void SoundPlayer::mute()
 {
 	storage.setSoundEnabled(false);
-	_currentSoundState->buzzer->noTone();
+	_state->buzzer->noTone();
 
 	DEBUG_INFO("sound muted");
 }

@@ -40,16 +40,21 @@ struct LightState
 	}
 
 	RGBLed* const rgbLed;
-	AsyncFuncPointer repeatedLightFunc;
+	AsyncFuncPointer repeatedLightEffectFunc;
 	LedState leftLed;
 	LedState rightLed;
 	uint32_t duration;
 	uint32_t targetDuration;
 };
 
-LightController::LightController(RGBLed* rgbLed, Coroutine* coroutine)
-	: _coroutine(coroutine), _state(new LightState(rgbLed))
+LightController::LightController(RGBLed* rgbLed, Coroutine* lightCoroutine)
+	: _coroutine(lightCoroutine), _state(new LightState(rgbLed))
 {
+}
+
+LightController::~LightController() 
+{
+	delete _state;
 }
 
 void showLighs(LightState* state)
@@ -82,7 +87,7 @@ void performColorTransition(RGBColor &color, RGBColor &targetColor, uint32_t dur
 	color.blue = performColorTransition(color.blue, targetColor.blue, duration, totalDuration);
 }
 
-CoroutineTaskResult* showLightTransitionAsync(const CoroutineTaskContext* context)
+CoroutineTaskResult* showLightColorTransitionAsync(const CoroutineTaskContext* context)
 {
 	auto state = (LightState*)context->data;
 
@@ -114,14 +119,78 @@ CoroutineTaskResult* showLightTransitionAsync(const CoroutineTaskContext* contex
 	return context->delayThenRepeat(stepDuration);
 }
 
+void prepareColorTransition(LightState* state, RGBColor leftColor, RGBColor rightColor, uint32_t duration) 
+{
+	state->leftLed.color = state->rgbLed->getColor(LEFT_LED);
+	state->leftLed.targetColor = leftColor;
+
+	state->rightLed.color = state->rgbLed->getColor(RIGHT_LED);
+	state->rightLed.targetColor = rightColor;
+
+	state->duration = 0ul;
+	state->targetDuration = duration;
+}
+
+CoroutineTaskResult* showEffectAsync(const CoroutineTaskContext* context)
+{
+	auto state = (LightState*)context->data;
+
+	switch (context->step)
+	{
+	default:
+		return context->end();
+	}
+}
+
+CoroutineTaskResult* repeatLightEffectAsync(const CoroutineTaskContext* context)
+{
+	auto state = (LightState*)context->data;
+	if (state->repeatedLightEffectFunc == nullptr)
+		return context->end();
+
+	return context->executeThenRepeat(CoroutineTask(state->repeatedLightEffectFunc, state));
+}
+
+AsyncFuncPointer getLightEffectFunc(LightEffect effect)
+{
+	switch (effect)
+	{
+	default:
+		DEBUG_ERR("unsupported light effect %u", (uint8_t)effect);
+		return nullptr;
+	}
+}
+
 void LightController::show(LightEffect effect)
 {
+	auto lightEffectFunc = getLightEffectFunc(effect);
+	if (lightEffectFunc == nullptr)
+		return;
+
+	if (_state->repeatedLightEffectFunc != nullptr)
+	{
+		_coroutine->start(CoroutineTask(&repeatLightEffectAsync, _state));
+		_coroutine->switchTo(CoroutineTask(lightEffectFunc, _state));
+	}
+	else
+	{
+		_coroutine->start(CoroutineTask(lightEffectFunc, _state));
+	}
 }
 
 void LightController::repeat(LightEffect effect)
 {
+	auto lightEffectFunc = getLightEffectFunc(effect);
+	if (lightEffectFunc == nullptr)
+		return;
+
+	_state->repeatedLightEffectFunc = lightEffectFunc;
+	_coroutine->start(CoroutineTask(&repeatLightEffectAsync, _state));
 }
 
 void LightController::lightOff()
 {
+	_state->repeatedLightEffectFunc = nullptr;
+	prepareColorTransition(_state, RGB_BLACK, RGB_BLACK, 50);
+	_coroutine->start(CoroutineTask(&showLightColorTransitionAsync, _state));
 }

@@ -36,8 +36,8 @@ struct SoundState;
 class SoundPlayer 
 {
 private:
-	Coroutine* const _soundCoroutine;
-	SoundState* const _currentSoundState;
+	Coroutine* const _coroutine;
+	SoundState* const _state;
 public:
 	SoundPlayer(const Buzzer* buzzer, Coroutine* soundCoroutine);
 	~SoundPlayer();

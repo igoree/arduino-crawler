@@ -27,7 +27,7 @@ private:
 	Coroutine* const _coroutine;
 	LightState* const _state;
 public:
-	LightController(RGBLed* rgbLed, Coroutine* coroutine);
+	LightController(RGBLed* rgbLed, Coroutine* lightCoroutine);
 	~LightController();
 
 	void show(LightEffect effect);
