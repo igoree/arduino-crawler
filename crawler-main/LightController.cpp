@@ -169,17 +169,6 @@ void prepareColorTransition(LightState* state, RGBColor leftColor, RGBColor righ
 	state->targetDuration = duration;
 }
 
-CoroutineTaskResult* showEffectAsync(const CoroutineTaskContext* context)
-{
-	auto state = (LightState*)context->data;
-
-	switch (context->step)
-	{
-	default:
-		return context->end();
-	}
-}
-
 CoroutineTaskResult* showEffectFrontLightsAsync(const CoroutineTaskContext* context)
 {
 	auto state = (LightState*)context->data;
@@ -248,6 +237,33 @@ CoroutineTaskResult* showEffectRightTurnSignalAsync(const CoroutineTaskContext* 
 	}
 }
 
+CoroutineTaskResult* showEffectSpeedChangeAsync(const CoroutineTaskContext* context)
+{
+	auto state = (LightState*)context->data;
+
+	switch (context->step)
+	{
+	case 0:
+		prepareColorTransition(state, RGB_BLUE, RGB_BLUE, DEFAULT_TRANSITION_DURATION);
+		return context->executeThenNext(CoroutineTask(&showLightColorTransitionAsync, state));
+
+	case 1:
+		return context->delayThenNext(DEFAULT_TRANSITION_DURATION);
+
+	case 2:
+		if (state->repeatedLightEffectFunc != nullptr) 
+		{
+			return context->end();
+		}
+
+		prepareColorTransition(state, RGB_BLACK, RGB_BLACK, DEFAULT_TRANSITION_DURATION);
+		return context->executeThenNext(CoroutineTask(&showLightColorTransitionAsync, state));
+
+	default:
+		return context->end();
+	}
+}
+
 CoroutineTaskResult* repeatLightEffectAsync(const CoroutineTaskContext* context)
 {
 	auto state = (LightState*)context->data;
@@ -274,6 +290,9 @@ AsyncFuncPointer getLightEffectFunc(LightEffect effect)
 
 	case LightEffect::RightTurnSignal:
 		return &showEffectRightTurnSignalAsync;
+
+	case LightEffect::SpeedChange:
+		return &showEffectSpeedChangeAsync;
 
 	default:
 		DEBUG_ERR("unsupported light effect %u", (uint8_t)effect);
