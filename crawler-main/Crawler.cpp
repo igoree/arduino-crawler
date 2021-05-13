@@ -2,13 +2,13 @@
 #include "Emakefun_MotorDriver.h"
 
 #include "DebugLevels.h"
-#define DEBUG_LEVEL DEBUG_LEVEL_INFO
+//#define DEBUG_LEVEL DEBUG_LEVEL_INFO
 #include "DebugOutput.h"
 
 //MotorDriverBoard V4.0
 Crawler::Crawler()
 	: _status(CrawlerStatus::Stop), _batteryValue(0), _servoBaseAngle(90), _speed(0), _motorDriver(nullptr), _leftDrive(nullptr), _rightDrive(nullptr), 
-	  _sensors(nullptr), _ir(nullptr), _soundPlayer(nullptr), _lightController(nullptr), _behaviour(nullptr)
+	  _sensors(nullptr), _irRemoteHandler(nullptr), _soundPlayer(nullptr), _lightController(nullptr), _behaviour(nullptr)
 {
 	for (uint8_t i = 0; i < CRAWLER_SERVO_COUNT; i++)
 	{
@@ -21,7 +21,7 @@ Crawler::~Crawler()
 	delete _motorDriver;
 	delete _leftDrive;
 	delete _rightDrive;
-	delete _ir;
+	delete _irRemoteHandler;
 	delete _soundPlayer;
 	delete _lightController;
 	delete _behaviour;
@@ -241,14 +241,9 @@ uint8_t Crawler::getBattery()
 	return _batteryValue;
 }
 
-void Crawler::initIRRemote()
+void Crawler::initIRRemote(Coroutine* irRemoteCoroutine)
 {
-	_ir = (IRRemote*)_motorDriver->getSensor(E_IR);
-}
-
-IRKeyCode Crawler::getPressedIRKey()
-{
-	return (IRKeyCode)_ir->getCode();
+	_irRemoteHandler = new IRRemoteHandler((IRRemote*)_motorDriver->getSensor(E_IR), this, irRemoteCoroutine);
 }
 
 void Crawler::initSoundPlayer(Coroutine* soundCoroutine)

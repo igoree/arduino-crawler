@@ -5,6 +5,7 @@ const Storage storage;
 
 uint8_t EEMEM soundEnabled;
 uint8_t EEMEM crawlerBehaviourKind;
+uint8_t EEMEM irRemoteControlMode;
 
 void Storage::setSoundEnabled(bool enabled) const
 {
@@ -24,4 +25,14 @@ void Storage::setCrawlerBehaviourKind(uint8_t behaviourKind) const
 uint8_t Storage::getCrawlerBehaviourKind() const
 {
 	return eeprom_read_byte(&crawlerBehaviourKind);
+}
+
+void Storage::setIRRemoteControlMode(uint8_t mode) const
+{
+	eeprom_update_byte(&irRemoteControlMode, mode);
+}
+
+uint8_t Storage::getIRRemoteControlMode() const
+{
+	return eeprom_read_byte(&irRemoteControlMode);
 }

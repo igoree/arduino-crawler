@@ -66,6 +66,9 @@
     <ClInclude Include="LightController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IRRemoteHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Buzzer.cpp">
@@ -102,6 +105,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LightController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IRRemoteHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

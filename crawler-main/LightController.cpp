@@ -57,6 +57,7 @@ LightController::LightController(RGBLed* rgbLed, Coroutine* lightCoroutine)
 
 LightController::~LightController()
 {
+	_coroutine->stop();
 	delete _state;
 }
 
@@ -169,6 +170,36 @@ void prepareColorTransition(LightState* state, RGBColor leftColor, RGBColor righ
 	state->targetDuration = duration;
 }
 
+CoroutineTaskResult* showEffectCommandAsync(const CoroutineTaskContext* context)
+{
+	auto state = (LightState*)context->data;
+
+	switch (context->step)
+	{
+	case 0:
+		prepareColorTransition(state, RGB_BLUE, RGB_BLUE, 50);
+		return context->executeThenNext(CoroutineTask(&showLightColorTransitionAsync, state));
+
+	case 1:
+		prepareColorTransition(state, RGB_BLACK, RGB_BLACK, 50);
+		return context->executeThenNext(CoroutineTask(&showLightColorTransitionAsync, state));
+
+	case 2:
+		return context->delayThenNext(150);
+
+	case 3:
+		prepareColorTransition(state, RGB_BLUE, RGB_BLUE, 50);
+		return context->executeThenNext(CoroutineTask(&showLightColorTransitionAsync, state));
+
+	case 4:
+		prepareColorTransition(state, RGB_BLACK, RGB_BLACK, 50);
+		return context->executeThenNext(CoroutineTask(&showLightColorTransitionAsync, state));
+
+	default:
+		return context->end();
+	}
+}
+
 CoroutineTaskResult* showEffectFrontLightsAsync(const CoroutineTaskContext* context)
 {
 	auto state = (LightState*)context->data;
@@ -244,7 +275,7 @@ CoroutineTaskResult* showEffectSpeedChangeAsync(const CoroutineTaskContext* cont
 	switch (context->step)
 	{
 	case 0:
-		prepareColorTransition(state, RGB_BLUE, RGB_BLUE, DEFAULT_TRANSITION_DURATION);
+		prepareColorTransition(state, RGB_GREEN, RGB_GREEN, DEFAULT_TRANSITION_DURATION);
 		return context->executeThenNext(CoroutineTask(&showLightColorTransitionAsync, state));
 
 	case 1:
@@ -279,6 +310,9 @@ AsyncFuncPointer getLightEffectFunc(LightEffect effect)
 {
 	switch (effect)
 	{
+	case LightEffect::Command:
+		return &showEffectCommandAsync;
+
 	case LightEffect::FrontLights:
 		return &showEffectFrontLightsAsync;
 

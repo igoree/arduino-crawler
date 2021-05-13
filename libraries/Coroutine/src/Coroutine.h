@@ -32,6 +32,7 @@ public:
 
 	void start(CoroutineTask task);
 	void switchTo(CoroutineTask task);
+	void stop();
 
 	void continueExecution();
 };

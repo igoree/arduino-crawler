@@ -1,5 +1,3 @@
-// LightController.h
-
 #ifndef _LIGHTCONTROLLER_h
 #define _LIGHTCONTROLLER_h
 

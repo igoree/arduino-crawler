@@ -143,6 +143,7 @@ SoundPlayer::SoundPlayer(const Buzzer* buzzer, Coroutine* soundCoroutine)
 
 SoundPlayer::~SoundPlayer()
 {
+	_coroutine->stop();
 	delete _state;
 }
 
@@ -631,7 +632,7 @@ CoroutineTaskResult* playSoundCommandAsync(const CoroutineTaskContext* context)
 		return context->executeThenNext(CoroutineTask(&playSeparatedNoteAsync, state));
 
 	case 1:
-		return context->delayThenNext(110);
+		return context->delayThenNext(100);
 
 	case 2:
 		prepareSeparatedNote(state, NOTE_C6, 50, 100);

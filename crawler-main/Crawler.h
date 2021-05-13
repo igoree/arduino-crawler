@@ -1,8 +1,7 @@
 #ifndef _PANTHER_TANK_H_
 #define _PANTHER_TANK_H_
 
-#include "IRKeyMap.h"
-#include "IRRemote.h"
+#include "IRRemoteHandler.h"
 #include "SoundPlayer.h"
 #include "LightController.h"
 #include "CrawlerBehaviour.h"
@@ -49,10 +48,10 @@ private:
 	Emakefun_DCMotor* _leftDrive, * _rightDrive;
 	Emakefun_Servo* _servos[CRAWLER_SERVO_COUNT];
 	Emakefun_Sensor* _sensors;
-	IRRemote* _ir;
 	SoundPlayer* _soundPlayer;
 	LightController* _lightController;
 	CrawlerBehaviour* _behaviour;
+	IRRemoteHandler* _irRemoteHandler;
 
 	void stopDrive(Emakefun_DCMotor* drive);
 	void runDrive(Emakefun_DCMotor* drive, uint8_t speed, uint8_t direction);
@@ -80,8 +79,7 @@ public:
 	CrawlerStatus getStatus();
 	uint8_t getBattery();
 
-	void initIRRemote();
-	IRKeyCode getPressedIRKey();
+	void initIRRemote(Coroutine* irRemoteCoroutine);
 
 	void initSoundPlayer(Coroutine* soundCoroutine);
 	void playSound(Sound sound);

@@ -2,7 +2,7 @@
 #include "Arduino.h"
 
 #include "DebugLevels.h"
-#define DEBUG_LEVEL DEBUG_LEVEL_ERR
+//#define DEBUG_LEVEL DEBUG_LEVEL_ERR
 #include "DebugOutput.h"
 
 #define UNKNOWN_INDEX UINT8_C(255)
@@ -126,6 +126,13 @@ void Coroutine::switchTo(CoroutineTask task)
 	_stack[_currentTaskIndex] = CoroutineTaskState(task);
 
 	DEBUG_INFO("CR '%s' switch task to %u", _name, _currentTaskIndex);
+}
+
+void Coroutine::stop()
+{
+	_currentTaskIndex = UNKNOWN_INDEX;
+
+	DEBUG_INFO("CR '%s' stop", _name);
 }
 
 void Coroutine::continueExecution()
