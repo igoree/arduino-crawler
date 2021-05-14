@@ -5,6 +5,8 @@
 //#define DEBUG_LEVEL DEBUG_LEVEL_INFO
 #include "DebugOutput.h"
 
+#define MAX_OPPOSITE_DRIVE_ROTATION_SPEED 10
+
 //MotorDriverBoard V4.0
 Crawler::Crawler()
 	: _status(CrawlerStatus::Stop), _batteryValue(0), _servoBaseAngle(90), _speed(0), _motorDriver(nullptr), _leftDrive(nullptr), _rightDrive(nullptr), 
@@ -228,6 +230,11 @@ void Crawler::validateState()
 
 uint8_t Crawler::getOppositeDriveRotationSpeed()
 {
+	if (_speed > MAX_OPPOSITE_DRIVE_ROTATION_SPEED * 3)
+	{
+		return MAX_OPPOSITE_DRIVE_ROTATION_SPEED;
+	}
+
 	return _speed / 3;
 }
 
