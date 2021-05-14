@@ -1,15 +1,16 @@
 #ifndef RGBLed_h
 #define RGBLed_h
-#include <Arduino.h>
+
+#include "stdint.h"
 
 struct RGBColor
 {
-	RGBColor()
+	constexpr RGBColor()
 		: RGBColor(0u, 0u, 0u)
 	{
 	}
 
-	RGBColor(uint8_t red, uint8_t green, uint8_t blue)
+	constexpr RGBColor(uint8_t red, uint8_t green, uint8_t blue)
 		: green(green), red(red), blue(blue)
 	{
 	}

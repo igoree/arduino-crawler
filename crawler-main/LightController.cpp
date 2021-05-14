@@ -2,25 +2,27 @@
 #include "RGBLed.h"
 
 #include "DebugLevels.h"
-#define DEBUG_LEVEL DEBUG_LEVEL_INFO
+//#define DEBUG_LEVEL DEBUG_LEVEL_INFO
 #include "DebugOutput.h"
 
 #define LEFT_LED 0u
 #define RIGHT_LED 1u
 
-#define RGB_RED     RGBColor(0xFF, 0x00, 0x00)
-#define RGB_GREEN   RGBColor(0x00, 0xFF, 0x00)
-#define RGB_BLUE    RGBColor(0x00, 0x00, 0xFF)
-#define RGB_YELLOW  RGBColor(0xFF, 0xFF, 0x00)
-#define RGB_PURPLE  RGBColor(0xFF, 0x00, 0xFF)
-#define RGB_ORANGE  RGBColor(0xFF, 0xA5, 0x00)
-#define RGB_INDIGO  RGBColor(0x4B, 0x00, 0x82)
-#define RGB_VIOLET  RGBColor(0x8A, 0x2B, 0xE2)
-#define RGB_WHITE   RGBColor(0xFF, 0xFF, 0xFF)
-#define RGB_BLACK   RGBColor(0x00, 0x00, 0x00)
+#define RGB_RED       RGBColor(0xFF, 0x00, 0x00)
+#define RGB_GREEN     RGBColor(0x00, 0xFF, 0x00)
+#define RGB_BLUE      RGBColor(0x00, 0x00, 0xFF)
+#define RGB_SKY_BLUE  RGBColor(0x00, 0xBF, 0xFF)
+#define RGB_YELLOW    RGBColor(0xFF, 0xFF, 0x00)
+#define RGB_PURPLE    RGBColor(0xFF, 0x00, 0xFF)
+#define RGB_ORANGE    RGBColor(0xFF, 0xA5, 0x00)
+#define RGB_INDIGO    RGBColor(0x4B, 0x00, 0x82)
+#define RGB_VIOLET    RGBColor(0x8A, 0x2B, 0xE2)
+#define RGB_WHITE     RGBColor(0xFF, 0xFF, 0xFF)
+#define RGB_BLACK     RGBColor(0x00, 0x00, 0x00)
 
 #define LIGHT_TRANSITION_STEP_DURATION 10ul
 #define DEFAULT_TRANSITION_DURATION 100ul
+#define TURN_SIGNAL_TRANSITION_DURATION 250ul
 
 struct LedState
 {
@@ -178,26 +180,28 @@ CoroutineTaskResult* showEffectCommandAsync(const CoroutineTaskContext* context)
 	{
 	case 0:
 		prepareColorTransition(state, RGB_BLUE, RGB_BLUE, 50);
-		return context->executeThenNext(CoroutineTask(&showLightColorTransitionAsync, state));
+		break;
 
 	case 1:
 		prepareColorTransition(state, RGB_BLACK, RGB_BLACK, 50);
-		return context->executeThenNext(CoroutineTask(&showLightColorTransitionAsync, state));
+		break;
 
 	case 2:
 		return context->delayThenNext(150);
 
 	case 3:
 		prepareColorTransition(state, RGB_BLUE, RGB_BLUE, 50);
-		return context->executeThenNext(CoroutineTask(&showLightColorTransitionAsync, state));
+		break;
 
 	case 4:
 		prepareColorTransition(state, RGB_BLACK, RGB_BLACK, 50);
-		return context->executeThenNext(CoroutineTask(&showLightColorTransitionAsync, state));
+		break;
 
 	default:
 		return context->end();
 	}
+
+	return context->executeThenNext(CoroutineTask(&showLightColorTransitionAsync, state));
 }
 
 CoroutineTaskResult* showEffectFrontLightsAsync(const CoroutineTaskContext* context)
@@ -237,16 +241,18 @@ CoroutineTaskResult* showEffectLeftTurnSignalAsync(const CoroutineTaskContext* c
 	switch (context->step)
 	{
 	case 0:
-		prepareColorTransition(state, RGB_ORANGE, RGB_BLACK, 250);
-		return context->executeThenNext(CoroutineTask(&showLightColorTransitionAsync, state));
+		prepareColorTransition(state, RGB_ORANGE, RGB_BLACK, TURN_SIGNAL_TRANSITION_DURATION);
+		break;
 
 	case 1:
-		prepareColorTransition(state, RGB_BLACK, RGB_BLACK, 250);
-		return context->executeThenNext(CoroutineTask(&showLightColorTransitionAsync, state));
+		prepareColorTransition(state, RGB_BLACK, RGB_BLACK, TURN_SIGNAL_TRANSITION_DURATION);
+		break;
 
 	default:
 		return context->end();
 	}
+
+	return context->executeThenNext(CoroutineTask(&showLightColorTransitionAsync, state));
 }
 
 CoroutineTaskResult* showEffectRightTurnSignalAsync(const CoroutineTaskContext* context)
@@ -256,16 +262,18 @@ CoroutineTaskResult* showEffectRightTurnSignalAsync(const CoroutineTaskContext* 
 	switch (context->step)
 	{
 	case 0:
-		prepareColorTransition(state, RGB_BLACK, RGB_ORANGE, 250);
-		return context->executeThenNext(CoroutineTask(&showLightColorTransitionAsync, state));
+		prepareColorTransition(state, RGB_BLACK, RGB_ORANGE, TURN_SIGNAL_TRANSITION_DURATION);
+		break;
 
 	case 1:
-		prepareColorTransition(state, RGB_BLACK, RGB_BLACK, 250);
-		return context->executeThenNext(CoroutineTask(&showLightColorTransitionAsync, state));
+		prepareColorTransition(state, RGB_BLACK, RGB_BLACK, TURN_SIGNAL_TRANSITION_DURATION);
+		break;
 
 	default:
 		return context->end();
 	}
+
+	return context->executeThenNext(CoroutineTask(&showLightColorTransitionAsync, state));
 }
 
 CoroutineTaskResult* showEffectSpeedChangeAsync(const CoroutineTaskContext* context)
@@ -293,6 +301,54 @@ CoroutineTaskResult* showEffectSpeedChangeAsync(const CoroutineTaskContext* cont
 	default:
 		return context->end();
 	}
+}
+
+CoroutineTaskResult* showEffectTurnOnAsync(const CoroutineTaskContext* context)
+{
+	const static RGBColor PROGMEM colors[] = { RGB_RED, RGB_ORANGE, RGB_YELLOW, RGB_GREEN, RGB_SKY_BLUE, RGB_BLUE, RGB_VIOLET, RGB_BLACK };
+
+	auto state = (LightState*)context->data;
+	auto colorCount = sizeof(colors) / sizeof(colors[0]);
+
+	if (context->step >= colorCount)
+	{
+		return context->end();
+	}
+
+	RGBColor currentColor;
+	memcpy_P(&currentColor, &colors[context->step], sizeof(currentColor));
+	prepareColorTransition(state, currentColor, currentColor, 80);
+
+	return context->executeThenNext(CoroutineTask(&showLightColorTransitionAsync, state));
+}
+
+CoroutineTaskResult* showEffectPoliceAsync(const CoroutineTaskContext* context)
+{
+	auto state = (LightState*)context->data;
+
+	switch (context->step)
+	{
+	case 0:
+		prepareColorTransition(state, RGB_RED, RGB_BLACK, 160);
+		break;
+
+	case 1:
+		prepareColorTransition(state, RGB_BLACK, RGB_BLACK, 160);
+		break;
+
+	case 2:
+		prepareColorTransition(state, RGB_BLACK, RGB_BLUE, 160);
+		break;
+
+	case 3:
+		prepareColorTransition(state, RGB_BLACK, RGB_BLACK, 160);
+		break;
+
+	default:
+		return context->end();
+	}
+
+	return context->executeThenNext(CoroutineTask(&showLightColorTransitionAsync, state));
 }
 
 CoroutineTaskResult* repeatLightEffectAsync(const CoroutineTaskContext* context)
@@ -327,6 +383,12 @@ AsyncFuncPointer getLightEffectFunc(LightEffect effect)
 
 	case LightEffect::SpeedChange:
 		return &showEffectSpeedChangeAsync;
+
+	case LightEffect::TurnOn:
+		return &showEffectTurnOnAsync;
+
+	case LightEffect::Police:
+		return &showEffectPoliceAsync;
 
 	default:
 		DEBUG_ERR("unsupported light effect %u", (uint8_t)effect);

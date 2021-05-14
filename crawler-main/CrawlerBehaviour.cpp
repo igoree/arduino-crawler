@@ -3,12 +3,13 @@
 #include "Storage.h"
 
 #include "DebugLevels.h"
-#define DEBUG_LEVEL DEBUG_LEVEL_INFO
+//#define DEBUG_LEVEL DEBUG_LEVEL_INFO
 #include "DebugOutput.h"
 
 void CrawlerBehaviourStrategy::init(SoundPlayer* soundPlayer, LightController* lightController, CrawlerStatus status)
 {
 	onStatusChanged(soundPlayer, lightController, status);
+	soundPlayer->stop();
 }
 
 void CrawlerBehaviourStrategy::onStatusChanged(SoundPlayer* soundPlayer, LightController* lightController, CrawlerStatus status)
@@ -60,8 +61,10 @@ void CrawlerBehaviourStrategy::onSpeedChanged(SoundPlayer* soundPlayer, LightCon
 	lightController->show(LightEffect::SpeedChange, newSpeed);
 }
 
-void PoliceCrawlerBehaviourStrategy::init(SoundPlayer* soundPlayer, LightController* lightController)
+void PoliceCrawlerBehaviourStrategy::init(SoundPlayer* soundPlayer, LightController* lightController, CrawlerStatus status)
 {
+	DEBUG_INFO("police init");
+
 	soundPlayer->repeat(Sound::Police);
 	lightController->repeat(LightEffect::Police);
 }

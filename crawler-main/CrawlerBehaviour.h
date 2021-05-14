@@ -27,8 +27,8 @@ class DefaultCrawlerBehaviourStrategy : public CrawlerBehaviourStrategy
 class PoliceCrawlerBehaviourStrategy : public CrawlerBehaviourStrategy
 {
 public:
-	void init(SoundPlayer* soundPlayer, LightController* lightController);
-	void onStatusChanged(SoundPlayer* soundPlayer, LightController* lightController, CrawlerStatus status);
+	void init(SoundPlayer* soundPlayer, LightController* lightController, CrawlerStatus status) override;
+	void onStatusChanged(SoundPlayer* soundPlayer, LightController* lightController, CrawlerStatus status) override;
 };
 
 class CrawlerBehaviour

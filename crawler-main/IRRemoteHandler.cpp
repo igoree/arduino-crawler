@@ -108,6 +108,18 @@ void handleIRCommand(IRKeyCode irKeyCode, CrawlerIRControlMode controlMode, IRRe
 		state->crawler->showLightEffect(LightEffect::Command);
 		break;
 
+	case IRKeyCode::Button4:
+		state->crawler->useBehaviour(CrawlerBehaviourKind::Default);
+		state->crawler->playSound(Sound::Command);
+		state->crawler->showLightEffect(LightEffect::Command);
+		break;
+
+	case IRKeyCode::Button5:
+		state->crawler->useBehaviour(CrawlerBehaviourKind::Police);
+		state->crawler->playSound(Sound::Command);
+		state->crawler->showLightEffect(LightEffect::Command);
+		break;
+
 	case IRKeyCode::Button3:
 		if (state->crawler->isMuted())
 		{
