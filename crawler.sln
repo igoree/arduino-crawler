@@ -18,9 +18,15 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DebugOutput", "libraries\De
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "crawler-motion-control", "crawler-motion-control\crawler-motion-control.vcxproj", "{F6E01291-7707-4EB4-9F5C-81C9C014B7C8}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MPU6050", "libraries\MPU6050\MPU6050.vcxitems", "{8D17F019-0CDA-48FC-8EB5-656D7C858ADE}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "I2C", "libraries\I2C\I2C.vcxitems", "{15C4784D-4AD8-445D-B136-7118EB456CFF}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		libraries\I2C\I2C.vcxitems*{15c4784d-4ad8-445d-b136-7118eb456cff}*SharedItemsImports = 9
 		libraries\NewTone\NewTone.vcxitems*{6e5df84b-adca-4392-961f-377d57182d48}*SharedItemsImports = 9
+		libraries\MPU6050\MPU6050.vcxitems*{8d17f019-0cda-48fc-8eb5-656d7c858ade}*SharedItemsImports = 9
 		libraries\DebugOutput\DebugOutput.vcxitems*{af7ac736-6911-4df0-9608-789017658eb3}*SharedItemsImports = 9
 		libraries\Coroutine\Coroutine.vcxitems*{bac2f087-b0a5-4237-9fc4-a2fd264b24e6}*SharedItemsImports = 9
 		libraries\Coroutine\Coroutine.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
@@ -28,6 +34,8 @@ Global
 		libraries\NewTone\NewTone.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		libraries\Coroutine\Coroutine.vcxitems*{f6e01291-7707-4eb4-9f5c-81c9c014b7c8}*SharedItemsImports = 4
 		libraries\DebugOutput\DebugOutput.vcxitems*{f6e01291-7707-4eb4-9f5c-81c9c014b7c8}*SharedItemsImports = 4
+		libraries\I2C\I2C.vcxitems*{f6e01291-7707-4eb4-9f5c-81c9c014b7c8}*SharedItemsImports = 4
+		libraries\MPU6050\MPU6050.vcxitems*{f6e01291-7707-4eb4-9f5c-81c9c014b7c8}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
