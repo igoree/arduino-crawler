@@ -16,6 +16,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Coroutine", "libraries\Coro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DebugOutput", "libraries\DebugOutput\DebugOutput.vcxitems", "{AF7AC736-6911-4DF0-9608-789017658EB3}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "crawler-motion-control", "crawler-motion-control\crawler-motion-control.vcxproj", "{F6E01291-7707-4EB4-9F5C-81C9C014B7C8}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		libraries\NewTone\NewTone.vcxitems*{6e5df84b-adca-4392-961f-377d57182d48}*SharedItemsImports = 9
@@ -24,6 +26,8 @@ Global
 		libraries\Coroutine\Coroutine.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		libraries\DebugOutput\DebugOutput.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		libraries\NewTone\NewTone.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		libraries\Coroutine\Coroutine.vcxitems*{f6e01291-7707-4eb4-9f5c-81c9c014b7c8}*SharedItemsImports = 4
+		libraries\DebugOutput\DebugOutput.vcxitems*{f6e01291-7707-4eb4-9f5c-81c9c014b7c8}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -34,6 +38,10 @@ Global
 		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Debug|x86.Build.0 = Debug|Win32
 		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|x86.ActiveCfg = Release|Win32
 		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|x86.Build.0 = Release|Win32
+		{F6E01291-7707-4EB4-9F5C-81C9C014B7C8}.Debug|x86.ActiveCfg = Debug|Win32
+		{F6E01291-7707-4EB4-9F5C-81C9C014B7C8}.Debug|x86.Build.0 = Debug|Win32
+		{F6E01291-7707-4EB4-9F5C-81C9C014B7C8}.Release|x86.ActiveCfg = Release|Win32
+		{F6E01291-7707-4EB4-9F5C-81C9C014B7C8}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

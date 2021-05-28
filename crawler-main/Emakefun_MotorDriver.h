@@ -8,8 +8,6 @@
 #include "IRRemote.h"
 #include "Buzzer.h"
 #include "RGBLed.h"
-#include "nRF24L01.h"
-//#define MOTORDEBUG
 
 #define MOTOR_DRIVER_BOARD_V3 3
 #define MOTOR_DRIVER_BOARD_V4 4
@@ -49,7 +47,7 @@ typedef enum
 	E_IR = 1,
 	E_BUZZER = 2,
 	// E_PS2X = 3,
-	E_NRF24L01 = 4,
+	// E_NRF24L01 = 4,
 	E_ULTRASONIC = 5,
 	E_EXTERN_PIN = 6,
 	E_SENSOR_MAX,
@@ -67,10 +65,7 @@ public:
 	IRRemote* mIrRecv;
 	Buzzer* mBuzzer;
 	RGBLed* mRgb;
-	Nrf24l* mNrf24L01;
 	uint16_t GetUltrasonicDistance(void);
-	int  GetNrf24L01(char* RxaddrName);
-	void sendNrf24l01(char* TxaddrName, int SendNrfData);
 private:
 	uint8_t IrPin;      // Infrared remoter pin
 	uint8_t BuzzerPin;  // Buzzer pin

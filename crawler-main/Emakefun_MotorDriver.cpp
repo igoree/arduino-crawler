@@ -260,7 +260,6 @@ Emakefun_Sensor::Emakefun_Sensor(void) {
 	mIrRecv = NULL;
 	mBuzzer = NULL;
 	mRgb = NULL;
-	mNrf24L01 = NULL;
 	IrPin = BuzzerPin = RgbPin = EchoPin = TrigPin = 0;
 }
 
@@ -274,29 +273,6 @@ uint16_t Emakefun_Sensor::GetUltrasonicDistance(void)
 	digitalWrite(TrigPin, LOW);
 	FrontDistance = pulseIn(EchoPin, HIGH) / 58.00;
 	return FrontDistance;
-}
-
-int Emakefun_Sensor::GetNrf24L01(char* RxaddrName) {
-	mNrf24L01->setRADDR((byte*)RxaddrName);
-	delay(10);
-	if (mNrf24L01->dataReady()) {
-		mNrf24L01->getData((byte*)&GetNrfData);
-		return GetNrfData;
-	}
-	else {
-		return NULL;
-	}
-}
-
-void Emakefun_Sensor::sendNrf24l01(char* TxaddrName, int SendNrfData) {
-	mNrf24L01->setTADDR((byte*)TxaddrName);
-	mNrf24L01->send((byte*)&SendNrfData);
-	while (mNrf24L01->isSending()) delay(1);        //Until you send successfully, exit the loop
-#ifdef MOTORDEBUG
-	Serial.print("Send success:");
-	Serial.println(SendNrfData);
-#endif
-	delay(1000);
 }
 
 void* Emakefun_MotorDriver::getSensor(E_SENSOR_INDEX n)
@@ -326,18 +302,6 @@ void* Emakefun_MotorDriver::getSensor(E_SENSOR_INDEX n)
 			sensors.mBuzzer = new Buzzer(sensors.BuzzerPin);
 		}
 		return sensors.mBuzzer;
-	}
-	if (n == E_NRF24L01) {
-		if (sensors.mNrf24L01 == NULL) {
-			sensors.mNrf24L01 = new Nrf24l(NRF24L01_CE, NRF24L01_CSN);
-			sensors.mNrf24L01->init();
-			sensors.mNrf24L01->setRADDR((byte*)"MotorDriver");
-			sensors.mNrf24L01->payload = 12;
-			sensors.mNrf24L01->channel = 90;             //Set the used channel
-			sensors.mNrf24L01->config();
-		}
-		// Serial.println("Got E_NRF24L01");
-		return sensors.mNrf24L01;
 	}
 	if (n == E_ULTRASONIC) {
 		// Serial.println("E_ULTRASONIC");
