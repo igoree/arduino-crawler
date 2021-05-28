@@ -19,6 +19,8 @@
   </ItemGroup>
   <ItemGroup>
     <!-- <ClInclude Include="$(MSBuildThisFileDirectory)MPU6050.h" /> -->
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\helper_3dmath.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\MPU6050_6Axis_MotionApps_V6_12.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\MPU6050.cpp" />
