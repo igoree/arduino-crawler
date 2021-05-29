@@ -119,7 +119,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="OrientationSensor.h" />
     <ClInclude Include="__vm\.crawler-motion-control.vsarduino.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="OrientationSensor.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
