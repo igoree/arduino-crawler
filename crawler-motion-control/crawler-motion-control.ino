@@ -8,7 +8,9 @@
 
 Coroutine _freeMemoryCoroutine("freeMemory");
 Coroutine _orientationCoroutine("orientation");
+#if DEBUG_LEVEL <= DEBUG_LEVEL_INFO
 Coroutine _orientationDebugCoroutine("orientationDebug");
+#endif
 
 int _lastFreeMemory(0);
 OrientationSensor orientationSensor(&_orientationCoroutine);
@@ -53,6 +55,8 @@ void loop()
 {
 	_freeMemoryCoroutine.continueExecution();
 	_orientationCoroutine.continueExecution();
+#if DEBUG_LEVEL <= DEBUG_LEVEL_INFO
 	_orientationDebugCoroutine.continueExecution();
+#endif
 }
 
