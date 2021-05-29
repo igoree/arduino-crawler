@@ -1,5 +1,6 @@
 #include "OrientationSensor.h"
 #include "MPU6050_6Axis_MotionApps_V6_12.h"
+#include "Storage.h"
 
 #include "DebugLevels.h"
 #define DEBUG_LEVEL DEBUG_LEVEL_INFO
@@ -71,7 +72,40 @@ void OrientationSensor::initialize()
 	_state->_mpu->setDMPEnabled(true);
 	_state->_buffer = new uint8_t[_state->_mpu->dmpGetFIFOPacketSize()];
 
+	auto calibrationSettings = storage.getMPUCalibrationSettings();
+
+	_state->_mpu->setXAccelOffset(calibrationSettings.accelOffsetX);
+	_state->_mpu->setYAccelOffset(calibrationSettings.accelOffsetY);
+	_state->_mpu->setZAccelOffset(calibrationSettings.accelOffsetZ);
+
+	_state->_mpu->setXGyroOffset(calibrationSettings.gyroOffsetX);
+	_state->_mpu->setYGyroOffset(calibrationSettings.gyroOffsetY);
+	_state->_mpu->setZGyroOffset(calibrationSettings.gyroOffsetZ);
+
+	DEBUG_INFO("MPU set calibration: accel %d,%d,%d gyro %d,%d,%d", calibrationSettings.accelOffsetX, calibrationSettings.accelOffsetY, calibrationSettings.accelOffsetZ, calibrationSettings.gyroOffsetX, calibrationSettings.gyroOffsetY, calibrationSettings.gyroOffsetZ);
+
 	_coroutine->start(CoroutineTask(&calculateOrientationAsync, _state));
+}
+
+void OrientationSensor::calibrate()
+{
+	DEBUG_INFO("start MPU calibration");
+
+	_state->_mpu->CalibrateAccel();
+	_state->_mpu->CalibrateGyro();
+
+	MPUCalibrationSettings calibrationSettings;
+	calibrationSettings.accelOffsetX = _state->_mpu->getXAccelOffset();
+	calibrationSettings.accelOffsetY = _state->_mpu->getYAccelOffset();
+	calibrationSettings.accelOffsetZ = _state->_mpu->getZAccelOffset();
+
+	calibrationSettings.gyroOffsetX = _state->_mpu->getXGyroOffset();
+	calibrationSettings.gyroOffsetY = _state->_mpu->getYGyroOffset();
+	calibrationSettings.gyroOffsetZ = _state->_mpu->getZGyroOffset();
+
+	storage.setMPUCalibrationSettings(calibrationSettings);
+
+	DEBUG_INFO("MPU calibrated: accel %d,%d,%d gyro %d,%d,%d", calibrationSettings.accelOffsetX, calibrationSettings.accelOffsetY, calibrationSettings.accelOffsetZ, calibrationSettings.gyroOffsetX, calibrationSettings.gyroOffsetY, calibrationSettings.gyroOffsetZ);
 }
 
 Orientation OrientationSensor::getOrientation()

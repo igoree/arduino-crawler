@@ -1,4 +1,5 @@
-﻿#include "OrientationSensor.h"
+﻿#include "Storage.h"
+#include "OrientationSensor.h"
 #include "Coroutine.h"
 
 #include "DebugLevels.h"
@@ -17,6 +18,7 @@ void setup()
 	INIT_DEBUG();
 
 	orientationSensor.initialize();
+	//orientationSensor.calibrate();
 
 	DEBUG_INFO("init ok");
 

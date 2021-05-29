@@ -25,6 +25,7 @@ public:
 	~OrientationSensor();
 
 	void initialize();
+	void calibrate();
 	Orientation getOrientation();
 };
 
