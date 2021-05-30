@@ -1,5 +1,4 @@
 #include "Coroutine.h"
-#include "ProtocolParser.h"
 #include "Crawler.h"
 
 #include "DebugLevels.h"
@@ -11,7 +10,6 @@ Coroutine _irRemoteCoroutine("IRRemote");
 Coroutine _lightCoroutine("speedLight", 3);
 Coroutine _soundCoroutine("sound", 4);
 
-ProtocolParser _protocol(&Serial);
 Crawler _crawler;
 
 int _lastFreeMemory(0);
@@ -25,8 +23,8 @@ void setup()
 	_crawler.initSoundPlayer(&_soundCoroutine);
 	_crawler.initIRRemote(&_irRemoteCoroutine);
 	_crawler.setSpeed(50);
-	_crawler.setServoBaseAngle(90);
-	_crawler.setServoAngle(CrawlerServoKind::Ultrasonic, 90);
+	_crawler.setServoBaseAngle(88);
+	_crawler.setServoAngle(CrawlerServoKind::Ultrasonic, 88);
 	_crawler.initUltrasonic();
 	_crawler.initBehaviour();
 
