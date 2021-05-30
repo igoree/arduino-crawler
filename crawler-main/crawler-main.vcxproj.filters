@@ -60,6 +60,12 @@
     <ClInclude Include="IRRemoteHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ServoMotor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ObstacleSensor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Buzzer.cpp">
@@ -93,6 +99,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="IRRemoteHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ServoMotor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ObstacleSensor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

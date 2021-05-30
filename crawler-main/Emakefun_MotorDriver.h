@@ -61,6 +61,7 @@ class Emakefun_Sensor
 {
 public:
 	Emakefun_Sensor(void);
+	~Emakefun_Sensor();
 	friend class Emakefun_MotorDriver;
 	IRRemote* mIrRecv;
 	Buzzer* mBuzzer;

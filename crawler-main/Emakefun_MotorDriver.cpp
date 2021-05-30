@@ -172,20 +172,14 @@ Emakefun_Servo::Emakefun_Servo(void) {
 	currentAngle = 0;
 }
 
+constexpr auto SERVO_PULSE_LENGTH = 1000000.0 / 50.0 / 4096.0; // 1,000,000 us per second / 50 Hz / 12 bits of resolution
+
 void Emakefun_Servo::setServoPulse(double pulse) {
-	double pulselength;
-	pulselength = 1000000;   // 1,000,000 us per second
-	pulselength /= 50;   // 50 Hz
-	pulselength /= 4096;  // 12 bits of resolution
-	pulse *= 1000;
-	pulse /= pulselength;
-	MC->setPWM(PWMpin, pulse);
+	MC->setPWM(PWMpin, pulse * 1000 / SERVO_PULSE_LENGTH);
 }
 
 void Emakefun_Servo::writeServo(uint8_t angle) {
-	double pulse;
-	pulse = 0.5 + angle / 90.0;
-	setServoPulse(pulse);
+	setServoPulse(0.5 + angle / 90.0);
 	currentAngle = angle;
 }
 
@@ -261,6 +255,13 @@ Emakefun_Sensor::Emakefun_Sensor(void) {
 	mBuzzer = NULL;
 	mRgb = NULL;
 	IrPin = BuzzerPin = RgbPin = EchoPin = TrigPin = 0;
+}
+
+Emakefun_Sensor::~Emakefun_Sensor()
+{
+	delete mIrRecv;
+	delete mBuzzer;
+	delete mRgb;
 }
 
 uint16_t Emakefun_Sensor::GetUltrasonicDistance(void)

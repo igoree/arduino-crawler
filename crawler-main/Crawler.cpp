@@ -5,33 +5,22 @@
 //#define DEBUG_LEVEL DEBUG_LEVEL_INFO
 #include "DebugOutput.h"
 
-#define MAX_OPPOSITE_DRIVE_ROTATION_SPEED 10
+#define MAX_OPPOSITE_DRIVE_ROTATION_SPEED UINT8_C(10)
 
-//MotorDriverBoard V4.0
 Crawler::Crawler()
 	: _status(CrawlerStatus::Stop), _batteryValue(0), _servoBaseAngle(90), _speed(0), _motorDriver(nullptr), _leftDrive(nullptr), _rightDrive(nullptr), 
-	  _sensors(nullptr), _irRemoteHandler(nullptr), _soundPlayer(nullptr), _lightController(nullptr), _behaviour(nullptr)
+	  _sensors(nullptr), _irRemoteHandler(nullptr), _soundPlayer(nullptr), _lightController(nullptr), _behaviour(nullptr), _obstacleSensor(nullptr)
 {
-	for (uint8_t i = 0; i < CRAWLER_SERVO_COUNT; i++)
-	{
-		_servos[i] = NULL;
-	}
 }
 
 Crawler::~Crawler()
 {
 	delete _motorDriver;
-	delete _leftDrive;
-	delete _rightDrive;
 	delete _irRemoteHandler;
 	delete _soundPlayer;
 	delete _lightController;
 	delete _behaviour;
-
-	for (uint8_t i = 0; i < CRAWLER_SERVO_COUNT; i++)
-	{
-		delete _servos[i];
-	}
+	delete _obstacleSensor;
 }
 
 void Crawler::init()
@@ -248,6 +237,17 @@ uint8_t Crawler::getBattery()
 	return _batteryValue;
 }
 
+void Crawler::initObstacleSensor()
+{
+	_motorDriver->getSensor(E_ULTRASONIC);
+	_obstacleSensor = new ObstacleSensor(_sensors, _motorDriver->getServo(1));
+}
+
+uint16_t Crawler::getObstacleDistance()
+{
+	return _obstacleSensor->getDistance();
+}
+
 void Crawler::initIRRemote(Coroutine* irRemoteCoroutine)
 {
 	_irRemoteHandler = new IRRemoteHandler((IRRemote*)_motorDriver->getSensor(E_IR), this, irRemoteCoroutine);
@@ -286,46 +286,6 @@ void Crawler::initLights(Coroutine* lightCoroutine)
 void Crawler::showLightEffect(LightEffect effect)
 {
 	_lightController->show(effect);
-}
-
-void Crawler::initUltrasonic()
-{
-	_motorDriver->getSensor(E_ULTRASONIC);
-}
-
-void Crawler::initServo()
-{
-	for (uint8_t i = 0; i < CRAWLER_SERVO_COUNT; i++)
-	{
-		_servos[i] = _motorDriver->getServo(i + 1);
-	}
-}
-
-void Crawler::setServoBaseAngle(uint8_t baseAngle)
-{
-	_servoBaseAngle = baseAngle;
-}
-
-void Crawler::setServoAngle(CrawlerServoKind servoKind, byte angle)
-{
-	int servoAngle;
-	if (angle > 360)
-	{
-		return;
-	}
-
-	if (angle == 90 || angle == 270)
-	{
-		servoAngle = _servoBaseAngle;
-	}
-	else if (angle >= 0 && angle <= 180)
-	{
-		servoAngle = _servoBaseAngle - 90 + angle;   // 180-degree-diff
-	}
-
-	uint8_t servoIndex = ((uint8_t)servoKind - 1);
-
-	_servos[servoIndex]->writeServo(servoAngle);
 }
 
 void Crawler::initBehaviour()

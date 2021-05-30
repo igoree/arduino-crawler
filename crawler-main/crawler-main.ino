@@ -1,3 +1,4 @@
+#include "ObstacleSensor.h"
 #include "Coroutine.h"
 #include "Crawler.h"
 
@@ -5,7 +6,9 @@
 #define DEBUG_LEVEL DEBUG_LEVEL_INFO
 #include "DebugOutput.h"
 
+#if DEBUG_LEVEL <= DEBUG_LEVEL_INFO
 Coroutine _freeMemoryCoroutine("freeMemory");
+#endif
 Coroutine _irRemoteCoroutine("IRRemote");
 Coroutine _lightCoroutine("speedLight", 3);
 Coroutine _soundCoroutine("sound", 4);
@@ -18,14 +21,12 @@ void setup()
 {
 	INIT_DEBUG();
 	_crawler.init();
-	_crawler.initServo();
+	_crawler.setSpeed(50);
+
+	_crawler.initObstacleSensor();
 	_crawler.initLights(&_lightCoroutine);
 	_crawler.initSoundPlayer(&_soundCoroutine);
 	_crawler.initIRRemote(&_irRemoteCoroutine);
-	_crawler.setSpeed(50);
-	_crawler.setServoBaseAngle(88);
-	_crawler.setServoAngle(CrawlerServoKind::Ultrasonic, 88);
-	_crawler.initUltrasonic();
 	_crawler.initBehaviour();
 
 	DEBUG_INFO("init ok");
@@ -48,19 +49,18 @@ CoroutineTaskResult* monitorFreeMemoryAsync(const CoroutineTaskContext* context)
 		_lastFreeMemory = freeMemory;
 	}
 
+	DEBUG_INFO("distance: %u", _crawler.getObstacleDistance());
+
 	return context->delayThenRepeat(500);
 }
 
 void loop()
 {
-	_freeMemoryCoroutine.continueExecution();
 	_irRemoteCoroutine.continueExecution();
 	_lightCoroutine.continueExecution();
 	_soundCoroutine.continueExecution();
 
-	/*_protocol.RecevData();
-	if (recv_flag = _protocol.ParserPackage()) {
-		if (_protocol->GetRobotControlFun() == E_CONTROL_MODE) {
-		}
-	}*/
+#if DEBUG_LEVEL <= DEBUG_LEVEL_INFO
+	_freeMemoryCoroutine.continueExecution();
+#endif
 }
