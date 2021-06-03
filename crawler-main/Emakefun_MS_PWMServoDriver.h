@@ -1,5 +1,4 @@
-#ifndef _Emakefun_MS_PWMServoDriver_H
-#define _Emakefun_MS_PWMServoDriver_H
+#pragma once
 
 #if ARDUINO >= 100
  #include "Arduino.h"
@@ -39,5 +38,3 @@ class Emakefun_MS_PWMServoDriver {
   uint8_t read8(uint8_t addr);
   void write8(uint8_t addr, uint8_t d);
 };
-
-#endif

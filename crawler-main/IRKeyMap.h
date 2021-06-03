@@ -1,5 +1,4 @@
-#ifndef _KEYMAY_H_
-#define _KEYMAY_H_
+#pragma once
 
 #include "stdint.h"
 
@@ -24,5 +23,3 @@ enum class IRKeyCode : uint8_t
 	Left = 0x08,
 	Right = 0x5A
 };
-
-#endif  /* _KEYMAY_H_ */

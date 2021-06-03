@@ -1,5 +1,4 @@
-#ifndef _OBSTACLESENSOR_h
-#define _OBSTACLESENSOR_h
+#pragma once
 
 #include "stdint.h"
 
@@ -18,6 +17,3 @@ public:
 
 	uint16_t getDistance();
 };
-
-#endif
-

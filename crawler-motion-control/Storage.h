@@ -1,5 +1,4 @@
-#ifndef _STORAGE_h
-#define _STORAGE_h
+#pragma once
 
 #include "stdint.h"
 
@@ -22,6 +21,3 @@ public:
 };
 
 extern const Storage storage;
-
-#endif
-

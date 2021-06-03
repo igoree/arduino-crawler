@@ -1,5 +1,4 @@
-#ifndef _CRAWLERBEHAVIUOR_h
-#define _CRAWLERBEHAVIUOR_h
+#pragma once
 
 #include "SoundPlayer.h"
 #include "LightController.h"
@@ -50,5 +49,3 @@ public:
 	void onStatusChanged(CrawlerStatus status);
 	void onSpeedChanged(uint8_t newSpeed, uint8_t oldSpeed);
 };
-
-#endif

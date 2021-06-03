@@ -1,5 +1,4 @@
-#ifndef _ORIENTATIONSENSOR_h
-#define _ORIENTATIONSENSOR_h
+#pragma once
 
 #include "stdint.h"
 #include "Coroutine.h"
@@ -28,6 +27,3 @@ public:
 	void calibrate();
 	Orientation getOrientation();
 };
-
-#endif
-

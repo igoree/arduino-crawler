@@ -1,5 +1,4 @@
-#ifndef Buzzer_H
-#define Buzzer_H
+#pragma once
 
 #include "stdint.h"
 
@@ -13,4 +12,3 @@ public:
 	void tone(float frequency, uint32_t duration) const;
 	void noTone() const;
 };
-#endif

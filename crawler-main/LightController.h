@@ -1,5 +1,4 @@
-#ifndef _LIGHTCONTROLLER_h
-#define _LIGHTCONTROLLER_h
+#pragma once
 
 #include "stdint.h"
 #include "Coroutine.h"
@@ -34,5 +33,3 @@ public:
 	void repeat(LightEffect effect, uint8_t brightness = MAX_BRIGHTNESS);
 	void lightOff();
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef _PANTHER_TANK_H_
-#define _PANTHER_TANK_H_
+#pragma once
 
 #include "IRRemoteHandler.h"
 #include "SoundPlayer.h"
@@ -84,5 +83,3 @@ public:
 	void initBehaviour();
 	void useBehaviour(CrawlerBehaviourKind behaviourKind);
 };
-
-#endif  /* _CRAWLER_H_ */

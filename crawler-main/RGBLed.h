@@ -1,5 +1,4 @@
-#ifndef RGBLed_h
-#define RGBLed_h
+#pragma once
 
 #include "stdint.h"
 
@@ -64,4 +63,3 @@ private:
 	volatile uint8_t* ws2812_port_reg;
 	uint8_t pinMask;
 };
-#endif

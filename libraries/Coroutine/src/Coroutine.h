@@ -1,5 +1,4 @@
-#ifndef _COROUTINESCHEDULER_h
-#define _COROUTINESCHEDULER_h
+#pragma once
 
 #include "stdint.h"
 
@@ -63,5 +62,3 @@ public:
 	CoroutineTaskResult* end() const;
 	CoroutineTaskResult* endThenExecute(CoroutineTask task) const;
 };
-
-#endif

@@ -1,7 +1,5 @@
-#ifndef IRremote_h
-#define IRremote_h
+#pragma once
 
-/* Includes ------------------------------------------------------------------*/
 #include <stdint.h>
 #include <stdbool.h>
 #include <Arduino.h>
@@ -122,4 +120,3 @@ private:
 	void end();
 };
 #endif // !__AVR_ATmega32U4__
-#endif

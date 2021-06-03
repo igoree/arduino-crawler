@@ -1,5 +1,4 @@
-#ifndef _SERVOMOTOR_h
-#define _SERVOMOTOR_h
+#pragma once
 
 #include "stdint.h"
 
@@ -26,6 +25,3 @@ public:
 	bool setAngle(int16_t angle);
 	bool turn(int16_t angleDelta);
 };
-
-#endif
-

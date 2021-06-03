@@ -1,5 +1,4 @@
-#ifndef _Emakefun_MotorDriver_h_
-#define _Emakefun_MotorDriver_h_
+#pragma once
 
 #include <inttypes.h>
 #include <Wire.h>
@@ -128,5 +127,3 @@ private:
 #endif
 	Emakefun_Sensor sensors;
 };
-
-#endif

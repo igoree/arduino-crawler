@@ -1,5 +1,4 @@
-#ifndef _SOUNDPLAYER_h
-#define _SOUNDPLAYER_h
+#pragma once
 
 #include "stdint.h"
 #include "Coroutine.h"
@@ -51,4 +50,3 @@ public:
 	bool isMuted();
 };
 
-#endif

@@ -1,5 +1,4 @@
-#ifndef _IRREMOTEHANDLER_h
-#define _IRREMOTEHANDLER_h
+#pragma once
 
 #include "IRKeyMap.h"
 #include "Coroutine.h"
@@ -17,6 +16,3 @@ public:
 	IRRemoteHandler(IRRemote* irRemote, Crawler* crawler, Coroutine* irRemoteCoroutine);
 	~IRRemoteHandler();
 };
-
-#endif
-

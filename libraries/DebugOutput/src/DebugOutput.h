@@ -1,5 +1,4 @@
-#ifndef _DEBUG_H_
-#define _DEBUG_H_
+#pragma once
 
 #include "DebugLevels.h"
 #include "WString.h"
@@ -39,5 +38,3 @@
 
 int debug_freeMemory();
 void debug_printf(const __FlashStringHelper* fmt, ...);
-
-#endif  /*  _DEBUG_H  */
