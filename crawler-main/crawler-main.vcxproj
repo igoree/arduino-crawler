@@ -130,7 +130,7 @@
     </ClInclude>
     <ClInclude Include="IRRemoteHandler.h" />
     <ClInclude Include="LightController.h" />
-    <ClInclude Include="ObstacleSensor.h" />
+    <ClInclude Include="ObstacleAvoidanceDriver.h" />
     <ClInclude Include="PinChangeInt.h">
       <FileType>CppHeader</FileType>
     </ClInclude>
@@ -151,7 +151,7 @@
     <ClCompile Include="IRRemote.cpp" />
     <ClCompile Include="IRRemoteHandler.cpp" />
     <ClCompile Include="LightController.cpp" />
-    <ClCompile Include="ObstacleSensor.cpp" />
+    <ClCompile Include="ObstacleAvoidanceDriver.cpp" />
     <ClCompile Include="RGBLed.cpp" />
     <ClCompile Include="ServoMotor.cpp" />
     <ClCompile Include="SoundPlayer.cpp" />

@@ -53,19 +53,33 @@ void handleIRCommand(IRKeyCode irKeyCode, CrawlerIRControlMode controlMode, IRRe
 		break;
 
 	case IRKeyCode::Up:
-		state->crawler->goForward();
+		if (controlMode == CrawlerIRControlMode::SinglePress)
+		{
+			state->crawler->driverGoForward();
+		}
+		else 
+		{
+			state->crawler->driverStop();
+			state->crawler->goForward();
+		}
 		break;
 
 	case IRKeyCode::Down:
+		state->crawler->driverStop();
 		state->crawler->goBack();
 		break;
 
 	case IRKeyCode::Ok:
+		state->crawler->driverStop();
 		state->crawler->stop();
 		break;
 
 	case IRKeyCode::Left:
-		if (rotateTurnMode)
+		if (controlMode == CrawlerIRControlMode::SinglePress && state->crawler->driverIsActive())
+		{
+			state->crawler->driverGoLeft();
+		}
+		else if (rotateTurnMode)
 		{
 			state->crawler->turnLeftRotate();
 		}
@@ -80,7 +94,11 @@ void handleIRCommand(IRKeyCode irKeyCode, CrawlerIRControlMode controlMode, IRRe
 		break;
 
 	case IRKeyCode::Right:
-		if (rotateTurnMode)
+		if (controlMode == CrawlerIRControlMode::SinglePress && state->crawler->driverIsActive())
+		{
+			state->crawler->driverGoRight();
+		}
+		else if (rotateTurnMode)
 		{
 			state->crawler->turnRightRotate();
 		}
@@ -169,6 +187,7 @@ CoroutineTaskResult* handleIRRemoteAsync(const CoroutineTaskContext* context)
 
 		if (getControlMode() == CrawlerIRControlMode::ContinuousPressing && state->crawler->getStatus() != CrawlerStatus::Stop)
 		{
+			state->crawler->driverStop();
 			state->crawler->stop();
 		}
 	}

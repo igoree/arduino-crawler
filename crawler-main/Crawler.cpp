@@ -9,7 +9,7 @@
 
 Crawler::Crawler()
 	: _status(CrawlerStatus::Stop), _batteryValue(0), _servoBaseAngle(90), _speed(0), _motorDriver(nullptr), _leftDrive(nullptr), _rightDrive(nullptr), 
-	  _sensors(nullptr), _irRemoteHandler(nullptr), _soundPlayer(nullptr), _lightController(nullptr), _behaviour(nullptr), _obstacleSensor(nullptr)
+	  _sensors(nullptr), _irRemoteHandler(nullptr), _soundPlayer(nullptr), _lightController(nullptr), _behaviour(nullptr), _driver(nullptr)
 {
 }
 
@@ -20,7 +20,7 @@ Crawler::~Crawler()
 	delete _soundPlayer;
 	delete _lightController;
 	delete _behaviour;
-	delete _obstacleSensor;
+	delete _driver;
 }
 
 void Crawler::init()
@@ -237,15 +237,35 @@ uint8_t Crawler::getBattery()
 	return _batteryValue;
 }
 
-void Crawler::initObstacleSensor()
+void Crawler::initDriver(Coroutine* driverCoroutine)
 {
 	_motorDriver->getSensor(E_ULTRASONIC);
-	_obstacleSensor = new ObstacleSensor(_sensors, _motorDriver->getServo(1));
+	_driver = new ObstacleAvoidanceDriver(this, _sensors, _motorDriver->getServo(1), driverCoroutine);
 }
 
-uint16_t Crawler::getObstacleDistance()
+void Crawler::driverGoForward()
 {
-	return _obstacleSensor->getDistance();
+	_driver->goForward();
+}
+
+void Crawler::driverGoLeft()
+{
+	_driver->goLeft();
+}
+
+void Crawler::driverGoRight()
+{
+	_driver->goRight();
+}
+
+void Crawler::driverStop()
+{
+	_driver->stop();
+}
+
+bool Crawler::driverIsActive()
+{
+	return _driver->isActive();
 }
 
 void Crawler::initIRRemote(Coroutine* irRemoteCoroutine)

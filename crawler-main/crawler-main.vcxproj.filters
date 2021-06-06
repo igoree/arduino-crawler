@@ -63,7 +63,7 @@
     <ClInclude Include="ServoMotor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ObstacleSensor.h">
+    <ClInclude Include="ObstacleAvoidanceDriver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -104,7 +104,7 @@
     <ClCompile Include="ServoMotor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ObstacleSensor.cpp">
+    <ClCompile Include="ObstacleAvoidanceDriver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

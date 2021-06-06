@@ -4,7 +4,7 @@
 #include "SoundPlayer.h"
 #include "LightController.h"
 #include "CrawlerBehaviour.h"
-#include "ObstacleSensor.h"
+#include "ObstacleAvoidanceDriver.h"
 
 enum class CrawlerStatus : uint8_t
 {
@@ -38,7 +38,7 @@ private:
 	LightController* _lightController;
 	CrawlerBehaviour* _behaviour;
 	IRRemoteHandler* _irRemoteHandler;
-	ObstacleSensor* _obstacleSensor;
+	ObstacleAvoidanceDriver* _driver;
 
 	void stopDrive(Emakefun_DCMotor* drive);
 	void runDrive(Emakefun_DCMotor* drive, uint8_t speed, uint8_t direction);
@@ -66,8 +66,12 @@ public:
 	CrawlerStatus getStatus();
 	uint8_t getBattery();
 
-	void initObstacleSensor();
-	uint16_t getObstacleDistance();
+	void initDriver(Coroutine* driverCoroutine);
+	void driverGoForward();
+	void driverGoLeft();
+	void driverGoRight();
+	void driverStop();
+	bool driverIsActive();
 
 	void initIRRemote(Coroutine* irRemoteCoroutine);
 

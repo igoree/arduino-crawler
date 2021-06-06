@@ -1,4 +1,3 @@
-#include "ObstacleSensor.h"
 #include "Coroutine.h"
 #include "Crawler.h"
 
@@ -12,6 +11,7 @@ Coroutine _freeMemoryCoroutine("freeMemory");
 Coroutine _irRemoteCoroutine("IRRemote");
 Coroutine _lightCoroutine("speedLight", 3);
 Coroutine _soundCoroutine("sound", 4);
+Coroutine _driverCoroutine("driver", 3);
 
 Crawler _crawler;
 
@@ -23,7 +23,7 @@ void setup()
 	_crawler.init();
 	_crawler.setSpeed(50);
 
-	_crawler.initObstacleSensor();
+	_crawler.initDriver(&_driverCoroutine);
 	_crawler.initLights(&_lightCoroutine);
 	_crawler.initSoundPlayer(&_soundCoroutine);
 	_crawler.initIRRemote(&_irRemoteCoroutine);
@@ -49,14 +49,13 @@ CoroutineTaskResult* monitorFreeMemoryAsync(const CoroutineTaskContext* context)
 		_lastFreeMemory = freeMemory;
 	}
 
-	DEBUG_INFO("distance: %u", _crawler.getObstacleDistance());
-
 	return context->delayThenRepeat(500);
 }
 
 void loop()
 {
 	_irRemoteCoroutine.continueExecution();
+	_driverCoroutine.continueExecution();
 	_lightCoroutine.continueExecution();
 	_soundCoroutine.continueExecution();
 
