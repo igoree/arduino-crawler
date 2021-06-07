@@ -149,7 +149,7 @@ void Coroutine::continueExecution()
 	auto result = _stack[_currentTaskIndex].task.func(&context);
 	if (result != &initialResult)
 	{
-		DEBUG_ERR("CR '%s' task %u invalid result", _name, context.step);
+		DEBUG_ERR("CR '%s' task %u on step %u invalid result", _name, _currentTaskIndex, context.step);
 
 		_currentTaskIndex = UNKNOWN_INDEX;
 
