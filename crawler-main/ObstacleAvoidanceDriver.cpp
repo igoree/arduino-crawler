@@ -7,8 +7,8 @@
 #define DEBUG_LEVEL DEBUG_LEVEL_INFO
 #include "DebugOutput.h"
 
-#define MIN_DISTANCE UINT16_C(3)
-#define CLEAR_DIRECTION_MIN_DISTANCE UINT16_C(15)
+#define MIN_DISTANCE UINT16_C(10)
+#define CLEAR_DIRECTION_MIN_DISTANCE UINT16_C(30)
 #define SERVO_ANGLE_STEP INT16_C(10)
 auto constexpr SERVO_ANGLE_SPEED = 1 / 3.5;
 auto constexpr SERVO_ANGLE_STEP_DURATION = static_cast<unsigned long>(SERVO_ANGLE_STEP / SERVO_ANGLE_SPEED);
@@ -88,6 +88,27 @@ CoroutineTaskResult* findClearDirectionAsync(const CoroutineTaskContext* context
 	switch (context->step)
 	{
 	case 0:
+		distance = state->sensorDriver->GetUltrasonicDistance();
+		if (distance < MIN_DISTANCE)
+		{
+			state->crawler->goBack();
+
+			return context->next();
+		}
+
+		return context->goTo(2);
+	case 1:
+		distance = state->sensorDriver->GetUltrasonicDistance();
+		if (distance < MIN_DISTANCE)
+		{
+			return context->delayThenRepeat(5);
+		}
+
+		state->crawler->stop();
+
+		return context->next();
+
+	case 2:
 		switch (state->direction)
 		{
 		case DriveDirection::Forward:
@@ -97,17 +118,17 @@ CoroutineTaskResult* findClearDirectionAsync(const CoroutineTaskContext* context
 
 		case DriveDirection::Left:
 			state->crawler->turnLeftRotate();
-			return context->goTo(4);
+			return context->goTo(6);
 
 		case DriveDirection::Right:
 			state->crawler->turnRightRotate();
-			return context->goTo(4);
+			return context->goTo(6);
 
 		default:
 			return context->end();
 		}
 
-	case 1:
+	case 3:
 		distance = state->sensorDriver->GetUltrasonicDistance();
 		if (distance < CLEAR_DIRECTION_MIN_DISTANCE)
 		{
@@ -129,7 +150,7 @@ CoroutineTaskResult* findClearDirectionAsync(const CoroutineTaskContext* context
 
 		return context->executeThenNext(CoroutineTask(&resetServoAsync, state));
 
-	case 2:
+	case 4:
 		distance = state->sensorDriver->GetUltrasonicDistance();
 		if (distance < CLEAR_DIRECTION_MIN_DISTANCE)
 		{
@@ -151,7 +172,7 @@ CoroutineTaskResult* findClearDirectionAsync(const CoroutineTaskContext* context
 
 		return context->executeThenNext(CoroutineTask(&resetServoAsync, state));
 
-	case 3:
+	case 5:
 		if (state->leftClearAngle <= state->rightClearAngle)
 		{
 			state->crawler->turnLeftRotate();
@@ -163,7 +184,7 @@ CoroutineTaskResult* findClearDirectionAsync(const CoroutineTaskContext* context
 
 		return context->next();
 
-	case 4:
+	case 6:
 		distance = state->sensorDriver->GetUltrasonicDistance();
 		if (distance >= CLEAR_DIRECTION_MIN_DISTANCE)
 		{
