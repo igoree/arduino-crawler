@@ -8,11 +8,11 @@
 #include "DebugOutput.h"
 
 #define MIN_DISTANCE UINT16_C(10)
-#define CLEAR_DIRECTION_MIN_DISTANCE UINT16_C(30)
+#define CLEAR_DIRECTION_MIN_DISTANCE UINT16_C(40)
 #define SERVO_ANGLE_STEP INT16_C(10)
-auto constexpr SERVO_ANGLE_SPEED = 1 / 3.5;
+auto constexpr SERVO_ANGLE_SPEED = 1 / 4.0;
 auto constexpr SERVO_ANGLE_STEP_DURATION = static_cast<unsigned long>(SERVO_ANGLE_STEP / SERVO_ANGLE_SPEED);
-#define MAX_CLEAR_ANGLE UINT8_C(90)
+#define MAX_SERVO_ANGLE UINT8_C(90)
 #define DISTANCE_CHECK_PERIOD 5ul
 
 enum class DriveDirection : uint8_t
@@ -27,7 +27,8 @@ struct ObstacleAvoidanceDriverState
 {
 	ObstacleAvoidanceDriverState(Crawler* crawler, Emakefun_Sensor* sensorDriver, Emakefun_Servo* servoDriver)
 		: crawler(crawler), sensorDriver(sensorDriver), sensorServo(new ServoMotor(servoDriver, 96, 6, 178)), 
-		direction(DriveDirection::None), currentDirection(DriveDirection::None), leftClearAngle(MAX_CLEAR_ANGLE), rightClearAngle(MAX_CLEAR_ANGLE)
+		direction(DriveDirection::None), currentDirection(DriveDirection::None), 
+		closestObstacleAngle(0), closestObstacleDistance(0u), servoTargetAngle(0)
 	{
 	}
 
@@ -42,8 +43,10 @@ struct ObstacleAvoidanceDriverState
 
 	DriveDirection direction;
 	DriveDirection currentDirection;
-	uint8_t leftClearAngle;
-	uint8_t rightClearAngle;
+
+	int16_t closestObstacleAngle;
+	uint16_t closestObstacleDistance;
+	int16_t servoTargetAngle;
 };
 
 ObstacleAvoidanceDriver::ObstacleAvoidanceDriver(Crawler* crawler, Emakefun_Sensor* sensorDriver, Emakefun_Servo* servoDriver, Coroutine* driverCoroutine)
@@ -57,7 +60,7 @@ ObstacleAvoidanceDriver::~ObstacleAvoidanceDriver()
 	delete _state;
 }
 
-CoroutineTaskResult* resetServoAsync(const CoroutineTaskContext* context)
+CoroutineTaskResult* adjustServoAngle(const CoroutineTaskContext* context)
 {
 	auto state = (ObstacleAvoidanceDriverState*)context->data;
 	int16_t angle;
@@ -66,14 +69,14 @@ CoroutineTaskResult* resetServoAsync(const CoroutineTaskContext* context)
 	{
 	case 0:
 		angle = state->sensorServo->getAngle();
-		if (angle == 0)
+		if (angle == state->servoTargetAngle)
 		{
 			return context->end();
 		}
 
-		state->sensorServo->setAngle(0);
+		state->sensorServo->setAngle(state->servoTargetAngle);
 
-		return context->delayThenNext(static_cast<unsigned long>(abs(angle) / SERVO_ANGLE_SPEED));
+		return context->delayThenNext(static_cast<unsigned long>(abs(state->servoTargetAngle - angle) / SERVO_ANGLE_SPEED));
 
 	default:
 		return context->end();
@@ -88,103 +91,88 @@ CoroutineTaskResult* findClearDirectionAsync(const CoroutineTaskContext* context
 	switch (context->step)
 	{
 	case 0:
+		state->servoTargetAngle = 0;
+		return context->executeThenNext(CoroutineTask(&adjustServoAngle, state));
+
+	case 1:
+		state->closestObstacleAngle = 0;
+		state->closestObstacleDistance = state->sensorDriver->GetUltrasonicDistance();
+		state->servoTargetAngle = -static_cast<int16_t>(MAX_SERVO_ANGLE);
+
+		return context->executeThenNext(CoroutineTask(&adjustServoAngle, state));
+
+	case 2:
 		distance = state->sensorDriver->GetUltrasonicDistance();
-		if (distance < MIN_DISTANCE)
+		if (distance < state->closestObstacleDistance)
+		{
+			state->closestObstacleDistance = distance;
+			state->closestObstacleAngle = state->sensorServo->getAngle();
+		}
+
+		if (!state->sensorServo->turn(SERVO_ANGLE_STEP))
+		{
+			DEBUG_INFO("closest obstacle: angle=%d, distance=%u cm", state->closestObstacleAngle, state->closestObstacleDistance);
+
+			state->servoTargetAngle = state->closestObstacleAngle;
+			return context->executeThenNext(CoroutineTask(&adjustServoAngle, state));
+		}
+
+		return context->delayThenRepeat(SERVO_ANGLE_STEP_DURATION);
+
+	case 3:
+		if (state->closestObstacleDistance < MIN_DISTANCE)
 		{
 			state->crawler->goBack();
 
 			return context->next();
 		}
 
-		return context->goTo(2);
-	case 1:
+		return context->goTo(context->step + 2);
+
+	case 4:
 		distance = state->sensorDriver->GetUltrasonicDistance();
 		if (distance < MIN_DISTANCE)
 		{
-			return context->delayThenRepeat(5);
+			return context->delayThenRepeat(DISTANCE_CHECK_PERIOD);
 		}
 
 		state->crawler->stop();
 
 		return context->next();
 
-	case 2:
+	case 5:
+		state->servoTargetAngle = 0;
+		return context->executeThenNext(CoroutineTask(&adjustServoAngle, state));
+
+	case 6:
 		switch (state->direction)
 		{
 		case DriveDirection::Forward:
-			state->leftClearAngle = MAX_CLEAR_ANGLE;
-			state->rightClearAngle = MAX_CLEAR_ANGLE;
-			return context->executeThenNext(CoroutineTask(&resetServoAsync, state));
+			if (state->closestObstacleAngle > 0)
+			{
+				state->crawler->turnLeftRotate();
+			}
+			else
+			{
+				state->crawler->turnRightRotate();
+			}
+			break;
 
 		case DriveDirection::Left:
 			state->crawler->turnLeftRotate();
-			return context->goTo(6);
+			break;
 
 		case DriveDirection::Right:
 			state->crawler->turnRightRotate();
-			return context->goTo(6);
+			break;
 
 		default:
 			return context->end();
 		}
 
-	case 3:
-		distance = state->sensorDriver->GetUltrasonicDistance();
-		if (distance < CLEAR_DIRECTION_MIN_DISTANCE)
-		{
-			if (!state->sensorServo->turn(-SERVO_ANGLE_STEP))
-			{
-				state->leftClearAngle = MAX_CLEAR_ANGLE;
-			}
-			else
-			{
-				return context->delayThenRepeat(SERVO_ANGLE_STEP_DURATION);
-			}
-		}
-		else 
-		{
-			state->leftClearAngle = static_cast<uint8_t>(-1 * state->sensorServo->getAngle());
-		}
-
-		DEBUG_INFO("LeftClearAngle=%u, distance=%u", state->leftClearAngle, distance);
-
-		return context->executeThenNext(CoroutineTask(&resetServoAsync, state));
-
-	case 4:
-		distance = state->sensorDriver->GetUltrasonicDistance();
-		if (distance < CLEAR_DIRECTION_MIN_DISTANCE)
-		{
-			if (!state->sensorServo->turn(SERVO_ANGLE_STEP))
-			{
-				state->rightClearAngle = MAX_CLEAR_ANGLE;
-			}
-			else
-			{
-				return context->delayThenRepeat(SERVO_ANGLE_STEP_DURATION);
-			}
-		}
-		else
-		{
-			state->rightClearAngle = static_cast<uint8_t>(state->sensorServo->getAngle());
-		}
-
-		DEBUG_INFO("RightClearAngle=%u, distance=%u", state->rightClearAngle, distance);
-
-		return context->executeThenNext(CoroutineTask(&resetServoAsync, state));
-
-	case 5:
-		if (state->leftClearAngle <= state->rightClearAngle)
-		{
-			state->crawler->turnLeftRotate();
-		}
-		else
-		{
-			state->crawler->turnRightRotate();
-		}
-
 		return context->next();
 
-	case 6:
+	case 7:
 		distance = state->sensorDriver->GetUltrasonicDistance();
 		if (distance >= CLEAR_DIRECTION_MIN_DISTANCE)
 		{
@@ -192,7 +180,7 @@ CoroutineTaskResult* findClearDirectionAsync(const CoroutineTaskContext* context
 
 			return context->end();
 		}
-		return context->repeat();
+		return context->delayThenRepeat(DISTANCE_CHECK_PERIOD);
 	}
 }
 
@@ -218,27 +206,35 @@ CoroutineTaskResult* driveAsync(const CoroutineTaskContext* context)
 {
 	auto state = (ObstacleAvoidanceDriverState*)context->data;
 
-	if (state->direction == DriveDirection::None)
-		return context->end();
-
-	if (state->direction != state->currentDirection)
+	switch (context->step)
 	{
-		state->currentDirection = state->direction;
-		runCrawler(state->crawler, state->currentDirection);
+	case 0:
+		state->servoTargetAngle = 0;
+		return context->executeThenNext(CoroutineTask(&adjustServoAngle, state));
+
+	default:
+		if (state->direction == DriveDirection::None)
+			context->end();
+
+		if (state->direction != state->currentDirection)
+		{
+			state->currentDirection = state->direction;
+			runCrawler(state->crawler, state->currentDirection);
+		}
+
+		auto distance = state->sensorDriver->GetUltrasonicDistance();
+		if (distance < MIN_DISTANCE)
+		{
+			DEBUG_INFO("obstacle detected: %u cm", distance);
+
+			state->crawler->stop();
+			state->currentDirection = DriveDirection::None;
+
+			return context->executeThenRepeat(CoroutineTask(&findClearDirectionAsync, state));
+		}
+
+		return context->delayThenRepeat(DISTANCE_CHECK_PERIOD);
 	}
-
-	auto distance = state->sensorDriver->GetUltrasonicDistance();
-	if (distance < MIN_DISTANCE)
-	{
-		DEBUG_INFO("obstacle detected: %u cm", distance);
-
-		state->crawler->stop();
-		state->currentDirection = DriveDirection::None;
-
-		return context->executeThenRepeat(CoroutineTask(&findClearDirectionAsync, state));
-	}
-
-	return context->delayThenRepeat(DISTANCE_CHECK_PERIOD);
 }
 
 void go(Coroutine* driverCoroutine, ObstacleAvoidanceDriverState* state, DriveDirection direction)
@@ -270,7 +266,8 @@ void ObstacleAvoidanceDriver::stop()
 {
 	if (isActive()) 
 	{
-		_coroutine->start(CoroutineTask(&resetServoAsync, _state));
+		_state->servoTargetAngle = 0;
+		_coroutine->start(CoroutineTask(&adjustServoAngle, _state));
 		_state->direction = DriveDirection::None;
 		_state->currentDirection = DriveDirection::None;
 	}
